@@ -740,6 +740,13 @@ gout()
 #this will not keep your old commit history around
 grmob()
 {
+	local bak dst
+	bak="$(git rev-parse --show-toplevel)"
+	dst="/tmp/$(basename "$bak")"
+
+	echo "backup -- $dst" >&2
+	cp "$bak" "$dst" || return
+
 	#checkout
 	git checkout --orphan latest_branch
 	#add all the files
