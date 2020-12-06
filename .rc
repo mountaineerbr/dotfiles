@@ -482,12 +482,12 @@ vf()
 	#cd "$dst"
 
 	command vifm --choose-dir - "$@" >~/.config/vifm/vifmcd.txt
-	pwd
+	echo "PWD: $PWD"
 }
 vfcd()
 {
 	cd "$( <~/.config/vifm/vifmcd.txt )"
-	pwd
+	echo "PWD: $PWD"
 }
 #https://wiki.vifm.info/index.php?title=How_to_set_shell_working_directory_after_leaving_Vifm
 
@@ -511,7 +511,7 @@ vswap()
 {
 	vim -r
 	cd ~/.vim/swap
-	pwd
+	echo "$PWD"
 }
 
 #pager
@@ -726,8 +726,7 @@ gc()
 	git clone "https://github.com/${1:-mountaineerbr}/$2"
 
 	cd "$2"
-	echo
-	echo "$PWD"
+	echo -e "\n$PWD"
 }
 
 #switching between branches in a repository you already have
@@ -957,7 +956,7 @@ tmpd()
 {
 	(( $# )) && set -- .${1##*/}
 	builtin cd "$( mktemp -d "/tmp/$( date +%s )${1}.XXXXXX" )"
-	pwd
+	echo "$PWD"
 }
 
 #view mounted drives
