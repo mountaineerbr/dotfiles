@@ -1317,7 +1317,7 @@ ubuntu()
 {
 	echo 'List of all packages' >&2
 	local v vv r
-	for v in focal eoan bionic xenial trusty precise
+	for v in groovy focal eoan bionic xenial trusty precise
 	do
 		case "$v" in
 			devel  ) vv=development;;
@@ -1329,6 +1329,7 @@ ubuntu()
 			disco  ) vv='19.04';;  #removed from repo
 			eoan   ) vv='19.10';;
 			focal  ) vv='20.04 LTS';;
+			groovy ) vv='20.10';;
 		esac
 
 		for r in main multiverse restricted universe
