@@ -482,11 +482,13 @@ vf()
 	#cd "$dst"
 
 	command vifm --choose-dir - "$@" >~/.config/vifm/vifmcd.txt
+
 	echo "PWD: $PWD"
 }
 vfcd()
 {
 	cd "$( <~/.config/vifm/vifmcd.txt )"
+	
 	echo "PWD: $PWD"
 }
 #https://wiki.vifm.info/index.php?title=How_to_set_shell_working_directory_after_leaving_Vifm
@@ -1284,8 +1286,9 @@ debian()
 #debian -- list of all packages by repo (without version)
 debian2()
 {
-	echo 'List of all packages' >&2
 	local v r
+
+	echo 'List of all packages' >&2
 	for v in bullseye buster stretch jessie
 	do
 		for r in main contrib non-free
@@ -1314,8 +1317,9 @@ debian2()
 #ubuntu -- list all pkg names (without version)
 ubuntu()
 {
-	echo 'List of all packages' >&2
 	local v vv r
+
+	echo 'List of all packages' >&2
 	for v in groovy focal eoan bionic xenial trusty precise
 	do
 		case "$v" in
@@ -1329,6 +1333,7 @@ ubuntu()
 			eoan   ) vv='19.10';;
 			focal  ) vv='20.04 LTS';;
 			groovy ) vv='20.10';;
+			#? ) vv='21.04';;
 		esac
 
 		for r in main multiverse restricted universe
@@ -1411,10 +1416,10 @@ mint2()
 #fedora
 fedora()
 {
-	echo 'List of (almost) all packages' >&2
-
 	local ver index
-	for ver in 32
+
+	echo 'List of (almost) all packages' >&2
+	for ver in 33
 	do
 		for index in {a..z} {0..9}
 		do
@@ -1460,7 +1465,7 @@ freeopt()
 
 cloudflare()
 {
-	python ${HOME}/bin/more/CloudFlair/cloudflair.py "$1"
+	python "$HOME/bin/more/CloudFlair/cloudflair.py" "$1"
 }
 #install the dependencies
 #$ cd cloudflair
