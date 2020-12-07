@@ -1186,5 +1186,5 @@ let g:netrw_winsize = 20
 "omni complete
 filetype plugin on
 set omnifunc=syntaxcomplete#Complete
-"autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
+autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
 
