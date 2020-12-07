@@ -5,18 +5,15 @@
 
 set -e
 
-#source diffcp()
-. ~/.rc
-
 setopt extendedglob globstarshort nullglob
 
 #~/ dotfiles
 #~/.config
-src="$HOME"  diffcp  .*(.)  .config/**(.)
+diffcp.sh  "$HOME"  .*(.)  .config/**(.)
 
 #/etc
 cd etc
-src="/etc"  diffcp  *(.)
+diffcp.sh  /etc  *(.)
 cp -f /etc/pacman.d/mirrorlist pacman.d/mirrorlist
 cd ..
 

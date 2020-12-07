@@ -766,36 +766,6 @@ grmob()
 #https://stackoverflow.com/questions/13716658/how-to-delete-all-commit-history-in-github
 #also check 'bgf repo-cleaner' https://rtyley.github.io/bfg-repo-cleaner/
 
-#copy different files to $PWD
-#$ C=1  src="$HOME"  cpf  [fileglob]
-#useful shell opts: extendedglob globstarshort nullglob
-diffcp()
-{
-	local f e
-
-	[[ -d "$src" ]] || {
-		echo "non-empty \$src is required" >&2
-		return 1
-	}
-
-	for f in "${@#$PWD}"
-	do
-		e="$src/$f"
-		
-		if [[ -f "$e" ]] &&
-			! diff -q "$f" "$e" &>/dev/null
-		then
-			#set $C for actually copying files
-			((C)) || echo "copy -- $e\nto   -- $PWD/$f" >&2
-			((C)) && cp -vf "$e" "$PWD/$f"
-		else
-			((C)) || echo "skip -- $e" >&2
-		fi
-	done
-	
-	((C)) || echo ">>>set \$C to non-empty to actually copy files" >&2
-}
-
 #compare files
 #{ git diff --no-index dir1/ dir2/ ;}
 #{ diff -r dir1/ dir2/ ;}
