@@ -1,5 +1,5 @@
-favorites=xfce4-terminal.desktop,google-chrome.desktop,mousepad.desktop,libreoffice-impress.desktop,stardict.desktop,org.gnome.Cheese.desktop,virtualbox.desktop
-recent=tor-browser.desktop,clementine.desktop,opera.desktop,electrum.desktop,gparted.desktop,virtualbox.desktop,libreoffice-impress.desktop,gpick.desktop,org.kde.kcharselect.desktop,audacity.desktop
+favorites=xfce4-terminal.desktop,mousepad.desktop,libreoffice-impress.desktop,org.gnome.Cheese.desktop,virtualbox.desktop
+recent=gparted.desktop,electrum.desktop,torbrowser.desktop,libreoffice-writer.desktop,clementine.desktop,whirlpool-gui.desktop,thunar.desktop,xfce4-terminal.desktop,virtualbox.desktop,libreoffice-impress.desktop
 button-icon=/home/jsn/Documents/Icons/Icons8-Christmas-Flat-Color-Star.ico
 button-single-row=false
 show-button-title=false

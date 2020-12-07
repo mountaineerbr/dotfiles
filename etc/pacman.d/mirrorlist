@@ -7,9 +7,9 @@
 ## Arch Linux Archives
 #sync Arch at least once a year
 #ALA fallback server +1day which should work
-Server = https://archive.archlinux.org/repos/2020/10/01/$repo/os/$arch
-Server = http://archlinux.arkena.net/archive/repos/2020/10/01/$repo/os/$arch
-Server = https://archive.archlinux.org/repos/2020/10/02/$repo/os/$arch
+Server = https://archive.archlinux.org/repos/2020/11/25/$repo/os/$arch
+Server = http://archlinux.arkena.net/archive/repos/2020/11/25/$repo/os/$arch
+Server = https://archive.archlinux.org/repos/2020/11/26/$repo/os/$arch
 #
 #Server = https://archive.archlinux.org/repos/month/$repo/os/$arch
 #Server = https://archive.archlinux.org/repos/week/$repo/os/$arch

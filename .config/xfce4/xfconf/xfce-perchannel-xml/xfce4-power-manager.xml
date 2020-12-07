@@ -13,10 +13,10 @@
     <property name="inactivity-on-battery" type="uint" value="16"/>
     <property name="critical-power-level" type="uint" value="7"/>
     <property name="critical-power-action" type="uint" value="3"/>
-    <property name="brightness-on-battery" type="uint" value="46"/>
+    <property name="brightness-on-battery" type="uint" value="9"/>
     <property name="blank-on-battery" type="int" value="0"/>
     <property name="dpms-on-battery-sleep" type="uint" value="0"/>
-    <property name="dpms-on-battery-off" type="uint" value="2"/>
+    <property name="dpms-on-battery-off" type="uint" value="21"/>
     <property name="brightness-level-on-battery" type="uint" value="34"/>
     <property name="dpms-on-ac-sleep" type="uint" value="0"/>
     <property name="blank-on-ac" type="int" value="0"/>

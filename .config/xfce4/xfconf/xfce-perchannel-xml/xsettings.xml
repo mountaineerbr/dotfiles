@@ -2,8 +2,8 @@
 
 <channel name="xsettings" version="1.0">
   <property name="Net" type="empty">
-    <property name="ThemeName" type="string" value="Arc-Dark"/>
-    <property name="IconThemeName" type="string" value="Faenza-Darkest"/>
+    <property name="ThemeName" type="string" value="Zukitre"/>
+    <property name="IconThemeName" type="string" value="Faenza-Ambiance"/>
     <property name="DoubleClickTime" type="empty"/>
     <property name="DoubleClickDistance" type="empty"/>
     <property name="DndDragThreshold" type="empty"/>
@@ -32,8 +32,8 @@
     <property name="MenuImages" type="empty"/>
     <property name="ButtonImages" type="empty"/>
     <property name="MenuBarAccel" type="empty"/>
-    <property name="CursorThemeName" type="string" value="Chameleon-SkyBlue-Regular-0.5"/>
-    <property name="CursorThemeSize" type="int" value="32"/>
+    <property name="CursorThemeName" type="string" value="Chameleon-DarkSkyBlue-Large-0.5"/>
+    <property name="CursorThemeSize" type="int" value="36"/>
     <property name="DecorationLayout" type="string" value="menu,close,maximize,minimize:"/>
   </property>
   <property name="Gdk" type="empty">
