@@ -2898,14 +2898,8 @@ d2h()
   echo "obase=16; $@" | bc
 }
 # Character/Word Count Helper. Simply give string as first argument. Eg. chrcount "hello" >> 5
-chrcount()
-{
-	echo -n $1 | wc -m
-}
-wordcount()
-{
-	echo -n $1 | wc -w
-}
+#chrcount() { echo -n $1 | wc -m ;}
+#wordcount() { echo -n $1 | wc -w ;}
 #https://www.soroushjp.com/2014/11/21/helpful-bash-scripts-for-working-with-byte-arrays-and-hex-in-bitcoin/
 
 #bitcoin-bash-tools
