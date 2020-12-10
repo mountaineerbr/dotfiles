@@ -251,7 +251,7 @@ tablef()
 
 sedlinks()
 {
-	sed 's|>|&\n|g' | sed -nE "s|.*href=['\"]([^'\"]+)['\"] title.*|\1| p"
+	sed 's|>|&\n|g' | sed -nE "s|.*href=['\"]([^'\"]+)['\"].*|\1| p"
 }
 #sed -r 's/.*"(http.*)".*/\1/g'
 
