@@ -1762,6 +1762,9 @@ zpass()
 {
 	LC_ALL=C tr -dc '0-9A-Za-z_@#%*,.:?!~' </dev/urandom | head -c${1:-12}
 	echo
+
+	tr -dc 'a-zA-Z0-9_#@.-' </dev/urandom | head -c${1:-12}
+	echo
 }
 #https://leahneukirchen.org/dotfiles/.zshrc
 
@@ -3565,34 +3568,6 @@ wfreq()
     }' "${@}"
 }
 #https://github.com/faif/shell-utils/blob/master/shell-utils.sh
-
-#shell builtins for
-#simple functions
-
-#count lines
-#usage: swc FILE 
-swc()
-{
-	local REPLY n
-	while IFS=  read -r
-	do
-		(( n++ ))
-	done < "${1:-/dev/stdin}"
-	echo "$n"
-}
-
-#grep something
-#usage: sgrep PATTERN FILE
-sgrep()
-{
-	local REPLY
-	while IFS=  read -r
-	do
-		[[ "$REPLY" = *"${1}"* ]] && echo "$REPLY"
-		#[[ "$REPLY" =~ ${1// /\\ } ]] && echo "$REPLY"
-	done < "${2:-/dev/stdin}"
-}
-
 
 #fun
 
