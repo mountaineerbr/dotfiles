@@ -49,6 +49,7 @@ CDPATH="${CDPATH%:}"
 #pwd: /etc/mail
 #https://linux.101hacks.com/cd-command/cdpath/
 #a . is needed to cd into $PWD dir before any other in $CDPATH
+#https://bosker.wordpress.com/2012/02/12/bash-scripters-beware-of-the-cdpath/
 
 #go path
 export GOPATH="$HOME/go"
