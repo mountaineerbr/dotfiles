@@ -2002,30 +2002,40 @@ alias ugrep='faurls | tac | urlgrep.sh'
 #alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])"'
 #python3
 #usage: urldecode 'string'
-alias urldecode='python3 -c "import sys, urllib.parse as ul; print(ul.unquote_plus(sys.argv[1]))"'
-alias urlencode='python3 -c "import sys, urllib.parse as ul; print (ul.quote_plus(sys.argv[1]))"'
+#alias urldecode='python3 -c "import sys, urllib.parse as ul; print(ul.unquote_plus(sys.argv[1]))"'
+#alias urlencode='python3 -c "import sys, urllib.parse as ul; print (ul.quote_plus(sys.argv[1]))"'
+#
+#see a complete shell plugin:
+#https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/urltools/urltools.plugin.zsh
+#
 #sed
 #alias urldecode="sed 's@+@ @g;s@%@\\x@g' | xargs -0 printf '%b'"
-#bash
-#urlencode() {
-#    # urlencode <string>
-#    local length="${#1}"
-#    for (( i = 0; i < length; i++ )); do
-#        local c="${1:i:1}"
-#        case $c in
-#            [a-zA-Z0-9.~_-]) printf "$c" ;;
-#            *) printf '%%%02X' "'$c" ;;
-#        esac
-#    done
-#}
-#urldecode() {
-#    # urldecode <string>
 #
-#    local url_encoded="${1//+/ }"
-#    printf '%b' "${url_encoded//%/\\x}"
-#}
-#https://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
+urlencode() {
+    # urlencode <string>
+    local i length="${#1}"
+    #busybox: for i in $(seq 0 $((length-1))); do
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:$i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf "$c" ;;
+            *) printf '%%%02X' "'$c" ;;
+        esac
+    done
+}
+urldecode() {
+    # urldecode <string>
+
+    local url_encoded="${1//+/ }"
+    printf '%b' "${url_encoded//\%/\\x}"
+}
 #https://gist.github.com/cdown/1163649
+#https://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
+#
+#decode url, works with zsh:
+#x='a%20%25%e3%81%82';printf "${x//\%/\\x}"
+#In zsh ${x//%/a} adds a to the end but ${x//\%/a} replaces % with a.
+#https://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
 
 #firefox with nvidia
 #{

@@ -563,6 +563,11 @@ command Sw w !sudo tee % > /dev/null
 "    set diffopt+=iwhite
 "endif
 " Check: https://github.com/charnley/dotfiles/blob/master/vimrc
+"
+" diff context lines around changes
+":set diffopt+=context:0
+"
+"
 
 
 " PLUG - INS
