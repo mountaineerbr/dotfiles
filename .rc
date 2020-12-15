@@ -1670,7 +1670,7 @@ tz()
 { 
 	curl -sL 'https://www.zeitverschiebung.net/en/all-time-zones.html' |
 	sed -e 's/<strong>/\n&/g' -e 's/Time Difference<\/h4>.*//g' -e 's/<[^>]*>//g' |
-	sed -e 's/\s\s*/ /g' -e 's/\s$//g' -e 1d
+	sed -Ee 's/\s\s*/ /g' -e 's/\s*$//g' -e '/(\{\s*var|analytics)/ d'
 }
 
 #city names
