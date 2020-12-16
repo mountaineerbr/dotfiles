@@ -179,6 +179,7 @@ set colorcolumn=72,77
 
 " Set whitespace and tab chars
 set listchars=tab:>-,trail:·,eol:$
+" kai hendry: set list listchars=nbsp:¬,tab:»·,trail:·,extends:>
 "All: set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
 "Enable:
 "set list

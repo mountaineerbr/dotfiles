@@ -2965,7 +2965,7 @@ alias el=electrum
 
 #check multiple addresses from a list
 #confirmed and unconfirmed
-#{ f=a.txt ;m="$(wc -l "$f")" ;n=0 ;exec 0<"$f" ;while read ; do ((n++)) ;echo ">$n/$m" >&2;electrum getaddressbalance "$REPLY" | jq -r '.[]' ;done | tee b.txt ;unset f m n ;}
+#{ btcgrep -o [ADDR_FILE] | sort -u | while read ;do ((n++)) ;echo ">$n" >&2;electrum getaddressbalance "$REPLY" | jq -r '.[]' ;done | tee b.txt ;}
 
 #load a wallet
 #{ electrum daemon walletname ;}
