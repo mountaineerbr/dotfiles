@@ -3966,6 +3966,9 @@ spacevis() { sed 's|\x20|\x1b[103m\xc2\xb7\x1b[0m|g'; }
 #https://askubuntu.com/questions/743649/new-16gb-of-ram-installed-yet-i-see-15-3-on-my-system-why
 #https://www.linuxatemyram.com/
 
+#Swap stdout and stderr
+#$ command 3>&1 1>&2 2>&3
+#all about redirections: https://catonmat.net/bash-one-liners-explained-part-three
 
 # vi:filetype=sh
 
