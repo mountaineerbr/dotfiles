@@ -2341,6 +2341,17 @@ myip5()
 #alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
 #https://github.com/mathiasbynens
 
+#get geo info from ip addr
+ipgeo()
+{
+	local ip
+	ip="$1"
+	#ip=2804:d4b:9d31:7f00:78b9:dd61:93dc:ee19
+
+	curl -s -N https://ipapi.co/$ip/json/
+}
+#https://www.vivaolinux.com.br/topico/Shell-Script/SHELL-SCRIPT-45
+
 #wifi pass key list
 #requires root access
 #all conections

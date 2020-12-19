@@ -1,5 +1,5 @@
 favorites=xfce4-terminal.desktop,mousepad.desktop,libreoffice-impress.desktop,org.gnome.Cheese.desktop,virtualbox.desktop
-recent=gparted.desktop,electrum.desktop,torbrowser.desktop,libreoffice-writer.desktop,clementine.desktop,whirlpool-gui.desktop,thunar.desktop,xfce4-terminal.desktop,virtualbox.desktop,libreoffice-impress.desktop
+recent=libreoffice-writer.desktop,electrum.desktop,libreoffice-calc.desktop,org.gnome.Evince.desktop,vivaldi-stable.desktop,gparted.desktop,torbrowser.desktop,clementine.desktop,whirlpool-gui.desktop,thunar.desktop
 button-icon=/home/jsn/Documents/Icons/Icons8-Christmas-Flat-Color-Star.ico
 button-single-row=false
 show-button-title=false
