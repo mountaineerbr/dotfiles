@@ -945,7 +945,7 @@ alias cdd='cd ~/Documents'
 alias cdw='cd ~/Downloads'
 alias cdt='cd /tmp'
 alias cdtt='cd ~/tmp'
-alias cdmedia='cd /run/media'
+alias cdmedia='cd /media ;[[ -n "$(/bin/ls)" ]] || cd /run/media'
 alias cdu='cd /media/secondaryNtfs/usenet || cd /usenet || cd /home/usenet'
 alias cdq='cd ~/www/mountaineerbr.github.io/'
 alias cdQ='cd ~/www/mountaineerbr.github.io/blog'
@@ -2964,6 +2964,12 @@ gqr()
 	#bitcoin:bc1qlxm5dfjl58whg6tvtszg5pfna9mn2cr2nulnjr
 }
 
+#bitcoin.blk.sh
+alias blk="$HOME/bin/bitcoin.blk.sh"
+#bitcoin.tx.sh
+alias tx="$HOME/bin/bitcoin.tx.sh"
+#bitcoin.hx.sh
+alias hx="$HOME/bin/bitcoin.hx.sh"
 #bitcoin-cli
 alias bit=bitcoin-cli
 #electrum cli
