@@ -3948,6 +3948,10 @@ add()
 #echo $(( $( tr '\n' +  < /dev/stdin) 0 ))
 #https://stackoverflow.com/questions/450799/shell-command-to-sum-integers-one-per-line
 
+#Gksu alternative
+alias gsu='pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS'
+#https://dev.to/logix2/another-gksu-alternative-for-ubuntu-xorg-2356
+
 #centralise text
 #colunas=$(tput cols) 
 #texto='Hello, world!'
