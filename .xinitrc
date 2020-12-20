@@ -35,6 +35,7 @@ fi
 #xmodmap and xfce4 may not well together.
 #culprit may be panel plugin xfce4-xkb-plugin
 #https://unix.stackexchange.com/questions/119994/xmodmap-configuration-get-resetted-after-some-time
+#https://lists.debian.org/debian-user/2011/04/msg01875.html
 
 # start some nice programs
 if [ -d /etc/X11/xinit/xinitrc.d ] ; then 
