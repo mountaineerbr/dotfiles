@@ -101,7 +101,7 @@ ENDC=$NC
 #\\e[0;0;0m \\e[m'
 #\e \E \033
 
-ALERT=${BWhite}${On_Red} # Bold White on red background
+ALERT=$BWhite$On_Red 	# Bold White on red background
 #http://tldp.org/LDP/abs/html/sample-bashrc.html
 
 #the xhost program is used to add and delete host names or user names to
@@ -205,7 +205,7 @@ alias ag='/usr/bin/ag --nofollow --hidden --smart-case'
 #also check 'vimgrep'
 
 #user agent
-#usage: curl/wget --header"${UAG}"
+#usage: curl/wget --header"$UAG"
 #chrome on windows 10
 UAG='user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36'
 #firefox on windows 10
@@ -319,7 +319,7 @@ alias feh='feh --scale-down --auto-zoom'
 h()
 {
 	[[ -n "$ZSH_VERSION" ]] && set -- "${1:-0}"
-	history "${@}"
+	history "$@"
 }
 
 #custom ls
@@ -552,7 +552,7 @@ rr()
 #xbindkeys rebind keys
 kk()
 {
-	if [[ -n ${TMUX} ]]
+	if [[ -n $TMUX ]]
 	then
 		echo 'kk: avoid starting xbindkeys in tmux' >&2
 		sleep 1
@@ -644,7 +644,7 @@ gpush()
 #git diff
 gdiff()
 {
-	git diff HEAD~${1:-1} HEAD -- ${2}
+	git diff HEAD~${1:-1} HEAD -- $2
 	#filename as $2 is optional
 }
 
@@ -832,10 +832,10 @@ gk()
 		(( $# )) || exit 1
 	
 		#set shell options
-		[[ -n "${ZSH_VERSION}" ]] && setopt nullglob dotglob 
-		[[ -n "${BASH_VERSION}" ]] && shopt -s nullglob dotglob globstar
+		[[ -n "$ZSH_VERSION" ]] && setopt nullglob dotglob 
+		[[ -n "$BASH_VERSION" ]] && shopt -s nullglob dotglob globstar
 	
-		local file="${3:-${2:-${1}}}"
+		local file="${3:-${2:-$1}}"
 		file="${file%/}"
 		file=${file##*/}
 		
@@ -843,10 +843,10 @@ gk()
 			if [[ -f "$file" ]]
 			then
 				#$file is at current local dir
-				tee >( cksum -- - "${file}" >&2 )
+				tee >( cksum -- - "$file" >&2 )
 			else
 				#$file is down local dir hierarch
-				tee >( cksum -- - **/"${file}" >&2 2>/dev/null )
+				tee >( cksum -- - **/"$file" >&2 2>/dev/null )
 			fi
 	)
 }
@@ -971,8 +971,8 @@ mnt()
 #find out where a mount/partition or file is
 wherep()
 {
-	[[ -z "${@}" ]] && set -- .
-	df -P  "${@}" | tail -1 | cut -d' ' -f 1
+	[[ -z "$@" ]] && set -- .
+	df -P  "$@" | tail -1 | cut -d' ' -f 1
 }
 #https://stackoverflow.com/questions/3274354/how-to-find-out-mount-partition-a-directory-or-file-is-on-linux-server
 
@@ -1021,14 +1021,14 @@ TOZ=31.1034768  #also? 31.1034807
 oz()
 {
 	#copy to clipboard
-	xclip -selection clipboard <<<"${OZ}"
-	printf "%s\n" "${OZ}"
+	xclip -selection clipboard <<<"$OZ"
+	printf "%s\n" "$OZ"
 }
 toz()
 {
 	#copy to clipboard
-	xclip -selection clipboard <<<"${TOZ}"
-	printf "%s\n" "${TOZ}"
+	xclip -selection clipboard <<<"$TOZ"
+	printf "%s\n" "$TOZ"
 }
 #https://goldprice.com/troy-ounce-vs-ounce/
 
@@ -1050,7 +1050,7 @@ cx()
 setxv()
 {
 	set -xv
-	"${@}"
+	"$@"
 	set +xv
 }
 
@@ -1067,7 +1067,7 @@ z()
 	#if file descriptor 1 is closed, do not print line numbers
 	[[ -t 1 ]] && local numopt='-n'
 
-	cat ${numopt} ~/arq/docs/zShellDocs/zshGuide/plainTxt/zShellGuideAll.man ||
+	cat $numopt ~/arq/docs/zShellDocs/zshGuide/plainTxt/zShellGuideAll.man ||
 		curl 'https://raw.githubusercontent.com/mountaineerbr/extra/master/zShellDocs/zshGuide/plainTxt/zShellGuideAll.man'
 }
 #also check the mailing list!
@@ -1154,9 +1154,9 @@ paci()
 	
 	{
 		printf "[online mirror]\n"
-		pacman -Si "${@}"
+		pacman -Si "$@"
 		printf "[local cache]\n"
-		pacman -Qi "${@}"
+		pacman -Qi "$@"
 	} 2>/dev/null | 
  		cat -n | sort -k2 | uniq -f 1 | sort -n | cut -f2
 		#perl -ne 'print unless $seen{$_}++'
@@ -1293,7 +1293,7 @@ debian2()
 	do
 		for r in main contrib non-free
 		do
-			printf '%s in %s\n' "${v}" "${r}" | tr a-z A-Z >&2
+			printf '%s in %s\n' "$v" "$r" | tr a-z A-Z >&2
 			curl -Ls "http://ftp.br.debian.org/debian/dists/${v}/${r}/source/Sources.xz" |
 				unxz | grep Package:
 		done
@@ -1489,31 +1489,31 @@ hy()
 	[[ -t 1 ]] && TCOL='-TWORD'
 
 	#if there is no local copy, try to download it
-	if [[ ! -f "${DIC}" ]]
+	if [[ ! -f "$DIC" ]]
 	then
 		#check for downloaded temp file
-		if [[ ! -f "${TMPF}" ]]
+		if [[ ! -f "$TMPF" ]]
 		then
-			curl -L 'http://www.gutenberg.org/files/3204/files/mhyph.txt' > "${TMPF}" || return 1
+			curl -L 'http://www.gutenberg.org/files/3204/files/mhyph.txt' > "$TMPF" || return 1
 			#https://github.com/mountaineerbr/extra/raw/master/MobyHyphenatorII/mhyph.txt
-			printf 'File at %s\n\n' "${TMPF}" >&2
+			printf 'File at %s\n\n' "$TMPF" >&2
 		fi
 
 		#set new path
-		DIC="${TMPF}"
+		DIC="$TMPF"
 	fi
 
 	#process raw dictionary
-	DIC="$( pr -mJ -t <( < "${DIC}" ) <( tr '¥' '-' < "${DIC}" ) | tr -cd '[:print:]\t\n' | sed -e 's/\t\t*/$/g' -e 's/\s\s*/ /g' )"
+	DIC="$( pr -mJ -t <( < "$DIC" ) <( tr '¥' '-' < "$DIC" ) | tr -cd '[:print:]\t\n' | sed -e 's/\t\t*/$/g' -e 's/\s\s*/ /g' )"
 
 	#grep and format table
-	if ! grep -i "^${*}\\$" <<< "${DIC}"
+	if ! grep -i "^${*}\\$" <<< "$DIC"
 	then
 		#if user adds '$', she probably means word bondary
 		set -- "${*//$/\\$}"
-		grep -i "${*}" <<< "${DIC}"
+		grep -i "$*" <<< "$DIC"
 	fi |
-		column -ets '$' -NWORD,HYPHENED ${TCOL}
+		column -ets '$' -NWORD,HYPHENED $TCOL
 	)
 }
 #grep-like sed: { sed -ne "s/${1:-.}/&/pI" ;}
@@ -1867,7 +1867,7 @@ cep4()
 gene()
 {
 	local gencode
-	for gencode in "${@}"
+	for gencode in "$@"
 	do
 		curl --compressed "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?report=fasta&id=$gencode"
 	done
@@ -1881,7 +1881,7 @@ gene()
 gened()
 {
 	local gencode tmpfile errtmpfile filename
-	for gencode in "${@}"
+	for gencode in "$@"
 	do
 		tmpfile="${gencode}.fst.tmp"
 		errtmpfile="err_$tmpfile"
@@ -2099,9 +2099,9 @@ wf()
 wf2()
 {
 	[[ -z "$*" ]] && set -- sao paulo
-	set -- $(sed 's/\s/%20/g' <<<"${*}")
+	set -- $(sed 's/\s/%20/g' <<<"$*")
 
-	curl -sL --header "$UAG" "https://www.google.com/search?q=weather+${*}" |
+	curl -sL --header "$UAG" "https://www.google.com/search?q=weather+$*" |
 		sed 's|<[^/]*>[^>]*>|&\n|g' |
 		grep -E -e \"wob_wc\" -e \"wob_loc\" -e \"wob_dts\" \
 		-e \"wob_dcp\" -e \"wob_dc\" -e id=\"wob_t\" -e \"wob_t\?tm\" \
@@ -2194,7 +2194,7 @@ wf3a()
 _wf3helperf()
 {
 	local query data
-	query="$( sed 's/\s/%20/g' <<< "${*}" )"
+	query="$( sed 's/\s/%20/g' <<< "$*" )"
 	data="$( curl -sL "https://api.opencagedata.com/geocode/v1/json?q=${query}&key=641c51bed8ab490184632ad8526e29ad&no_annotations=1&language=en" )"
 
 	jq -r '.results[0].formatted//empty' <<< "$data" >&2 2>/dev/null
@@ -2222,7 +2222,7 @@ gps()
 {
 	[[ -z "$1" ]] && set -- sao paulo
 
-	local query="$( sed 's/\s/%20/g' <<< "${*}" )"
+	local query="$( sed 's/\s/%20/g' <<< "$*" )"
 	local data="$( curl -sL "https://api.opencagedata.com/geocode/v1/json?q=${query}&key=641c51bed8ab490184632ad8526e29ad&no_annotations=1&language=en" )"
 
 	jq -r '.results[0]|.formatted,(.geometry|"\(.lat) \(.lng)")' <<< "$data"
@@ -2233,7 +2233,7 @@ gps2()
 {
 	[[ -z "$1" ]] && set -- são paulo
 
-	local query=$( sed 's/\s/%20/g' <<<"${*}" )
+	local query=$( sed 's/\s/%20/g' <<<"$*" )
 
 	curl -Ls "https://www.metaweather.com/api/location/search/?query=$query" |
 		jq '.[]'
@@ -2375,7 +2375,7 @@ wpsk()
 turl()
 {
 	local short
-	short="$( curl -sL "http://tinyurl.com/api-create.php?url=${*}" )"
+	short="$( curl -sL "http://tinyurl.com/api-create.php?url=$*" )"
 
 	echo "$short"
 }
@@ -2552,7 +2552,7 @@ colors3()
 #}
 
 #scrape images from website
-#{ wget -nd -H -p -A jpg,jpeg,png,gif -e robots=off "${*}" ;}
+#{ wget -nd -H -p -A jpg,jpeg,png,gif -e robots=off "$*" ;}
 #https://davidwalsh.name/scrape-images-wget
 
 #scrape files required for a website
@@ -2567,8 +2567,8 @@ colors3()
 #usage: cmd | toimage [filename].ext
 toimage()
 {
-	[[ -z "$1" ]] && set -- "${HOME}/Downloads/cmd_$(date +%FT%T%Z).png"
-	[[ "$1" != *.??? ]] && [[ "$1" != *.???? ]] && set -- "${1}.png"
+	[[ -z "$1" ]] && set -- "$HOME/Downloads/cmd_$(date +%FT%T%Z).png"
+	[[ "$1" != *.??? ]] && [[ "$1" != *.???? ]] && set -- "$1.png"
 
 	convert label:@- "$1" && echo "$1"
 }
@@ -2599,12 +2599,12 @@ joke()
 	local NAME LASTN NAMEF
 	#NAME=John; LASTN=Doe; NAMEF="?firstName=${NAME}&lastName=${LASTN}"
 	
-	if [[ "${*}" =~ id ]]
+	if [[ "$*" =~ id ]]
 	then
 		set -- ${@//id/}
-		curl -s "http://api.icndb.com/jokes/${*}${NAMEF}"
+		curl -s "http://api.icndb.com/jokes/$*$NAMEF"
 	else
-		curl -s "http://api.icndb.com/jokes/random/${1}${NAMEF}"
+		curl -s "http://api.icndb.com/jokes/random/$1$NAMEF"
 	fi |
 		jq -r '..|"[\(.id?)]\t\(.joke?)"' | sed -e 's/&quot;/\"/g' -e '/null/d'
 }
@@ -2704,7 +2704,7 @@ ytb()
 {
 	echo '[ dl best quality audio and video ]' >&2
 
-	yt -f best "${@}"
+	yt -f best "$@"
 }
 #dl video of medium quality  (for cellphone)
 #codec set to 18, works for most yt vids
@@ -2777,7 +2777,7 @@ alias c='noglob bcalc.sh'
 #find files not owned by user in $HOM
 homesudo()
 {
-	find "${HOME}" ! -uid "$( id -u )" ! -gid "$( id -g )"
+	find "$HOME" ! -uid "$( id -u )" ! -gid "$( id -g )"
 }
 #https://bbs.archlinux.org/viewtopic.php?id=245416
 
@@ -2826,7 +2826,7 @@ tomp3()
 #https://coderwall.com/p/zbevoq/convert-m4a-to-mp3-with-ffmpeg
 
 #convert image types
-#{ for i in *.jpg; do convert "${i}" "${i/.jpg}.png"; done ;}
+#{ for i in *.jpg; do convert "$i" "${i/.jpg}.png"; done ;}
 
 #sed one-liners
 sedcht()
@@ -3097,7 +3097,7 @@ ht()
 #disable one of each sibling ht
 dht()
 {
-	if [[ -n ${TMUX} ]]
+	if [[ -n "$TMUX" ]]
 	then
 		echo 'err: command cannot be run under tmux' >&2
 		return 1
@@ -3114,7 +3114,7 @@ dht()
 #enable hyperthreading
 eht()
 {
-	if [[ -n ${TMUX} ]]
+	if [[ -n "$TMUX" ]]
 	then
 		echo 'err: command cannot be run under tmux' >&2
 		return 1
@@ -3189,7 +3189,7 @@ et()
 #run test script
 t()
 {
-	~/bin/test.sh ${@}
+	~/bin/test.sh "$@"
 }
 
 #script aliases
@@ -3453,13 +3453,13 @@ nomef()
 	if [[ -z "$1" ]]
 	then
 		json="$( curl -s 'https://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking' )"
-		jq -r '.[]|"Localidade: \(.localidade)"' <<<"${json}"
-		jq -r '.[]|.res[]|"\(.nome)\t\(.frequencia)\t\(.ranking)"' <<<"${json}" | column -et -NNOME,FREQ,RNK
+		jq -r '.[]|"Localidade: \(.localidade)"' <<<"$json"
+		jq -r '.[]|.res[]|"\(.nome)\t\(.frequencia)\t\(.ranking)"' <<<"$json" | column -et -NNOME,FREQ,RNK
 	else
 		set -- "$( tr A-Z a-z <<< "$1" )"
-		json="$(curl -s "https://servicodados.ibge.gov.br/api/v2/censos/nomes/${1}")"
-		jq -r '.[]|"Local: \(.localidade)","Nome_: \(.nome)"' <<<"${json}"
-		jq -r '.[].res[]|"\(.periodo)\t\(.frequencia)"' <<<"${json}" |
+		json="$(curl -s "https://servicodados.ibge.gov.br/api/v2/censos/nomes/$1")"
+		jq -r '.[]|"Local: \(.localidade)","Nome_: \(.nome)"' <<<"$json"
+		jq -r '.[].res[]|"\(.periodo)\t\(.frequencia)"' <<<"$json" |
 			tr -d '][' | tr ',' '-' | column -et -NPERIODO,FREQ
 	fi
 }
@@ -3559,7 +3559,7 @@ dword()
 	    printf "%s:%d:`%s`\n", FILENAME, NR, $i
 	if (NF > 0)
 	    lastword = $NF
-    }' "${@}"
+    }' "$@"
 }
 
 # count word frequencies
@@ -3580,7 +3580,7 @@ wfreq()
     END {
         for (w in cnt)
             print w, cnt[w]
-    }' "${@}"
+    }' "$@"
 }
 #https://github.com/faif/shell-utils/blob/master/shell-utils.sh
 
