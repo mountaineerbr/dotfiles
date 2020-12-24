@@ -1115,7 +1115,10 @@ pacman()
 {
 	[[ "$*" = *-Syu* ]] && echo "DID YOU MAKE A BACKUP BEFORE SYNC'ING?" >&2
 	/usr/bin/pacman "$@"
+	[[ "$*" = *-Syu* ]] && pkgfile --update && sync
 }
+#or add a pacman hook to sync data to disk
+#https://bbs.archlinux.org/viewtopic.php?id=261655
 
 #edit config
 alias pconf='sudo vim /etc/pacman.conf'
@@ -1767,6 +1770,10 @@ zpass()
 	echo
 }
 #https://leahneukirchen.org/dotfiles/.zshrc
+
+#ASCII chars
+#ascii="$(for ((i=32;i<127;i++)) ;do printf "\\$(printf %03o "$i")"; done)"
+#ascii="\ \!\"#\$%\&\'\(\)\*+\,./0123456789:\;\<=\>\?@ABCDEFGHIJKLMNOPQRSTUVWXYZ\[\]\^_\`abcdefghijklmnopqrstuvwxyz\{\|\}~\\-"
 
 #cep dos correios
 #por nome de rua ou cep
