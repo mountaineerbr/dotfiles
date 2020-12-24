@@ -1115,7 +1115,7 @@ pacman()
 {
 	[[ "$*" = *-Syu* ]] && echo "DID YOU MAKE A BACKUP BEFORE SYNC'ING?" >&2
 	/usr/bin/pacman "$@"
-	[[ "$*" = *-Syu* ]] && pkgfile --update && sync
+#run `pkgfile --update` and `sync`
 }
 #or add a pacman hook to sync data to disk
 #https://bbs.archlinux.org/viewtopic.php?id=261655
