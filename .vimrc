@@ -827,6 +827,8 @@ nnoremap <Leader>whs :let _save_pos=getpos(".") <Bar>
     \ :call setpos('.', _save_pos)<Bar> 
     \ :unlet _save_pos<CR><CR> 
 "
+"Remove bash variable dust when possible ${VAR} --> $VAR
+nnoremap <Leader>bdust :,$s/${\([^@*\[\]}%#^/,:]*\)}/$\1/gc
 
 " MAPLEADER 1 ( CUSTOM LEADER ) < = >
 ""map = <cleader1>
