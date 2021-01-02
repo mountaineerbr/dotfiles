@@ -3728,6 +3728,12 @@ SUM()
 #is a positive decimal integer.
 #tac may not be in osx
 
+#IPC#Different ways to print the next few lines after pattern match 
+#https://www.theunixschool.com/2012/05/different-ways-to-print-next-few-lines.html?m=1
+
+#print last fiel
+#{ awk '{print $NF}' ;}
+
 #add columns in only one line with a separator
 #{ awk -F":" '{ORS=",";print $1}' ;}
 
