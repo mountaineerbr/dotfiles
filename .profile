@@ -27,11 +27,13 @@ then
 fi
 
 #set custom $PATH
-for d in "/opt" \
+for d in \
+	"/opt" \
 	"$HOME/.local/bin" \
 	"$HOME/bin/more" \
-	"$HOME/bin/markets" \
-	"$HOME/bin" .
+	#"$HOME/bin/markets" \
+	"$HOME/bin" \
+	.
 do
 	if [[ -d "$d" ]] &&
 		[[ :"$PATH": != *:"${d:-x}":* ]]
