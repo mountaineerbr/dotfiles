@@ -3267,11 +3267,10 @@ mop()
 {
 	go run ~/go/src/github.com/mop-tracker/mop/cmd/mop/main.go
 }
-alias ctop='cointop --hide-chart'
 alias cointop='cointop --hide-chart'
 #wallet and trading monitors
-alias W=walletmonitor.sh
-alias T=tradingview.sh
+#alias W=walletmonitor.sh
+#alias T=tradingview.sh
 #novadax roll
 novadr()
 { 
