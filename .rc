@@ -1822,9 +1822,10 @@ cep()
 		(( pini = pini + pvar ))
 		(( pfim = pfim + pvar ))
 
-		jq -r '.dados[] | "\(.cep)\t\(.uf)\t\(.localidade)\t\(.bairro)\t\(.logradouroDNEC)\t\(.numeroLocalidade)\t\(.logradouroTextoAdicional)\t\(.nomeUnidade)\t\(.situacao)"' <<<"$d"
-		#column -dts$'\t' -N1,2,3,4,5,6,7,8,9 -T4,7,8,9
-		#sleep 1.2  #evita throttle
+		jq -r '.dados[] | "\(.cep)\t\(.uf)\t\(.localidade)\t\(.bairro)\t\(.logradouroDNEC)\t\(.numeroLocalidade)\t\(.logradouroTextoAdicional)\t\(.nomeUnidade)\t\(.situacao)"' <<<"$d" |
+			column -dts$'\t' -N1,2,3,4,5,6,7,8,9 -T4,7,8,9
+		
+		#sleep 1.2  #pode evitar throttle
 
 		if (( pfim > t ))
 		then
