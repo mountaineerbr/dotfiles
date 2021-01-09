@@ -1,14 +1,12 @@
 # dotfiles
 
-Dotfiles and other c files.
+## Dotfiles and other c files
+__Most shell functions and aliases are at .rc__. That is sourced from
+both _.bashrc_ and _.zshrc_, which contains some configs for each shell, too.
 
-Most shell functions and aliases are at .rc because that file is sourced
-from both .bashrc and .zshrc.
-The .rc file changes constantly and is also a testcamp for new code.
+The _.rc file_ changes constantly and is also a testcamp for new code.
 When functions become too large and mature, they may be promoted to
-full-fledged scripts and moved to mountaineerbr/scripts.
- 
-.bashrc and .zshrc hold configurations/functions specific to their shell.
+full-fledged scripts and moved to __mountaineerbr/scripts.__
 
 ---
 
