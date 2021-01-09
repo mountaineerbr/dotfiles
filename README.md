@@ -11,7 +11,5 @@ full-fledged scripts and moved to __mountaineerbr/scripts.__
 ---
 
 ![ScreenShot](https://github.com/mountaineerbr/dotfiles/blob/master/git_screenshot1.png)
-Fig. 1. "Own deserted island in the heart of a busy city. Breathe in[..]";
-chilled cow by kupla:
-https://www.youtube.com/watch?v=Mu3BfD6wmPg
+Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](https://www.youtube.com/watch?v=Mu3BfD6wmPg "Chilled Cow by Kupla")
 
