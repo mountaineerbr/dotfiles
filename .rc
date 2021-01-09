@@ -762,6 +762,9 @@ grmob()
 	git branch -m master
 	#finally, force update your repository
 	git push -f origin master
+
+	#push the current branch and set the remote as upstream
+	git push --set-upstream origin master
 }
 #https://stackoverflow.com/questions/13716658/how-to-delete-all-commit-history-in-github
 #also check 'bgf repo-cleaner' https://rtyley.github.io/bfg-repo-cleaner/
@@ -2934,6 +2937,9 @@ d2h()
 #bitcoin-bash-tools
 #https://github.com/grondilu/bitcoin-bash-tools
 #many important tools, such as 'encodeBase58'
+
+#base48 array
+B58=( {1..9} {A..H} {J..N} {P..Z} {a..k} {m..z} )
 
 #convert "decimal number" to Base58 in Bash
 toBase58()
