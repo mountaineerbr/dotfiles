@@ -332,6 +332,7 @@ alias ll='ls++ --potsf'
 #alias l='ls -l'
 #alias ll='ls -l'
 #alias ls='ls -F'
+alias pl="printf '%s\n'"
 
 alias j='jobs -l'
 #alias pu=pushd
@@ -1135,7 +1136,7 @@ alias pcache='cd /var/cache/pacman/pkg'
 #extract installation info
 alias pacdate='expac --timefmt="%F %T" "%l %n" | sort -n'
 #paclog, coloured pacman log
-alias pl='paclog'
+#alias pl='paclog'
 
 #query the file database
 #look for packages owning certain files or display files owned by certain
