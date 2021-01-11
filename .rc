@@ -473,25 +473,23 @@ alias cal='cal -s'
 #record working directory leaving Vifm
 vf()
 {
-	#local dst
-	#dst="$( command vifm --choose-dir - "$@" )"
-	#if [[ -z "$dst" ]]
-	#then
-	#	echo 'Directory picking cancelled/failed'
-	#	return 1
-	#fi
-	#cd "$dst"
+	local recfile="$HOME/.config/vifm/vifmcd.txt"
+	
+	command vifm --choose-dir "$recfile" "$@"
 
-	command vifm --choose-dir - "$@" >~/.config/vifm/vifmcd.txt
-
-	echo "PWD: $PWD"
+	echo -e "\aPWD: $PWD"
 }
+
+#cd to last visited dir in Vifm
 vfcd()
 {
-	cd "$( <~/.config/vifm/vifmcd.txt )"
+	local recfile="$HOME/.config/vifm/vifmcd.txt"
+
+	cd "$(<"$recfile")"
 	
-	echo "PWD: $PWD"
+	echo -e "\aPWD: $PWD"
 }
+#see another idea from:
 #https://wiki.vifm.info/index.php?title=How_to_set_shell_working_directory_after_leaving_Vifm
 
 alias vimdiff='vimdiff "+colorscheme default" "+syntax off" "+set t_Co=16"'
