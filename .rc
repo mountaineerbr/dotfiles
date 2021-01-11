@@ -1273,15 +1273,23 @@ alias ala='~/bin/ala.sh'
 
 #arch linux mail
 #arch-general
+#get the current month box
+#usage: amail dec-2020
 amail()
 {
-	local url month
+	local month
 	month="$(date -d"${*:-today}" +%Y-%B)" ||
 		month="$(date -d"01 ${*:-today}" +%Y-%B)" || return
-	url=https://lists.archlinux.org/pipermail/arch-general/${month}.txt.gz
+
+	curl -L https://lists.archlinux.org/pipermail/arch-general/${month}.txt.gz |
+		gzip -c -d
 
 	echo "MONTH: $month" >&2
-	curl -L "$url" | gzip -c -d
+}
+#get the raw mailbox (210+ MB!!)
+allmail()
+{
+	curl -L https://lists.archlinux.org/pipermail/arch-general.mbox/arch-general.mbox
 }
 #https://lists.archlinux.org/pipermail/arch-general/
 
