@@ -116,13 +116,18 @@ zcalcasc () { print $(( [#16] ans = ##${1:-ans} )) }
 
 #hash customd dirs
 #maybe CDABLE_VARS must be enabled
-for dir in /run/media ~/arq ~/arq/docs ~/bin ~/bin/markets ~/bak ~/tmp ~/Documents ~/Downloads
-do
-	[[ -d "$dir" ]] || continue
-	dir="${dir%/}"
-	eval hash -d ${dir##*/}="$dir"
-done
-unset dir
+hash -d media=/run/media
+hash -d arq=~/arq
+hash -d a=~/arq
+hash -d docs=~/arq/docs
+hash -d bin=~/bin
+hash -d markets=~/bin/markets
+hash -d m=~/bin/markets
+hash -d bak=~/bak
+hash -d tmp=~/tmp
+hash -d d=~/Documents
+hash -d w=~/Downloads
+
 
 #list all binded keys
 #bindkey
@@ -238,7 +243,10 @@ wrap()
 #.rc extensive aliases ans functions
 #command-not-found hook from pkgfile
 #zsh syntax highliting plugin
-for f in ~/.rc  /usr/share/doc/pkgfile/command-not-found.zsh /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+for f in \
+	~/.rc \
+	/usr/share/doc/pkgfile/command-not-found.zsh \
+	/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 do
 	[[ -r "$f" ]] && . "$f"
 done
@@ -336,164 +344,27 @@ haha() ( x=.2; y=0.00000002; i=$x; [[ $1 = [0-9+]* ]] && set - "$2" $1; while { 
 #of a function, but define the function first if the alias has the same
 #name as the function.
 
-#dream:
-#Preserving cursor position
-#https://github.com/zsh-users/zsh-history-substring-search/issues/54
-#
-#the following zle functions preserve the cursor position of the last 
-#command executed in {up,down}-search-history
-#as i use the grml-zshrc as base config, it is a little harder
-#than necessary to integrate this functionality. looks like an ugly hack
-#
-#references:
-#Book: From bash to Zshell
-#Case Study 4: Chaining Widgets Together, pg 360-1
-#http://www.bash2zsh.com/
-#
-#zshell guide:
-#4.2.1: Moving
-#  bindkey "\eOA" up-line-or-history
-#  bindkey "\eOB" down-line-or-history
-#  bindkey "\eOC" forward-char
-#  bindkey "\eOD" backward-char
-#
-#also had to look into grml zshrc 
-#https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
-#
-#From Bash to Zshell
-#page 360-1 excerpt
-#
-#Case Study 4: Chaining Widgets Together
-#Sometimes it’s useful to know the name of the most recently executed widget.
-#As we’ll see, when you chain a series of widgets together you can sometimes
-#help the user if a later widget takes account of what the previous one was 
-#doing. The widget in question is stored in the variable LASTWIDGET. When you 
-#enter a widget called by the keyboard or Esc x, the last widget was the 
-#previous widget called in that fashion. In other words, it’s the name of the
-#editor action the user thinks they executed before the current one. Remember
-#that typing a key that inserts a character is also a widget, namely self-
-#insert. Here’s an example that uses LASTWIDGET to maintain your position on 
-#the command line when you move up the history list to the line you’ve just 
-#entered. In the following example, the position of the cursor is saved in 
-#the variable __savepos. We do this by changing accept-line as we did earlier 
-#in the chapter. The function up-history, which is designed to override the 
-#real widget of that name, checks whether we’ve just called accept-line and 
-#have set __savepos. If we have, we go back up a line and restore the cursor 
-#position. Otherwise, we just go back up a line.
-#
-#accept-line() {
-#  # Execute the line as normal, but first save the position.
-#  __savepos=$CURSOR
-#  zle .accept-line
-#}
-#up-history() {
-#   # Only use the special behavior if we just executed a line,
-#   # and only if that left us a saved position.
-#   if [[ $LASTWIDGET = accept-line ]] && (( $+__savepos )); then
-#     # Go up a line and save the position.
-#     zle .up-history
-#     CURSOR=__savepos
-#  else
-#     # Just go up a line normally
-#     zle .up-history
-#  fi
-# }
-#
-#other refs:
+
+#search history when Up or Down is pressed
+#i find this a better way
+up-history()
+{
+	#zle up-line-or-search $LBUFFER
+	zle history-beginning-search-backward
+}
+down-history()
+{
+	#zle down-line-or-search $LBUFFER
+	zle history-beginning-search-forward
+}
+zle -N up-history
+zle -N down-history
+bind2maps emacs viins vicmd -- Up     up-history
+bind2maps emacs viins vicmd -- Down   down-history
+#see also thes eother funcs:
+#zle up-line-or-history
+#zle history-beginning-search-backward
 #zle .up-history
-#up-line-or-search $LBUFFER
-#https://unix.stackexchange.com/questions/16101/zsh-search-history-on-up-and-down-keys
-#
-#up-line-or-beginning-search
-#like up-line-or-search, but uses the whole line
-#prefix up to the cursor position for searching backwards.
-#https://github.com/zsh-users/zsh/blob/master/Functions/Zle/up-line-or-beginning-search
-#
-#up-history() {
-#		zle history-beginning-search-backward
-#}
-#
-#*gilles tips:
-#https://unix.stackexchange.com/questions/16101/zsh-search-history-on-up-and-down-keys 
-#
-#only activate if using grml zsh base configs
-#otherwise it wreaks havoc
-if declare -f grmlstuff accept-line >/dev/null
-then
-
-	#copy grml accept-line func
-	if ! functions -c accept-line grml-accept-line 2>/dev/null
-	then
-		#for versions older than 5.8
-		_oldf="$( declare -f accept-line )"
-		_oldf="${_oldf/#/grml-}"
-		eval "$_oldf"
-		unset _oldf
-	fi
-	#https://mharrison.org/post/bashfunctionoverride/
-	
-	#create new widget with original grml func
-	zle -N grml-accept-line
-	
-	#define custom accept-line func
-	accept-line()
-	{
-		__savepos=$CURSOR
-		zle grml-accept-line
-	}
-	
-	#redefine widget accept-line
-	zle -N accept-line
-	
-	#redefine widget funcs
-	up-history()
-	{
-		__saveposhist=$CURSOR
-	
-		if [[ "$LASTWIDGET" != up-history ]] || 
-			(( $#BUFFER - __saveposhist && __savepos - __saveposhist ))
-		then
-			#grml orig binding -- up arrow
-			zle up-line-or-search $LBUFFER || [[ "$LASTWIDGET" != up-history ]] || 
-				(( $#BUFFER - __saveposhist )) || (( --__saveposhist ))
-
-			(( __savepos )) && CURSOR=$__savepos
-			(( __saveposhist )) && CURSOR=$__saveposhist
-		else
-			#grml orig binding -- page up
-			#this leaves the cursor in its original position
-			zle history-beginning-search-backward-end
-		fi
-	}
-	
-	down-history()
-	{
-		__saveposhist=$CURSOR
-	
-		if [[ "$LASTWIDGET" != down-history ]] || 
-			(( $#BUFFER - __saveposhist && __savepos - __saveposhist ))
-		then
-			#grml orig binding -- down arrow
-			zle down-line-or-search $LBUFFER || [[ "$LASTWIDGET" != down-history ]] ||
-				(( $#BUFFER - __saveposhist )) || (( --__saveposhist ))
-
-			(( __savepos )) && CURSOR=$__savepos
-			(( __saveposhist )) && CURSOR=$__saveposhist
-		else
-			zle history-beginning-search-forward-end
-		fi
-	}
-	
-	zle -N up-history
-	zle -N down-history
-	
-	#bind over grml zshrc {up,down}-line-or-search widgets
-	#use grml bind2maps func
-	bind2maps emacs viins vicmd -- Up     up-history
-	bind2maps emacs viins vicmd -- Down   down-history
-	#bindkey "\eOA" up-history
-	#bindkey "\eOB" down-history
-fi
 
 
 # Filename:      /etc/skel/.zshrc
