@@ -3316,7 +3316,10 @@ novadr()
 }
 
 #sources
-for f in ~/.apikeys ~/bin/markets/mkt_func.sh ~/bin/corona_func.sh
+for f in \
+	~/.apikeys \
+	~/bin/markets/mkt_func.sh \
+	~/bin/corona_func.sh
 do
 	[[ -r "$f" ]] && . "$f"
 done
