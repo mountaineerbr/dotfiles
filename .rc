@@ -2615,6 +2615,9 @@ alias autoclicker='xdotool click --repeat 100 --delay 18 1'
 #which means: click a hundred times, every 18 milliseconds, using left mouse button (1 at the end)
 #https://www.reddit.com/r/incremental_games/comments/4pygkl/autoclicker_for_ubuntu_linux/
 
+#click and enter
+#{ xdotool click 1 key KP_Enter ;}
+
 #play tron
 #use wasd to move
 tron()
