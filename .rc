@@ -1271,6 +1271,21 @@ alias yw='yay -Pw'
 alias ala='~/bin/ala.sh'
 
 
+#arch linux mail
+#arch-general
+amail()
+{
+	local url month
+	month="$(date -d"${*:-today}" +%Y-%B)" ||
+		month="$(date -d"01 ${*:-today}" +%Y-%B)" || return
+	url=https://lists.archlinux.org/pipermail/arch-general/${month}.txt.gz
+
+	echo "MONTH: $month" >&2
+	curl -L "$url" | gzip -c -d
+}
+#https://lists.archlinux.org/pipermail/arch-general/
+
+
 #debian -- list of all packages
 debian()
 {
