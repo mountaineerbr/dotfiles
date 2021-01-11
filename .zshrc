@@ -346,7 +346,7 @@ haha() ( x=.2; y=0.00000002; i=$x; [[ $1 = [0-9+]* ]] && set - "$2" $1; while { 
 
 
 #search history when Up or Down is pressed
-#i find this a better way
+#this widget is better than grml-zsh defaults
 up-history()
 {
 	#zle up-line-or-search $LBUFFER
@@ -361,7 +361,7 @@ zle -N up-history
 zle -N down-history
 bind2maps emacs viins vicmd -- Up     up-history
 bind2maps emacs viins vicmd -- Down   down-history
-#see also thes eother funcs:
+#see also these other widgets:
 #zle up-line-or-history
 #zle history-beginning-search-backward
 #zle .up-history
