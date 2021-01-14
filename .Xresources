@@ -11,7 +11,7 @@
 
 ! XScreenSaver
 ! Since at least XScreenSaver 5.22, user can use .Xresources
-! template: https://gist.github.com/anonymous/682d8daf5631b588e12e
+! 5.22 defaults from: https://gist.github.com/anonymous/682d8daf5631b588e12e
 
 !xscreensaver.mode: random
 !xscreensaver.timeout: 0:10:00
