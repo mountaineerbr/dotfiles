@@ -2130,7 +2130,7 @@ ipmet()
 	if (( loopf ))
 	then
 		#record pid
-		echo -e "pid:\t$$\t$(date -Isec)" >> "$tempdir/pids.txt"
+		echo -e "pid:\t$$\t$(date -Isec)" >> "$tempdir/loop_pids.txt"
 	else
 		#open image with feh
 		( feh "$tempfile" & )
