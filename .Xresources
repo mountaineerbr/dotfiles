@@ -10,6 +10,8 @@
 !https://en.wikipedia.org/wiki/X11_color_names
 
 ! XScreenSaver
+! xscreensaver-demo writes the chosen configuration to ~/.xscreensaver,
+! discarding any manual modifications to the file.
 ! Since at least XScreenSaver 5.22, user can use .Xresources
 ! 5.22 defaults from: https://gist.github.com/anonymous/682d8daf5631b588e12e
 
