@@ -2104,8 +2104,9 @@ urldecode() {
 #https://www.ipmetradar.com.br/2imagemRadar.php
 ipmet()
 {
-	local baseurl referer data name info time tempdir tempfile
+	local baseurl referer data name imgviewer info time tempdir tempfile
 
+	imgviewer=( feh )
 	tempdir=/tmp/ipmet_radar
 	baseurl=https://www.ipmetradar.com.br/ipmet_html/radar
 	referer=Referer:https://www.ipmetradar.com.br/2imagemRadar.php
@@ -2133,7 +2134,7 @@ ipmet()
 		echo -e "pid:\t$$\t$(date -Isec)" >> "$tempdir/loop_pids.txt"
 	else
 		#open image with feh
-		( feh "$tempfile" & )
+		( "${imgviewer[@]}" "$tempfile" & )
 	fi
 
 	echo
