@@ -199,6 +199,16 @@ grepid()
 #use pstree -s to get a tree of the process
 #https://stackoverflow.com/questions/7138783/how-to-display-the-current-process-tree-of-a-bash-session
 
+#For the full command, not just the name of the program:
+pscom()
+{
+	local pid=$1
+
+	ps -p $pid -o command
+	#ps -p $pid -o comm=
+}
+#https://superuser.com/questions/632979/if-i-know-the-pid-number-of-a-process-how-can-i-get-its-name
+
 #silver searcher
 alias ag='/usr/bin/ag --nofollow --hidden --smart-case'
 #alias grep=ag
@@ -2094,14 +2104,20 @@ urldecode() {
 #https://www.ipmetradar.com.br/2imagemRadar.php
 ipmet()
 {
-	local baseurl referer data name info time tempfile
+	local baseurl referer data name info time tempdir tempfile
+
+	tempdir=/tmp/ipmet_radar
 	baseurl=https://www.ipmetradar.com.br/ipmet_html/radar
-	referer='Referer: https://www.ipmetradar.com.br/2imagemRadar.php'
+	referer=Referer:https://www.ipmetradar.com.br/2imagemRadar.php
+
+	#create dir if it does not exist
+	[[ -d "$tempdir" ]] || mkdir -pv "$tempdir" || return 1
+
 	data="$( curl "$baseurl/2carga_img.php" --compressed )"
 	name="$( sed -nE 's/.*(nova.jpg\?[0-9]+).*/\1/p' <<<"$data" )"
 	info="$( sed -nE 's/.*(Imagem Composta dos Radares.*)<.*/\1/p' <<<"$data" )"
 	time="$( grep -Eo '[0-9]+/[0-9]+/[0-9: ]+$' <<<"$info" )"
-	tempfile="/tmp/ipmet_${time//[\/\ ]/_}.jpg"
+	tempfile="$tempdir/ipmet_${time//[\/\ ]/_}.jpg"
 
 	#if file does not exist already
 	if [[ ! -f "$tempfile" ]]
@@ -2110,8 +2126,15 @@ ipmet()
 		curl "$baseurl/$name" --compressed -H "$referer" -o "$tempfile"
 	fi
 
-	#open image with feh?
-	(( dontopen )) || ( feh "$tempfile" & )
+	#are we calling from the ``ipmetloop'' function?
+	if (( loopf ))
+	then
+		#record pid
+		echo -e "pid:\t$$\t$(date -Isec)" >> "$tempdir/pids.txt"
+	else
+		#open image with feh
+		( feh "$tempfile" & )
+	fi
 
 	echo
 	#echo "$name"
@@ -2119,11 +2142,14 @@ ipmet()
 	echo "tempfile at -- $tempfile"
 }
 #loop ipmet
+#send to bg if needed
 ipmetloop()
 {
+	local loopf
+
 	while true
 	do
-		dontopen=1 ipmet
+		loopf=1 ipmet
 		sleep 6m
 	done
 }
