@@ -119,13 +119,13 @@ zcalcasc () { print $(( [#16] ans = ##${1:-ans} )) }
 hash -d media=/run/media
 hash -d arq=~/arq
 hash -d a=~/arq
-hash -d docs=~/arq/docs
+hash -d d=~/arq/docs
 hash -d bin=~/bin
 hash -d markets=~/bin/markets
 hash -d m=~/bin/markets
 hash -d bak=~/bak
 hash -d tmp=~/tmp
-hash -d d=~/Documents
+hash -d D=~/Documents
 hash -d w=~/Downloads
 
 
