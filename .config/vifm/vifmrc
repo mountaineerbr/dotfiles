@@ -212,7 +212,8 @@ mark 1 ~
 mark a ~/arq
 mark b ~/bak
 mark c ~/arq/Concursos_Publicos
-mark d ~/Documents
+mark D ~/Documents
+mark d ~/arq/docs
 mark k ~/.config/conky/confs
 mark m ~/bin/markets
 mark n /media
