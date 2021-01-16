@@ -829,7 +829,7 @@ nnoremap <Leader>whs :let _save_pos=getpos(".") <Bar>
 "
 "Remove bash variable dust when possible ${VAR} --> $VAR
 "from cursor to end of file
-nnoremap <Leader>bdust :,$s/${\([^@*\[\]}%#^/,:]\+\)}\|${\([*@0-9]\+\)}/$\1\2/gc
+nnoremap <Leader>bdust :,$s/${\([^@*\[\]}%#^/,:]\+\)}\\|${\([*@0-9]\+\)}/$\1\2/gc
 
 " MAPLEADER 1 ( CUSTOM LEADER ) < = >
 ""map = <cleader1>
