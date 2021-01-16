@@ -2980,18 +2980,6 @@ clr()
 }
 #{ tput clear ;}  #removes scrollback buffer
 
-#see the actual bits of a file
-#{ xxd -b ;}
-
-#bitcoin blockchain
-#you can just print every string in the blockchain database directly
-#{ strings -n 20 blk0000.dat ;}
-#https://bitcoin.stackexchange.com/questions/18/how-can-one-embed-custom-data-in-block-headers
-#transaction hex to ascii
-#{ echo -n "$hex" | xxd -p -r ;}
-#transaction ascii to hex
-#{ echo -n "$str" | xxd -ps ;}
-
 #regex for string that is only numbers
 # ^[+-]?[0-9]+([.][0-9]+)?$
 #https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
@@ -3011,10 +2999,6 @@ d2h()
 #wordcount() { echo -n $1 | wc -w ;}
 #https://www.soroushjp.com/2014/11/21/helpful-bash-scripts-for-working-with-byte-arrays-and-hex-in-bitcoin/
 
-#bitcoin-bash-tools
-#https://github.com/grondilu/bitcoin-bash-tools
-#many important tools, such as 'encodeBase58'
-
 #base48 array
 B58=( {1..9} {A..H} {J..N} {P..Z} {a..k} {m..z} )
 
@@ -3031,6 +3015,24 @@ toBase58()
     printf '%s\n' "$b58"
 }
 #https://stackoverflow.com/questions/30630841/how-to-convert-decimal-number-to-base58-in-bash
+
+#bitcoin-bash-tools
+#https://github.com/grondilu/bitcoin-bash-tools
+#many important tools, such as 'encodeBase58'
+
+#bitcoin blockchain
+#you can just print every string in the blockchain database directly
+#{ strings -n 20 blk0000.dat ;}
+#https://bitcoin.stackexchange.com/questions/18/how-can-one-embed-custom-data-in-block-headers
+#transaction hex to ascii
+#{ echo -n "$hex" | xxd -p -r ;}
+#transaction ascii to hex
+#{ echo -n "$str" | xxd -ps ;}
+#get coinbase tx from genesisblock with
+#{ bitcoin-cli getblock [GENBLK_HASH] 2 ;}
+
+#see the actual bits of a file
+#{ xxd -b ;}
 
 #produce a 64 character hexadecimal string (256 bits or 32 bytes,
 #{ openssl rand -hex 32 ;}
