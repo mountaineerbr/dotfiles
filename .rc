@@ -2988,7 +2988,9 @@ clr()
 #{ strings -n 20 blk0000.dat ;}
 #https://bitcoin.stackexchange.com/questions/18/how-can-one-embed-custom-data-in-block-headers
 #transaction hex to ascii
-#{ xxd -p -r <<<"hex" ;}
+#{ echo -n "$hex" | xxd -p -r ;}
+#transaction ascii to hex
+#{ echo -n "$str" | xxd -ps ;}
 
 #regex for string that is only numbers
 # ^[+-]?[0-9]+([.][0-9]+)?$
