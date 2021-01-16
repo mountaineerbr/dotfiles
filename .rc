@@ -3028,11 +3028,13 @@ toBase58()
 #{ echo -n "$hex" | xxd -p -r ;}
 #transaction ascii to hex
 #{ echo -n "$str" | xxd -ps ;}
-#get coinbase tx from genesisblock with
-#{ bitcoin-cli getblock [GENBLK_HASH] 2 ;}
 
 #see the actual bits of a file
 #{ xxd -b ;}
+
+#get coinbase tx from genesisblock with
+#{ bitcoin-cli getblock [GENBLK_HASH] 2 ;}
+#https://ma.ttias.be/retrieving-the-genesis-block-in-bitcoin-with-bitcoin-cli/
 
 #produce a 64 character hexadecimal string (256 bits or 32 bytes,
 #{ openssl rand -hex 32 ;}
