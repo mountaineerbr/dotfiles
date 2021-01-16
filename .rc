@@ -2985,7 +2985,7 @@ clr()
 
 #bitcoin blockchain
 #you can just print every string in the blockchain database directly
-#{ strings -n 20 blk0001.dat ;}
+#{ strings -n 20 blk0000.dat ;}
 #https://bitcoin.stackexchange.com/questions/18/how-can-one-embed-custom-data-in-block-headers
 #transaction hex to ascii
 #{ xxd -p -r <<<"hex" ;}
