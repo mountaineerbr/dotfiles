@@ -1,8 +1,8 @@
 !
 !  GNU gv - Postscript and PDF viewer
-!  User specific config
+!  User specific config - mountaineerbr
 !
-! see also: https://www.ic.unicamp.br/~stolfi/PUB/lib/i686-Linux-2.2/gv/gv_class.ad
+!  more resources: https://www.ic.unicamp.br/~stolfi/PUB/lib/i686-Linux-2.2/gv/gv_class.ad
 
 !########## gv_user_res.dat
 
@@ -19,9 +19,9 @@ GV.ignoreEOF:		True
 !GV.confirmPrint:	True
 GV.reverseScrolling:	True
 GV.scrollingEyeGuide:	True
-GV.autoResize:		True
-!GV.maximumWidth:	screen-20
-!GV.maximumHeight:	screen-44
+GV.autoResize:		False
+GV.maximumWidth:	screen-66
+GV.maximumHeight:	screen-66
 !GV.minimumWidth:	400
 !GV.minimumHeight:	430
 !GV.geometry:		+5+5
@@ -42,7 +42,8 @@ GV.autoResize:		True
 !			print_marked	\n\
 !			save_all	\n\
 !			save_marked
-!GV.scale:		0
+GV.scale:		-1001
+!tip: resource `GV.scale` may be set to `-1001` to fit width to page
 !GV.scaleBase:		1
 !GV.medias:		Letter,		612	792	\n\
 !			# LetterSmall,	612	792	\n\
@@ -135,10 +136,14 @@ GV.autoResize:		True
 !GV.defaultSaveDir:	~/
 !GV.fallbackPageMedia:	A4
 !GV.useBackingPixmap:	True
-!GV*dirs:		Home\n\
-!			Tmp\n\
-!			/usr/doc\n\
-!			/usr/local/doc
+GV*dirs:		Home\n\
+			~/Downloads\n\
+			~/Documents\n\
+			~/arq/docs\n\
+			~/livros\n\
+			Tmp\n\
+			/usr/doc\n\
+			/usr/local/doc
 !GV*filter:		no .*
 !GV*filters:		None\n\
 !			*.*ps* *.pdf*  no  .*\n\
