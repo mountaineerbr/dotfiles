@@ -461,9 +461,16 @@ tdk()
 alias ka='killall'
 #kill user
 alias ku='sudo pkill -15 -u'
+
+#kill sub-processes
+#{ kill -- -$$  ;} #kill a process group
+#{ kill 0 ;}
+#{ pkill -P $$ ;}
+
 #SIGINT = 1 , SIGKILL = 9 , SIGTERM = 15
 #list of exit signals
 #install core/man-pages -> man 7 signal
+
 
 #check battery level on arch linux
 batt()
@@ -2027,23 +2034,23 @@ TEMPFILE="$HOME/Downloads/urls.sqlite"
 
 #firefox -- all urls (history, etc)
 faurls() { 
-	\cp "$FFUSER" "$TEMPFILE" <<< y || return 1
+	/bin/cp "$FFUSER" "$TEMPFILE" <<< y || return 1
 	sqlite3 "$TEMPFILE" <<< 'select url from moz_places where 1;'
-	\rm "$TEMPFILE"
+	/bin/rm "$TEMPFILE"
 }
 
 #firefox -- bookmarks
 fburls() { 
-	\cp "$FFUSER" "$TEMPFILE" <<< y || return 1
+	/bin/cp "$FFUSER" "$TEMPFILE" <<< y || return 1
 	sqlite3 "$TEMPFILE" <<< 'select url from moz_bookmarks, moz_places where moz_places.id=moz_bookmarks.fk;'
-	\rm "$TEMPFILE"
+	/bin/rm "$TEMPFILE"
 }
 
 #chrome -- all urls (history, etc)
 caurls() { 
-	\cp "$GCUSER" "$TEMPFILE" <<< y || return 1
+	/bin/cp "$GCUSER" "$TEMPFILE" <<< y || return 1
 	sqlite3 "$TEMPFILE" <<< 'select url from urls where 1;'
-	\rm "$TEMPFILE"
+	/bin/rm "$TEMPFILE"
 }
 
 #chrome -- bookmarks
