@@ -2347,7 +2347,7 @@ sunrise()
 #ascii world
 aworld()
 {
-	while sleep 30 ;do asciiworld -soT -t MUNDO || return 1 ;done
+	while asciiworld -soT -t MUNDO ;do sleep 30 ;done
 }
 #https://www.uninformativ.de/git/asciiworld/file/README.html
 
