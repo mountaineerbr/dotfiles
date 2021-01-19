@@ -1,5 +1,5 @@
 favorites=xfce4-terminal.desktop,mousepad.desktop,libreoffice-impress.desktop,org.gnome.Cheese.desktop,virtualbox.desktop
-recent=libreoffice-writer.desktop,electrum.desktop,libreoffice-calc.desktop,org.gnome.Evince.desktop,vivaldi-stable.desktop,gparted.desktop,torbrowser.desktop,clementine.desktop,whirlpool-gui.desktop,thunar.desktop
+recent=clementine.desktop,xreader.desktop,com.github.muriloventuroso.pdftricks.desktop,xpdf.desktop,gv.desktop,supertuxkart.desktop,electrum.desktop,libreoffice-writer.desktop,xfce4-screensaver-preferences.desktop,simplescreenrecorder.desktop
 button-icon=/home/jsn/Documents/Icons/Icons8-Christmas-Flat-Color-Star.ico
 button-single-row=false
 show-button-title=false
@@ -12,10 +12,10 @@ hover-switch-category=false
 category-show-name=true
 category-icon-size=0
 load-hierarchy=false
-view-as-icons=false
+view-as-icons=true
+default-category=0
 recent-items-max=10
 favorites-in-recent=true
-display-recent-default=false
 position-search-alternate=true
 position-commands-alternate=true
 position-categories-alternate=true
@@ -43,9 +43,9 @@ show-command-hibernate=false
 command-logout=xfce4-session-logout
 show-command-logout=true
 command-menueditor=menulibre
-show-command-menueditor=true
+show-command-menueditor=false
 command-profile=mugshot
-show-command-profile=true
+show-command-profile=false
 search-actions=7
 
 [action0]

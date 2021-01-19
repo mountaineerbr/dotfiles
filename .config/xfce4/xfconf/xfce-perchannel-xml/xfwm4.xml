@@ -87,5 +87,7 @@
       <value type="string" value="Workspace 5"/>
       <value type="string" value="Workspace 6"/>
     </property>
+    <property name="cycle_minimized" type="bool" value="false"/>
+    <property name="zoom_pointer" type="bool" value="true"/>
   </property>
 </channel>
