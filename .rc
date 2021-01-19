@@ -1,7 +1,7 @@
 #
 # ~/.rc
 # shell functions
-# 2020  by mountaineerbr
+# 2021  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 
 # sourced by ~/.bashrc and ~/.zshrc
@@ -2351,7 +2351,7 @@ aworld()
 }
 #https://www.uninformativ.de/git/asciiworld/file/README.html
 
-#check interfaces
+#check interfaces (wlan or eth0)
 #{ ip -brief link show ;}
 #{ ip a ;}
 

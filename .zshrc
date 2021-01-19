@@ -1,5 +1,6 @@
 #
 # ~/.zshrc
+# 2021  by mountaineerbr
 
 #tmux
 #this enables one command to be run when tmux exits.
