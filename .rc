@@ -507,7 +507,7 @@ vf()
 }
 
 #cd to last visited dir in Vifm
-vfcd()
+cdv()
 {
 	local recfile="$HOME/.config/vifm/vifmcd.txt"
 
