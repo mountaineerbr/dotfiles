@@ -216,7 +216,7 @@ mark D ~/Documents
 mark d ~/arq/docs
 mark k ~/.config/conky/confs
 mark m ~/bin/markets
-mark n /media
+mark M /media
 mark q ~/www/mountaineerbr.github.io
 mark Q ~/www/mountaineerbr.github.io/blog
 mark s ~/bin
