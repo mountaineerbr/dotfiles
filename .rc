@@ -185,7 +185,7 @@ alias mv='mv --interactive'
 rm()
 {
 	local REPLY
-	printf '%s\n' "${@:1:10}" ${11+...} "PWD: $PWD" "Press Enter to confirm" >&2
+	printf '%s\n' "${@:1:10}" ${11+...} "PWD: $PWD" "Press Enter to confirm removal" >&2
 	read
 	/usr/bin/rm -I "$@"
 }
