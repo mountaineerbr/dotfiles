@@ -1541,11 +1541,10 @@ cloudflare()
 #usage: hy dog; hy '^dog'; hy 'dog$' and hy '^dog$'
 hy()
 {
-	#subshell
-	(
+	local DIC TMPF TCOL 
+
 	#user local copy
 	DIC=~/arq/docs/MobyHyphenatorII/mhyph.txt
-
 	#tmp file (for downloading, if necessary)
 	TMPF=/tmp/mhyph.txt
 
@@ -1578,7 +1577,6 @@ hy()
 		grep -i "$*" <<< "$DIC"
 	fi |
 		column -ets '$' -NWORD,HYPHENED $TCOL
-	)
 }
 #grep-like sed: { sed -ne "s/${1:-.}/&/pI" ;}
 #also: http://www.gutenberg.org/ebooks/3204
@@ -1659,6 +1657,13 @@ sin()
 #extensão do OpenOffice
 #https://extensions.openoffice.org/en/node/6213
 
+#for acronym list, check
+# package wtf
+# and: http://www.mirbsd.org/acronyms.gz
+
+# for random phrases, check
+# https://swanrad.ch/g.html
+
 #convert between human and unix time formats
 #cdate()
 #{
@@ -1667,10 +1672,7 @@ sin()
 #}
 
 #my script ddate.sh
-D()
-{
-	ddate.sh "$@"
-}
+alias D='ddate.sh'
 
 # Calculate the difference in whole days between two dates, ignoring timezone changes
 datedifference()
