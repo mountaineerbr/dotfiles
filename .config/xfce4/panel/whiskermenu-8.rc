@@ -1,5 +1,5 @@
 favorites=xfce4-terminal.desktop,mousepad.desktop,libreoffice-impress.desktop,org.gnome.Cheese.desktop,virtualbox.desktop
-recent=clementine.desktop,xreader.desktop,com.github.muriloventuroso.pdftricks.desktop,xpdf.desktop,gv.desktop,supertuxkart.desktop,electrum.desktop,libreoffice-writer.desktop,xfce4-screensaver-preferences.desktop,simplescreenrecorder.desktop
+recent=gparted.desktop,clementine.desktop,xreader.desktop,com.github.muriloventuroso.pdftricks.desktop,xpdf.desktop,gv.desktop,supertuxkart.desktop,electrum.desktop,libreoffice-writer.desktop,xfce4-screensaver-preferences.desktop
 button-icon=/home/jsn/Documents/Icons/Icons8-Christmas-Flat-Color-Star.ico
 button-single-row=false
 show-button-title=false
