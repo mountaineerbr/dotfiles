@@ -2064,6 +2064,12 @@ cburls() {
 #url grep
 alias ugrep='faurls | tac | urlgrep.sh'
 
+#check unicode chars
+unichar()
+{
+	python -c "print(\"U+{:04x}\".format(ord(\"$1\")))"
+	#python -c "print(format(ord(\"$1\"), \"04x\"))"
+}
 
 #url encode/decode - percente codes
 #python2
