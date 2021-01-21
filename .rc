@@ -507,7 +507,7 @@ vf()
 }
 
 #cd to last visited dir in Vifm
-cdv()
+vfcd()
 {
 	local recfile="$HOME/.config/vifm/vifmcd.txt"
 
@@ -3341,20 +3341,14 @@ sp()
 
 
 #espeak config speech synthesis
-alias espeak='espeak -a40 -s150 -p30'  #-v brazil
+alias espeak='/bin/espeak -a40 -s150 -p30'  #-v brazil
+alias espeakbr='espeak -v brazil'
+alias espeakng='/bin/espeak-ng -a40 -s150 -p30'
+alias espeakngbr='espeakng -v pt-br'
+
 #make a wav file with text input:
 #{ espeak --stdout -f text.txt > text.wav ;}
-#also check espeak-ng, which has more features
-espeako()
-{
-	local f="espeak_$(date +%s).wav"
-	if espeak --stdout "$@" > "$f"
-	then
-		mplayer "$f"
-		#vlc "$f" &
-	fi
-	echo "wav file $f" >&2
-}
+#open with *mplayer or vlc
 
 ####################
 ###market aliases###
