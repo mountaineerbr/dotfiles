@@ -3621,6 +3621,11 @@ mandelbrot3()
 #{ echo -e "\033[2K" ;}
 #https://unix.stackexchange.com/questions/26576/how-to-delete-line-with-echo
 
+#regex to search for non-ascii values
+#ASCII is in range of 0 to 127
+# [^\x00-\x7F]+
+#https://stackoverflow.com/questions/20889996/how-do-i-remove-all-non-ascii-characters-with-regex-and-notepad
+
 #ncdu for disk and folder usage
 #for a feh alternative, check sxiv
 

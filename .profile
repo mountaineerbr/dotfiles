@@ -32,8 +32,8 @@ for d in  \
 	"$HOME/.local/bin" \
 	"$HOME/bin/more" \
 	"$HOME/bin" \
+	"$HOME/bin/markets" \
 	.
-	#"$HOME/bin/markets" \
 do
 	if [[ -d "$d" ]] &&
 		[[ :"$PATH": != *:"${d:-x}":* ]]
