@@ -638,6 +638,11 @@ rc()
 #git aliases
 
 #use gitk --all for a gui interface
+#install git and tk
+#gnu git viewer: gitg
+#use git log or gitk to get hashes
+#git diff HEAD versionHash [file]
+#https://stackoverflow.com/questions/3338126/how-do-i-diff-the-same-file-between-two-different-commits-on-the-same-branch
 
 #git push force
 #{ git push --force ;}
@@ -1198,6 +1203,8 @@ paci()
  		#nl | sort -k2 -u | sort -n | cut -f2
 		#zshell: print -l "${(fu)$( <infile.txt )}"
 }
+
+alias unseen="perl -ne 'print unless \$seen{\$_}++'"
 
 #pkg file lists
 pls()
@@ -3050,6 +3057,13 @@ toBase58()
 #see the actual bits of a file
 #{ xxd -b ;}
 
+#print hex dump
+#{ xxd -p ;}
+hxd()
+{
+	hexdump -e '32/1 "%02X" "\n"'
+}
+
 #get coinbase tx from genesisblock with
 #{ bitcoin-cli getblock [GENBLK_HASH] 2 ;}
 #https://ma.ttias.be/retrieving-the-genesis-block-in-bitcoin-with-bitcoin-cli/
@@ -4102,6 +4116,12 @@ spacevis() { sed 's|\x20|\x1b[103m\xc2\xb7\x1b[0m|g'; }
 #Swap stdout and stderr
 #$ command 3>&1 1>&2 2>&3
 #all about redirections: https://catonmat.net/bash-one-liners-explained-part-three
+
+#bash helpers
+#$ help if
+#$ help [
+#in bsd (macos)
+#man [
 
 # vi:filetype=sh
 
