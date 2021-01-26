@@ -275,6 +275,25 @@ sedlinks()
 }
 #sed -r 's/.*"(http.*)".*/\1/g'
 
+#jq filters
+#get all paths of a json
+jqpath()
+{
+	#jq -rc 'path(..)|[.[]|tostring]|join("/")' "$@"
+	#jq -r '[path(..)|map(if type=="number" then "[]" else tostring end)|join(".")|split(".[]")|join("[]")]|unique|map("."+.)|.[]' "$@"
+	 jq -r 'def path2text($value):
+		  def tos: if type == "number" then . else tojson end;
+		  reduce .[] as $segment ("";  .
+		    + ($segment
+		       | if type == "string" then "." + . else "[\(.)]" end))
+		  + " = \($value | tos)";
+		
+		paths(scalars) as $p
+		  | getpath($p) as $v
+		  | $p | path2text($v)' "$@"
+}
+#https://github.com/stedolan/jq/issues/243
+
 #browse usetnet
 #from w3m man page
 w3mu()
@@ -518,6 +537,13 @@ vfcd()
 }
 #see another idea from:
 #https://wiki.vifm.info/index.php?title=How_to_set_shell_working_directory_after_leaving_Vifm
+
+#vifm command history
+vifmh() {
+	local vifminfo="$HOME/.config/vifm/vifminfo.json"
+	jq -r '.["cmd-hist"][] | "\(.ts|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))  text: \(.text)"' "$vifminfo"
+	#also: prompt-hist
+}
 
 alias vimdiff='vimdiff "+colorscheme default" "+syntax off" "+set t_Co=16"'
 # Ref vimdiff colurs: https://stackoverflow.com/questions/2019281/load-different-colorscheme-when-using-vimdiff
@@ -4135,6 +4161,9 @@ spacevis() { sed 's|\x20|\x1b[103m\xc2\xb7\x1b[0m|g'; }
 #$ help [
 #in bsd (macos)
 #man [
+
+#useful sed expressions
+#https://gist.github.com/worker8/69d084c59a075fec589741ea0924e6d9
 
 # vi:filetype=sh
 
