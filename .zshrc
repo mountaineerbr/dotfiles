@@ -138,10 +138,7 @@ hash -d w=~/Downloads
 #^[[1; is Alt?
 
 #exit shell on partial command line
-exit_zsh()
-{
-	exit
-}
+exit_zsh() { exit }
 zle -N exit_zsh
 bindkey '^D' exit_zsh
 

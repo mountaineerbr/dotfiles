@@ -181,7 +181,7 @@ alias cp='cp --interactive'
 #moving
 alias mv='mv --interactive'
 
-#
+#more robust rm
 rm()
 {
 	local REPLY
