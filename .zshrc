@@ -89,6 +89,10 @@ setopt G_L___OB_ST_A_R__SH____ORT
 #setopt GLOB_DOTS
 #or use '**string(D)'
 
+#avoids reflexively the rm prompt when `rm  *'  or  `rm  path/*'
+#wait ten seconds and ignore anything typed in that time
+setopt RM_STAR_WAIT
+
 #do not add to history, however it stays in the interactive history
 HISTORY_IGNORE='(q|qq)'
 #HISTORY_IGNORE="(ls|cd|pwd|exit|cd)"
