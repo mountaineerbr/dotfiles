@@ -790,10 +790,10 @@ noremap \w :set wrap!<cr>
 "nnoremap ,t :!xterm &<cr>
 "Edit .ViFMrc
 " Open editor to edit vifmrc and apply settings after returning to vifm
-"nnoremap ,c :write | edit $MYVIFMRC | restart<cr>
+nnoremap ,c :write | edit $MYVIFMRC | restart<cr>
 " Open gvim to edit vifmrc
 "nnoremap ,C :!gvim --remote-tab-silent $MYVIFMRC &<cr>
-
+"https://wiki.vifm.info/index.php/Configuration_model#:restart_usage_example
 
 
 " FUNCTION ( FN ) KEYS BINDDINGS
