@@ -536,7 +536,8 @@ vfcd()
 #https://wiki.vifm.info/index.php?title=How_to_set_shell_working_directory_after_leaving_Vifm
 
 #vifm command history
-vifmh() {
+vifmh()
+{
 	local vifminfo="$HOME/.config/vifm/vifminfo.json"
 	jq -r '.["cmd-hist"][] | "\(.ts|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))  text: \(.text)"' "$vifminfo"
 	#also: prompt-hist
@@ -2125,7 +2126,8 @@ unichar()
 #sed
 #alias urldecode="sed 's@+@ @g;s@%@\\x@g' | xargs -0 printf '%b'"
 #
-urlencode() {
+urlencode()
+{
     # urlencode <string>
     local i length="${#1}"
     #busybox: for i in $(seq 0 $((length-1))); do
@@ -2137,7 +2139,8 @@ urlencode() {
         esac
     done
 }
-urldecode() {
+urldecode()
+{
     # urldecode <string>
 
     local url_encoded="${1//+/ }"
@@ -4130,7 +4133,10 @@ alias gsu='pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY DBUS_SESSION_BUS_A
 
 #its job is to highlight plain whitespaces and
 #mark each one with a dot for easy counting:
-spacevis() { sed 's|\x20|\x1b[103m\xc2\xb7\x1b[0m|g'; }
+spacevis()
+{
+	sed 's|\x20|\x1b[103m\xc2\xb7\x1b[0m|g'
+}
 #https://www.datafix.com.au/BASHing/2020-09-09.html
 
 #awk
