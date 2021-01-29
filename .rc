@@ -520,9 +520,7 @@ alias cal='cal -s'
 vf()
 {
 	local recfile="$HOME/.config/vifm/vifmcd.txt"
-	
 	command vifm --choose-dir "$recfile" "$@"
-
 	echo -e "\aPWD: $PWD"
 }
 
@@ -530,9 +528,7 @@ vf()
 vfcd()
 {
 	local recfile="$HOME/.config/vifm/vifmcd.txt"
-
-	cd "$(<"$recfile")"
-	
+	cd "$(<"$recfile")" || return
 	echo -e "\aPWD: $PWD"
 }
 #see another idea from:
@@ -564,7 +560,7 @@ alias vbak='cd ~/.vim/bak'
 vswap()
 {
 	vim -r
-	cd ~/.vim/swap
+	cd ~/.vim/swap || return
 	echo "$PWD"
 }
 
@@ -784,7 +780,7 @@ gc()
 	(( ${#@} - 1 )) || set -- '' "$1" 
 	git clone "https://github.com/${1:-mountaineerbr}/$2"
 
-	cd "$2"
+	cd "$2" || return
 	echo -e "\n$PWD"
 }
 
@@ -1024,7 +1020,7 @@ alias cdW='cd ~/www/mountaineerbr'
 tmpd()
 {
 	(( $# )) && set -- .${1##*/}
-	builtin cd "$( mktemp -d "/tmp/$( date +%s )${1}.XXXXXX" )"
+	builtin cd "$( mktemp -d "/tmp/$( date +%s )${1}.XXXXXX" )" || return
 	echo "$PWD"
 }
 
