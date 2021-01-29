@@ -252,7 +252,7 @@ alias hf='w3m -dump -T text/html'
 #{ lynx -force_html -stdin -dump -nolist ;}
 #{ elinks -dump ;}
 alias hf2="sed 's/<[^>]*>//g'"
-#try to leave one tag per line (minified html)
+#try to leave one tag per line (from minified html)
 #{ sed 's|<[^/]*>[^>]*>|&\n|g' ;}
 
 #curly brackets filter
