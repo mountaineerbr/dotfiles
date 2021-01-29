@@ -1042,9 +1042,11 @@ wherep()
 #https://stackoverflow.com/questions/3274354/how-to-find-out-mount-partition-a-directory-or-file-is-on-linux-server
 
 #copy buffer to clipboard
+#usage: echo 'copy this' | clip
+#usage: clip FILE..
 clip()
 {
-	cat | xsel -b
+	cat "$@" | xsel -b
 }
 #to use with GNU Screen: 1.Copy buffer (Ctrl+a [); 2. entre this function; 3. Paste (Ctrl+a ]); 4. Ctrl+d
 #https://stackoverflow.com/questions/16111548/how-to-copy-the-gnu-screen-copy-buffer-to-the-clipboard
@@ -1055,9 +1057,9 @@ clipboard()
 {
 	while :
 	do
-		echo -ne "\n${Purple}PRIMARY__:$NC  "
+		echo -ne "\n${Purple}PRIMARY__:$NC "
 		xsel -p -o
-		echo -ne "\n${Blue}CLIPBOARD:$NC  "
+		echo -ne "\n${Blue}CLIPBOARD:$NC "
 		xsel -b -o
 		sleep 1
 	done
@@ -1067,9 +1069,9 @@ clipboard2()
 {
 	while :
 	do
-		echo -ne "\n${Purple}PRIMARY__:$NC  "
+		echo -ne "\n${Purple}PRIMARY__:$NC "
 		xclip -o -sel p
-		echo -ne "\n${Blue}CLIPBOARD:$NC  "
+		echo -ne "\n${Blue}CLIPBOARD:$NC "
 		xclip -o -sel c
 		sleep 1
 	done
@@ -1081,19 +1083,18 @@ OZ=28.349523125
 #https://en.wikipedia.org/wiki/Ounce
 #gram to troy ounce ratio for precious metals
 TOZ=31.1034768  #also? 31.1034807
-
 #funcs to print and copy values
 oz()
 {
 	#copy to clipboard
-	xclip -selection clipboard <<<"$OZ"
-	printf "%s\n" "$OZ"
+	echo -n "$OZ" | xclip -selection clipboard
+	echo "$OZ"
 }
 toz()
 {
 	#copy to clipboard
-	xclip -selection clipboard <<<"$TOZ"
-	printf "%s\n" "$TOZ"
+	echo -n "$TOZ" | xclip -selection clipboard
+	echo "$TOZ"
 }
 #https://goldprice.com/troy-ounce-vs-ounce/
 
@@ -1176,12 +1177,7 @@ alias pacc='sudo pacman -Sy && pacman -Qu'
 #pkgs with upgrades available - another way
 alias pacp='sudo pacman -Syup'
 #https://bbs.archlinux.org/viewtopic.php?id=8181
-pacman()
-{
-	[[ "$*" = *-Syu* ]] && echo "DID YOU MAKE A BACKUP BEFORE SYNC'ING?" >&2
-	/usr/bin/pacman "$@"
 #run `pkgfile --update` and `sync`
-}
 #or add a pacman hook to sync data to disk
 #https://bbs.archlinux.org/viewtopic.php?id=261655
 

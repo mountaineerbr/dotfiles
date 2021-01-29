@@ -662,8 +662,8 @@ noremap :; :
 "inoremap <C-\> :q<CR>
 " Other Exits
 noremap :Q :q
-noremap :qq :q<CR>
-noremap ;qq :q<CR>
+noremap ;Q :q
+noremap ;q :q
 "
 "
 " Go to same line position within a wrapped line

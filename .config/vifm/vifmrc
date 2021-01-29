@@ -736,13 +736,21 @@ vnoremap w :view<cr>gv
 "nnoremap O :!gvim %f<cr>
 
 " Open file in the background using its default program
-"nnoremap gb :file &<cr>l
+nnoremap gb :file &<cr>l
 
-" Yank current Dir path to PRIMARY and CLIPBOARD
-nnoremap yd :!echo %d | xclip -selection primary %i && echo %d | xclip -selection clipboard %i <cr>
-
-" Yank current File path to PRIMARY and CLIPBOARD
-nnoremap yf :!echo %c:p | xclip -selection primary %i && echo %c:p | xclip -selection clipboard %i<cr> 
+" yank current directory path into primary and selection clipboards
+nnoremap yd :!echo -n %d | xsel --input --primary %i &&
+            \ echo -n %d | xsel --clipboard --input %i<cr>:echo expand('%"d') "is yanked to clipboard"<cr>
+" yank current file path into primary and selection clipboards
+nnoremap yf :!echo -n %c:p | xsel --input --primary %i &&
+            \ echo -n %c:p | xsel --clipboard --input %i<cr>:echo expand('%"c:p') "is yanked to clipboard"<cr>
+" yank current filename without path into primary and selection clipboards
+nnoremap yn :!echo -n %c | xsel --input --primary %i &&
+            \ echo -n %c | xsel --clipboard --input %i<cr>:echo expand('%"c') "is yanked to clipboard"<cr>
+" yank root of current file's name into primary and selection clipboards
+nnoremap yr :!echo -n %c:r | xsel --input --primary %i &&
+            \ echo -n %c:r | xsel --clipboard --input %i<cr>:echo expand('%"c:r') "is yanked to clipboard"<cr>
+"https://wiki.vifm.info/index.php/How_to_copy_path_to_current_file/directory_to_system_clipboard
 
 " RENAMING Maps
 " Rename from first char
@@ -759,7 +767,9 @@ nnoremap ; :
 "nmap <C-d> :q <CR>
 " May want to remap something to trigger original command:
 "noremap <C-s> <C-d>
-nmap :qq :q <CR> 
+nmap :Q :q
+nmap ;Q :q
+nmap ;q :q
 
 
 
