@@ -181,7 +181,8 @@ alias cp='cp --interactive'
 #moving
 alias mv='mv --interactive'
 
-#more robust rm
+#as i have removed important files accidentally recently,
+#i am using this rm function now instead
 rm()
 {
 	local REPLY
@@ -2101,11 +2102,13 @@ cburls() {
 alias ugrep='faurls | tac | urlgrep.sh'
 
 #check unicode chars
+#usage: unichar ⛄
 unichar()
 {
 	python -c "print(\"U+{:04x}\".format(ord(\"$1\")))"
 	#python -c "print(format(ord(\"$1\"), \"04x\"))"
 }
+#see also: https://stackoverflow.com/questions/41125346/how-do-i-display-the-unicode-syntax-uxxxx-from-a-string/41125383
 
 #url encode/decode - percente codes
 #python2
