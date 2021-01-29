@@ -350,7 +350,7 @@ command Xbrc !vim ~/.xbindkeysrc
 " FAVORITE PROGRAMMES (MIME TYPE)
 
 " Pdf
-filextype *.pdf evince %c %i &, apvlv %c, xpdf %c
+filextype *.pdf xpdf %c, evince %c %i &, apvlv %c
 fileviewer *.pdf pdftotext -nopgbrk %c -
 
 " PostScript
