@@ -327,6 +327,7 @@ command Xbrc !vim ~/.xbindkeysrc
 " The other programs for the file type can be accessed with the :file command
 " The command macros %f, %F, %d, %F may be used in the commands.
 " The %a macro is ignored.  To use a % you must put %%.
+" %i     Completely ignore command output.
 
 " For automated FUSE mounts, you must register an extension with :file[x]type
 " in one of following formats:
@@ -350,17 +351,17 @@ command Xbrc !vim ~/.xbindkeysrc
 " FAVORITE PROGRAMMES (MIME TYPE)
 
 " Pdf
-filextype *.pdf xpdf %c, evince %c %i &, apvlv %c
+filextype *.pdf xpdf %c %i &, xreader %c %i &, evince %c %i &, apvlv %c
 fileviewer *.pdf pdftotext -nopgbrk %c -
 
 " PostScript
 filextype *.ps,*.eps,*.ps.gz
+        \ {View in gv}
+        \ gv %c %i &,
 	\ {View in evince}
 	\ evince %f,
         \ {View in zathura}
-        \ zathura %f,
-        \ {View in gv}
-        \ gv %c %i &,
+        \ zathura %f
 
 " Djvu
 filextype *.djvu
@@ -386,7 +387,7 @@ filextype *.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,
 	\*.mpeg,*.vob,*.fl[icv],*.m2v,*.mov,*.webm,*.ts,
 	\*.mts,*.m4v,*.r[am],*.qt,*.divx,*.as[fx]
 		\ {View using VLC}
-		\ vlc %f,
+		\ vlc %f %i &,
 		\ {View using mplayer}
 		\ mplayer %f,
 		\ {View using ffplay}
@@ -426,7 +427,7 @@ fileviewer *.[1-8] man ./%c | col -b
 " Images
 filextype *.bmp,*.jpg,*.jpeg,*.png,*.xpm,*.pnm,*.tiff
 	\ {View in Feh}
-	\ feh -FZ %d --start-at %d/%c 2>/dev/null,
+	\ feh -FZ %d --start-at %d/%c %i,
 	\ {View in sxiv}
         \ sxiv %f,
         \ {View in gpicview}
