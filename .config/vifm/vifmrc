@@ -431,16 +431,17 @@ filextype *.bmp,*.jpg,*.jpeg,*.png,*.xpm,*.pnm,*.tiff
 filextype *.svg
 	\ nomacs %c,
 fileviewer *.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm
+         \ imgt %px %py %pw %ph %c %i, 
+         \ %pc,
+         \ imgc %px %py %pw %ph
 	"\ convert -identify %f -verbose /dev/null
 	"\ img2txt %c
 	"\ imgc %c
 	"\ fbi %c  "for frame buffers, tty; also check fim
 	"\ chafa -s 40x80 --color-space din99d %c
-         \ imgt %px %py %pw %ph %c,
-         \ %pc,
-         \ imgc %px %py %pw %ph,
 "aalib (b&w), libcaca (colour)
 "img2txt (from libcaca), cacaviewer, aatest, aview, jp2a, pixterm
+"imgt and imgc:: https://wiki.vifm.info/index.php/How_to_preview_images
 
 " GIF with NOMACS
 filextype *.gif
@@ -684,13 +685,13 @@ set vifminfo=dhistory,savedirs,chistory,state,tui,shistory,
 "set viewcolumns=-{name}.,12{}.
 "windo set viewcolumns=-{name}..,6{size},11{perms}
 windo    set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
-nmap ,o :set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
+nmap ,0 :set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
 
 "change mtime to perms
 nmap ,p  :set viewcolumns=-{name}..,3{ext},7{size},11{perms} <cr>
 
 "mtime + perms
-nmap ,0  :set viewcolumns=-{name}..,3{ext},7{size},11{perms},13{mtime} <cr>
+nmap ,o  :set viewcolumns=-{name}..,3{ext},7{size},11{perms},13{mtime} <cr>
 
 
 " Natural sort of (version) numbers within text.
@@ -774,6 +775,12 @@ nnoremap yr :!echo -n %c:r | xsel --input --primary %i &&
 " Rename from last char
 "nnoremap A cw
 
+"Panel resizing
+"Just type - or _ to resize the panels
+nnoremap - <C-w>5<
+nnoremap _ <C-w>5>
+"https://wiki.archlinux.org/index.php/Vifm
+
 " Single stroke to access command line
 nnoremap ; :
                                                                             
@@ -788,6 +795,7 @@ nmap :Q  :q
 nmap ;Q  :q
 nmap :Wq :wq
 nmap ;Wq :wq
+
 
 
 " BINDDINGS WITH LEADER ,
