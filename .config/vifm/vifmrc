@@ -58,13 +58,6 @@ set followlinks
 " unambiguous beginning using :! (e.g. :!Te instead of :!Terminal or :!Te<tab>).
 set fastrun
 
-" Natural sort of (version) numbers within text.
-set sortnumbers
-
-" Sort by names, ignores case
-set sort=iname
-set sortorder=ascending
-
 " Maximum number of changes that can be undone
 " One file deleted, one unit, not one operation
 " (Default: 100)
@@ -93,7 +86,7 @@ highlight Border cterm=none ctermbg=DarkBlue ctermfg=White
 " See man date or man strftime for details.
 "(Example)set timefmt=%m/%d\ %H:%M
 "set timefmt=%y/%m/%d\_%R
-set timefmt=%y%b%d\_%H%M
+set timefmt=%y%b%d\ %H%M
 " OBS: Check "man 1 date"
 
 " Show list of matches on tab completion in command-line mode
@@ -163,7 +156,7 @@ set hlsearch
 "set iec
 
 " Human-friendly Size Format Configuration
-set sizefmt=units:si,precision:3
+set sizefmt=units:iec,precision:2,nospace
 
 " Terminal height in lines on startup
 "set lines=50
@@ -265,20 +258,21 @@ command link ln -s %d/%f %D
 
 " Toggle Between Three Sorting States
 command! togglesort
-         \ :if &sort == '-size,+name'
-	 \ |        set viewcolumns=-{name}...,6{}.
-	 \ | 	    set sort=+iname 
-         \ |        echo 'Sorted by NAME'
+         \ :if &sort == '+ext,+name'
+	 \ |    set sort=+name 
+         \ |    echo 'Sorted by NAME'
+         \ |elseif &sort == '-size,+name'
+	 \ |    set sort=+ext
+         \ |    echo 'Sorted by EXTENSION'
+	 \ |elseif &sort == '+mtime,+name'
+         \ |    set sort=-size
+         \ |    echo 'Sorted by SIZE'
+         \ |elseif &sort == '+iname'
+         \ |    set sort=+mtime
+	 \ |    echo 'Sorted by MODIFICATION DATE'
          \ |else
-         \ |    if &sort == '+mtime,+name'
-	 \ |        set viewcolumns=-{name}..,9{}.
-         \ |        set sort=-size
-         \ |        echo 'Sorted by SIZE'
-         \ |    else
-	 \ |        set viewcolumns=-{name}..,12{}. 
-         \ |        set sort=+mtime
-	 \ |        echo 'Sorted by MODIFICATION DATE'
-         \ |    endif
+         \ |    set sort=+iname
+	 \ |    echo 'Defaults view, iNAME'
          \ |endif
 " https://q2a.vifm.info/78/how-can-i-toggle-between-two-sorting-states?show=79#a79
 "ORIGINAL CODE:
@@ -685,8 +679,27 @@ set vifminfo=dhistory,savedirs,chistory,state,tui,shistory,
 " Examples of configuring both panels
 
 " Customize view columns a bit (enable ellipsis for truncated file names)
+"set viewcolumns=-{name},{ext},{mtime}
 "set viewcolumns=-{name}..,12{}.
-set viewcolumns=-{name}.,12{}.
+"set viewcolumns=-{name}.,12{}.
+"windo set viewcolumns=-{name}..,6{size},11{perms}
+windo    set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
+nmap ,o :set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
+
+"change mtime to perms
+nmap ,p  :set viewcolumns=-{name}..,3{ext},7{size},11{perms} <cr>
+
+"mtime + perms
+nmap ,0  :set viewcolumns=-{name}..,3{ext},7{size},11{perms},13{mtime} <cr>
+
+
+" Natural sort of (version) numbers within text.
+set sortnumbers
+
+" Sort by names, ignores case
+set sort=iname
+set sortorder=ascending
+
 
 " Filter-out build and temporary files
 "
@@ -764,25 +777,29 @@ nnoremap yr :!echo -n %c:r | xsel --input --primary %i &&
 " Single stroke to access command line
 nnoremap ; :
                                                                             
-" Quit similarly to Bash                                                    
+" Exits
+"Prefer to use ZZ or ZQ
+" Bash-like quit
 "nmap <C-d> :q <CR>
 " May want to remap something to trigger original command:
 "noremap <C-s> <C-d>
-nmap :Q :q
-nmap ;Q :q
-nmap ;q :q
+nmap ;q  :q
+nmap :Q  :q
+nmap ;Q  :q
+nmap :Wq :wq
+nmap ;Wq :wq
 
 
-
-" BINDDINGS WITH LEADER \
+" BINDDINGS WITH LEADER ,
 
 " Execute command togglesort
-noremap \t :togglesort<cr>
+noremap ,t :togglesort<cr>
 
 " Toggle wrap setting on ,w key
-noremap \w :set wrap!<cr>
+noremap ,w :set wrap!<cr>
 
-
+"sync directory in panes
+noremap ,i :sync! <cr>
 
 " Examples
 " Open console in current directory
@@ -794,6 +811,16 @@ nnoremap ,c :write | edit $MYVIFMRC | restart<cr>
 " Open gvim to edit vifmrc
 "nnoremap ,C :!gvim --remote-tab-silent $MYVIFMRC &<cr>
 "https://wiki.vifm.info/index.php/Configuration_model#:restart_usage_example
+
+
+"toggle lsview
+noremap ,l :set lsview! <cr>
+"toggle millerview
+noremap ,m :set millerview! <cr>
+
+
+" BINDDINGS WITH LEADER \
+
 
 
 " FUNCTION ( FN ) KEYS BINDDINGS
