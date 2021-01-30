@@ -1177,6 +1177,7 @@ alias pacc='sudo pacman -Sy && pacman -Qu'
 #pkgs with upgrades available - another way
 alias pacp='sudo pacman -Syup'
 #https://bbs.archlinux.org/viewtopic.php?id=8181
+
 #run `pkgfile --update` and `sync`
 #or add a pacman hook to sync data to disk
 #https://bbs.archlinux.org/viewtopic.php?id=261655

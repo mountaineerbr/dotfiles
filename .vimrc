@@ -657,13 +657,17 @@ noremap :: :
 noremap :; :
 "
 "
+" Exits
+"Prefer to use ZZ or ZQ
 " Bash-like Quit
 "noremap <C-D> :q<CR>
 "inoremap <C-\> :q<CR>
 " Other Exits
-noremap :Q :q
-noremap ;Q :q
-noremap ;q :q
+noremap ;q  :q
+noremap :Q  :q
+noremap ;Q  :q
+noremap :Wq :wq
+noremap ;Wq :wq
 "
 "
 " Go to same line position within a wrapped line
