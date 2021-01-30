@@ -830,7 +830,8 @@ nnoremap ,c :write | edit $MYVIFMRC | restart<cr>
 noremap ,l :set lsview! <cr>
 "toggle millerview
 noremap ,m :set millerview! 
-	\ |:set viewcolumns={name} <cr>
+	\ |view
+	\ |set viewcolumns={name} <cr>
 "tree view
 noremap ,e :tree! <cr>
 
