@@ -180,6 +180,9 @@ set lsoptions=transposed
 "set milleroptions=lsize:1,csize:2,rsize:2
 " Example 2 of two-column mode which is useful
 " in combination with :view cmd
+"default
+"set milleroptions=lsize:1,csize:1,rsize:1,rpreview:dirs
+"two-column mode which is useful in combination with :view command:
 set milleroptions=lsize:1,csize:2
 " More options: ,rsize:1
 
@@ -684,14 +687,16 @@ set vifminfo=dhistory,savedirs,chistory,state,tui,shistory,
 "set viewcolumns=-{name}..,12{}.
 "set viewcolumns=-{name}.,12{}.
 "windo set viewcolumns=-{name}..,6{size},11{perms}
-windo    set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
 nmap ,0 :set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
+"set defaults
+windo    set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
 
 "change mtime to perms
 nmap ,p  :set viewcolumns=-{name}..,3{ext},7{size},11{perms} <cr>
 
-"mtime + perms
-nmap ,o  :set viewcolumns=-{name}..,3{ext},7{size},11{perms},13{mtime} <cr>
+" detailed information about files
+nnoremap <silent> ,d :set viewcolumns=*{name}..,11{perms},7{uname},-7{gname},7{size}.,13{mtime}<cr>
+"https://q2a.vifm.info/464/filtering-columns-when-window-is-too-small
 
 
 " Natural sort of (version) numbers within text.
@@ -824,7 +829,10 @@ nnoremap ,c :write | edit $MYVIFMRC | restart<cr>
 "toggle lsview
 noremap ,l :set lsview! <cr>
 "toggle millerview
-noremap ,m :set millerview! <cr>
+noremap ,m :set millerview! 
+	\ |:set viewcolumns={name} <cr>
+"tree view
+noremap ,e :tree! <cr>
 
 
 " BINDDINGS WITH LEADER \
