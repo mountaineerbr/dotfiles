@@ -1335,30 +1335,32 @@ alias ala='~/bin/ala.sh'
 #arch-general
 #get the current month box
 #usage: amail dec-2020
+#arch-general arch-mirrors arch-security aur-requests aur-general pacman-contrib
 amail()
 {
-	local month list
-
-	#arch-general arch-mirrors arch-security aur-requests aur-general pacman-contrib
-	list=arch-general
-	month="$(date -d"${*:-today}" +%Y-%B)" ||
-		month="$(date -d"01 ${*:-today}" +%Y-%B)" || return
-
-	#files are either plain ``.txt'' or ``.txt.gz''
-	curl -L https://lists.archlinux.org/pipermail/${list}/${month}.txt.gz |
-		gzip -c -d
-
-	echo "MONTH: $month" >&2
+	local months list m
+	list="${1:-arch-general}"
+	months=( $(curl -L https://lists.archlinux.org/pipermail/$list/ |
+		sed -n '/<td><A/ p' | sed -En 's/.*"([^"]*)".*/\1/ p' ) )
+	select m in "${months[@]}"
+	do
+		#files are either plain `.txt' or `.txt.gz'
+		curl -L https://lists.archlinux.org/pipermail/$list/$m |
+		if [[ "$m" = *.gz ]]
+		then gzip -c -d
+		else cat
+		fi
+		echo "MONTH: $m" >&2
+		break
+	done
 }
 #get the raw mailbox (210+ MB!!)
 allmail()
 {
 	local list
-
-	list=arch-general
+	list="${1:-arch-general}"
 	curl -L https://lists.archlinux.org/pipermail/${list}.mbox/${list}.mbox
 }
-#https://lists.archlinux.org/pipermail/arch-general/
 
 
 #debian -- list of all packages
@@ -4166,6 +4168,9 @@ spacevis()
 
 #useful sed expressions
 #https://gist.github.com/worker8/69d084c59a075fec589741ea0924e6d9
+
+#read with readline (-e), question (-p) initial value (-i)
+#read -e -p "Enter Your Name:" -i "Ricardo"
 
 # vi:filetype=sh
 
