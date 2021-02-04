@@ -2,7 +2,7 @@
 # ~/.xbindkeysrc
 #
 
-#should start xbinkeys from ~/.xinitrc
+#xinit loads this
 
 #reload:
 #killall -s1 xbindkeys
@@ -140,6 +140,10 @@
 #xkill
 "xkill"
  Mod2+Mod4 + k
+
+#rofimoji
+"rofimoji"
+ Mod2+Mod4 + r
 
 #location of pointer on keypress
 #must enable settings>acessibility>mouse in xfce4

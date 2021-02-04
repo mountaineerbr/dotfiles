@@ -186,8 +186,8 @@ alias mv='mv --interactive'
 rm()
 {
 	local REPLY
-	printf '%s\n' ${11+...} "PWD: $PWD" "Press Enter to confirm removal" >&2
 	ls "${@:1:10}"
+	printf '%s\n' ${11+...} "PWD: $PWD" "Press Enter to confirm removal" >&2
 	read
 	/usr/bin/rm -I "$@"
 }
@@ -201,6 +201,19 @@ alias egrep='egrep --colour=auto'
 alias fgrep='fgrep --colour=auto'
 alias igrep='grep -i'
 #'agrep' for approximate search from the 'tre' pkg
+
+#parent pid of given process
+ppid()
+{
+	local id=${1:-$$}
+
+	ps -p $id -o ppid=
+	#ps j $id
+	#pstree -sg $id
+	#grep '^PPid:' /proc/$id/status
+}
+#https://superuser.com/questions/150117/how-to-get-parent-pid-of-a-given-process-in-gnu-linux-from-command-line
+#scripts: parent pid is in shell variable $PPID
 
 #grep id and process
 grepid()
