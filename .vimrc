@@ -41,10 +41,11 @@ if 1
   "see:https://vim.fandom.com/wiki/Indenting_source_code
   "
   " Use the indent of the previous line for a newly created line
-  "set autoindent
   "set cindent
-  set autoindent smartindent
-  "'smartindent' and 'cindent' might interfere with file type based indentation, and should never be used in conjunction with it.
+  "set smartindent
+  set autoindent
+  "smartindent and cindent might interfere with file type based
+  "indentation, and should never be used in conjunction with it.
   
   " Line will continue visually indented (same amount of space as the
   " beginning of that line), thus preserving horizontal blocks of text
