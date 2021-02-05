@@ -849,10 +849,12 @@ grmob()
 #{ git -C DIR rev-parse --is-inside-work-tree ;}
 
 #download a single file from github repos
-#one positional parameter is read as FILE or a subrepo
-#path to a FILE;  two args are read as REPO and FILE;  
-#three arguments give the full address to a git USER, 
-#REPO and FILE location.  must set def git user and repo
+#usage:  gd [USER] [REPO] [SUBREPO/PATH/]FILE
+#usage:  gd  grml  grml-etc-core  etc/zsh/zshrc
+#one positional parameter is read as FILE or a subrepo path to a FILE;
+#two args are read as REPO and FILE;  
+#three arguments give the full address to a git USER, REPO and FILE location.
+#must set def git user and repo
 gd()
 {
 	local defuser defrepo url
@@ -860,14 +862,7 @@ gd()
 	defrepo=dotfiles
 
 	#print usage
-	if [[ -z "$1" || -n "$4" ]]
-	then
-		cat >&2 <<-!
-		usage:  gd [USER] [REPO] [SUBREPO/PATH/]FILE
-		usage:  gd  grml  grml-etc-core  etc/zsh/zshrc
-		!
-		return 1
-	fi
+	[[ -z "$1" || -n "$4" ]] && return 1
 
 	#set positional parameters (default user, repo etc if empty..)
 	(( ${#@} - 1 )) || set -- "${3:-$defuser}" "${2:-$defrepo}" "$1"
@@ -901,7 +896,7 @@ gd()
 gk()
 { 
 	#check arg number
-	(( $# )) || return
+	(( $# )) || return 1
 
 	(
 	#set shell options
