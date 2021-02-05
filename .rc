@@ -1586,47 +1586,28 @@ cloudflare()
 #https://medium.com/bugbountywriteup/bypass-cloudflare-waf-to-pwned-application-2c9e4f862319
 
 #moby hyphenator dictionary
-#usage: hy dog; hy '^dog'; hy 'dog$' and hy '^dog$'
+#usage: hy dog
+#usage: hy '^dog'
 hy()
 {
-	local DIC TMPF TCOL 
+	local dic tcol expression
+	expression="$*"
 
-	#user local copy
-	DIC=~/arq/docs/MobyHyphenatorII/mhyph.txt
-	#tmp file (for downloading, if necessary)
-	TMPF=/tmp/mhyph.txt
-
-	#set columns for interactive pretty print
-	[[ -t 1 ]] && TCOL='-TWORD'
-
-	#if there is no local copy, try to download it
-	if [[ ! -f "$DIC" ]]
-	then
-		#check for downloaded temp file
-		if [[ ! -f "$TMPF" ]]
-		then
-			curl -L 'http://www.gutenberg.org/files/3204/files/mhyph.txt' > "$TMPF" || return
-			#https://github.com/mountaineerbr/extra/raw/master/MobyHyphenatorII/mhyph.txt
-			printf 'File at %s\n\n' "$TMPF" >&2
-		fi
-
-		#set new path
-		DIC="$TMPF"
-	fi
+	#local copy
+	dic="$HOME/arq/docs/MobyHyphenatorII/mhyph.txt"
+	#http://www.gutenberg.org/files/3204/files/mhyph.txt
 
 	#process raw dictionary
-	DIC="$( pr -mJ -t <( < "$DIC" ) <( tr '¥' '-' < "$DIC" ) | tr -cd '[:print:]\t\n' | sed -e 's/\t\t*/$/g' -e 's/\s\s*/ /g' )"
+	diclist="$(paste "$dic" <(tr '¥' '-' <"$dic") | tr -dc '[:print:]\n\s\t' | sed 's/--/-/g')"
+
+	#set columns for interactive pretty print
+	[[ -t 1 ]] && tcol='-TWORD,HYPHENED'
 
 	#grep and format table
-	if ! grep -i "^${*}\\$" <<< "$DIC"
-	then
-		#if user adds '$', she probably means word bondary
-		set -- "${*//$/\\$}"
-		grep -i "$*" <<< "$DIC"
-	fi |
-		column -ets '$' -NWORD,HYPHENED $TCOL
+	if ! grep -iE "^${expression}$" <<<"$diclist"
+	then grep -iE "${expression}" <<<"$diclist"
+	fi | column -et -s$'\t' -NWORD,HYPHENED $tcol
 }
-#grep-like sed: { sed -ne "s/${1:-.}/&/pI" ;}
 #also: http://www.gutenberg.org/ebooks/3204
 #https://raw.githubusercontent.com/mountaineerbr/dotfiles/master/mhyphMobyHyphenatorII.txt
 
@@ -1887,64 +1868,7 @@ zpass()
 #ascii="\ \!\"#\$%\&\'\(\)\*+\,./0123456789:\;\<=\>\?@ABCDEFGHIJKLMNOPQRSTUVWXYZ\[\]\^_\`abcdefghijklmnopqrstuvwxyz\{\|\}~\\-"
 
 #cep dos correios
-#por nome de rua ou cep
-#ex: $ cep Avenida Paulista
-#https://www.vivaolinux.com.br/topico/Sed-Awk-ER-Manipulacao-de-Textos-Strings/CEP-pela-Shell
-cep()
-{
-	local d t cephelp pvar pini pfim
-	cephelp="Puxar CEP dos Correios
-
-	Não utilize acentos, número de casa/apto/lote/prédio ou
-	abreviações.
-
-	Exemplos
-		cep 07140-190
-		cep Rua Higienopolis Guarulhos"
-
-	#check arguments or -h opt
-	if [[ -z "$1" ]] || [[ "$1" = -h ]]
-	then
-		echo "$cephelp"
-		return
-	fi
-
-	#retirar espaços em branco e acentos do input
-	set -- $( iconv -f utf-8 -t ascii//translit <<< "$*" | tr \  + )
-	
-	#bucar resultados
-	pvar=50 ;pini=1 ;pfim="$pvar"
-	while d="$( curl -L -\# "https://buscacepinter.correios.com.br/app/endereco/carrega-cep-endereco.php?pagina=%2Fapp%2Fendereco%2Findex.php&cepaux=&mensagem_alerta=&endereco=${*}&tipoCEP=ALL&inicio=${pini}&final=${pfim}" | jq -e . 2>/dev/null )"
-
-		#check exit codes
-		if [[ "${PIPESTATUS[*]:-${pipestatus[*]}}" = *[1-9]* ]]
-		then
-			return 1
-		fi
-
-		#error message in json?
-		if [[ "$(jq -r .erro <<<"$d" )" != false ]]
-		then
-			jq -r .mensagem <<<"$d" >&2
-			return 1
-		fi
-	do
-		t="$(jq -r .total <<<"$d")"
-		(( pini = pini + pvar ))
-		(( pfim = pfim + pvar ))
-
-		jq -r '.dados[] | "\(.cep)\t\(.uf)\t\(.localidade)\t\(.bairro)\t\(.logradouroDNEC)\t\(.numeroLocalidade)\t\(.logradouroTextoAdicional)\t\(.nomeUnidade)\t\(.situacao)"' <<<"$d" |
-			column -dts$'\t' -N1,2,3,4,5,6,7,8,9 -T4,7,8,9
-		
-		#sleep 1.2  #pode evitar throttle
-
-		if (( pfim > t ))
-		then
-			jq -r .mensagem <<<"$d" | grep -vi sucesso && return 1
-			return 0
-		fi
-	done
-}
+alias cep=cep.sh
 
 #informações por número de cep
 cep2()
