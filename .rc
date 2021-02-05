@@ -2749,8 +2749,6 @@ pages2txt()
 #default urls file:  ~/Downloads/yt.txt
 
 #THE FOLLOWING youtube-dl FUNCTIONS ARE DEPENDENT ON EACH OTHER
-#will change them so they are independent of each other some time..
-
 #simple download
 #usage:  yt ["dest_dir"] [urls..]
 yt()
@@ -2861,10 +2859,8 @@ homesudo()
 octal()
 {
 	if [[ -z "$1" ]]
-	then
-		/usr/bin/stat -c "%a %u %U >> %n" -- *
-	else
-		/usr/bin/stat -c "%a %u %U >> %n" "$1"
+	then /usr/bin/stat -c "%a %u %U >> %n" -- *
+	else /usr/bin/stat -c "%a %u %U >> %n" "$1"
 	fi
 }
 #https://stackoverflow.com/questions/1795976/can-the-unix-list-command-ls-output-numerical-chmod-permissions
@@ -3162,10 +3158,8 @@ xtfr()
 xtfs()
 {
 	if [[ "$1" = [[:digit:]]* ]]
-	then
-		echo -e "\e]50;-xos4-terminus-medium-r-*--${1}-*-*-*-*-*-*-*\a"
-	else
-		echo -e "\e]50;${1}\a"
+	then echo -e "\e]50;-xos4-terminus-medium-r-*--${1}-*-*-*-*-*-*-*\a"
+	else echo -e "\e]50;${1}\a"
 	fi
 	
 	xlsfonts | grep xos4 | grep medium
