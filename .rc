@@ -4043,5 +4043,21 @@ spacevis()
 #read with readline (-e), question (-p) initial value (-i)
 #read -e -p "Enter Your Name:" -i "Ricardo"
 
+#unit representations
+#k=K=kiB=KiB=1024
+#kb=KB=1000
+#M=MiB=10242
+#MB=10002
+#https://www.pixelbeat.org/docs/coreutils-gotchas.html#units
+
+#bash matrix
+shmatrix()
+{
+	tr -c "[:xdigit:]" " " < /dev/urandom | dd cbs=$COLUMNS conv=unblock |
+	GREP_COLOR="1;32" grep --color "[^ ]"
+}
+#https://www.pixelbeat.org/docs/terminal_colours/
+
+
 # vi:filetype=sh
 
