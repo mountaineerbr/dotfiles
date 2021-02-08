@@ -178,6 +178,19 @@ set cursorline
 set colorcolumn=72,77
 " Make it obvious where 80 characters is
 
+
+" Tab and indent options
+"
+" set display width of tab; 1 tab = x space with                                                           
+"set tabstop=2
+" transform tab to x space (x is tabstop)                                                               
+"set expandtab
+" auto indent; new line with number of space at the beginning same as previous
+"set autoindent
+" number of space append to lines when type >>
+"set shiftwidth=2
+"https://stackoverflow.com/questions/1878974/redefine-tab-as-4-spaces/38461002
+
 " Set whitespace and tab chars
 set listchars=tab:>-,trail:·,eol:$
 " kai hendry: set list listchars=nbsp:¬,tab:»·,trail:·,extends:>

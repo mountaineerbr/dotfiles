@@ -638,6 +638,7 @@ alias xbk='vim ~/.xbindkeysrc'
 alias trc='vim ~/.tmux.conf'
 alias mrc='vim ~/.mutt/muttrc'
 alias mrc='vim ~/bin/markets/mkt_func.sh'
+alias pkgl='vim ~/arq/docs/archInstallPkgSuggestion.txt'
 
 #edit and source
 sbrc()
@@ -2541,6 +2542,13 @@ alias emojientities='htmlentities 129510 8986'
 alias atown='ssh torus@ascii.town'
 #https://ascii.town/
 
+#get colour information
+#color hex, name, rgb, hsl or hs
+cinfo()
+{
+	firefox "https://www.color-hex.com/color/$*" &
+}
+
 #color functions
 colors()
 {
@@ -3077,6 +3085,10 @@ alias el=electrum
 
 #andreas antonopoulos' mastering bitcoin
 #https://github.com/bitcoinbook/bitcoinbook
+
+#utilities for bitcoin
+#https://github.com/igorbarinov/awesome-bitcoin#utilities
+#install hal crate (cargo install hal), very useful
 
 #bitcoin historical price (time series)
 btchist()
@@ -4026,6 +4038,13 @@ spacevis()
 #{ cat /proc/meminfo | grep Slab ;}
 #https://askubuntu.com/questions/743649/new-16gb-of-ram-installed-yet-i-see-15-3-on-my-system-why
 #https://www.linuxatemyram.com/
+
+#If it seems that rustup did not successfully install and
+#configure the stable toolchain, you can do it manually:
+#rustup install stable
+#rustup default stable
+#rust: error: no override and no default toolchain set
+#https://stackoverflow.com/questions/44303915/no-default-toolchain-configured-after-installing-rustup
 
 #Swap stdout and stderr
 #$ command 3>&1 1>&2 2>&3
