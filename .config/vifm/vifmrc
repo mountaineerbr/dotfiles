@@ -348,6 +348,7 @@ command Xbrc !vim ~/.xbindkeysrc
 " FAVORITE PROGRAMMES (MIME TYPE)
 
 " Pdf
+" note: xreader cannot open from tmux
 filextype *.pdf xpdf %c %i &, xreader %c %i &, evince %c %i &, apvlv %c
 fileviewer *.pdf pdftotext -nopgbrk %c -
 
