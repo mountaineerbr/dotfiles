@@ -348,7 +348,7 @@ command Xbrc !vim ~/.xbindkeysrc
 " FAVORITE PROGRAMMES (MIME TYPE)
 
 " Pdf
-filextype *.pdf xreader %c %i &, xpdf %c %i &, evince %c %i &, apvlv %c
+filextype *.pdf xpdf %c %i &, xreader %c %i &, evince %c %i &, apvlv %c
 fileviewer *.pdf pdftotext -nopgbrk %c -
 
 " PostScript
