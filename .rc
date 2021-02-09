@@ -2546,7 +2546,7 @@ alias atown='ssh torus@ascii.town'
 #color hex, name, rgb, hsl or hs
 cinfo()
 {
-	firefox "https://www.color-hex.com/color/$*" &
+	firefox "https://www.color-hex.com/color/${*#\#}" &
 }
 
 #color functions
