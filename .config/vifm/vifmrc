@@ -547,7 +547,7 @@ filetype *.ftp
        \ FUSE_MOUNT2|curlftpfs -o ftp_port=-,,disable_eprt %PARAM %DESTINATION_DIR %FOREGROUND,
 
 " Office files
-filextype *.odt,*.doc,*.docx,*.xls,*.xlsx,*.odp,*.pptx libreoffice %f &
+filextype *.odt,*.doc,*.docx,*.xls,*.xlsx,*.odp,*.pptx libreoffice %f %i &
 fileviewer *.doc catdoc %c
 fileviewer *.docx, docx2txt.pl %f -
 
@@ -762,12 +762,15 @@ nnoremap gb :file &<cr>l
 " yank current directory path into primary and selection clipboards
 nnoremap yd :!echo -n %d | xsel --input --primary %i &&
             \ echo -n %d | xsel --clipboard --input %i<cr>:echo expand('%"d') "yanked"<cr>
+
 " yank current file path into primary and selection clipboards
 nnoremap yf :!echo -n %c:p | xsel --input --primary %i &&
             \ echo -n %c:p | xsel --clipboard --input %i<cr>:echo expand('%"c:p') "yanked"<cr>
+
 " yank current filename without path into primary and selection clipboards
 nnoremap yn :!echo -n %c | xsel --input --primary %i &&
             \ echo -n %c | xsel --clipboard --input %i<cr>:echo expand('%"c') "yanked"<cr>
+
 " yank root of current file's name into primary and selection clipboards
 nnoremap yr :!echo -n %c:r | xsel --input --primary %i &&
             \ echo -n %c:r | xsel --clipboard --input %i<cr>:echo expand('%"c:r') "yanked"<cr>
