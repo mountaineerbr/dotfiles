@@ -934,7 +934,7 @@ set grepprg=ag\ --smart-case\ --hidden\ --nofollow\ --heading\ --numbers\ %i\ %a
 " 	- , - other pane
 
 " Colorscheme adjustments
-"highlight  CurrLine    cterm=underline,bold    ctermfg=087  ctermbg=red
+highlight  CurrLine    cterm=underline,bold    ctermfg=087  ctermbg=red
 "highlight  OtherLine   cterm=none     ctermfg=cyan  ctermbg=236
 "highlight AuxWin cterm=bold,underline ctermfg=default ctermbg=default
 "highlight TopLine cterm=underline ctermfg=yellow ctermbg=234
