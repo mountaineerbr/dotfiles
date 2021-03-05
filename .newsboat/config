@@ -48,7 +48,7 @@ reload-only-visible-feeds no
 
 
 #Subheadings (hack)
-highlight feedlist "---.*---" red default bold
+highlight feedlist "---.*---" color230 default bold
 highlight feedlist ".*0/0.." default default invis
 
 
@@ -60,4 +60,50 @@ highlight feedlist ".*0/0.." default default invis
 #https://wiki.archlinux.org/index.php/Newsboat#Configuration
 #https://github.com/gpakosz/.newsboat/blob/master/config
 #
+
+
+#xeronull
+#https://github.com/xeronull/
+#auto-reload
+#auto-reload yes
+
+#keep cursor above and below set line
+#scrolloff 10
+
+#colors
+#color listnormal cyan default
+#color listfocus black yellow standout bold
+#color listnormal_unread blue default
+#color listfocus_unread yellow default bold
+#color info red black bold
+#color article cyan default
+
+#keybinds
+#bind-key j down
+#bind-key k up
+#bind-key j next articlelist
+#bind-key k prev articlelist
+#bind-key J next-feed articlelist
+#bind-key K prev-feed articlelist
+#bind-key G end
+#bind-key g home
+#bind-key d pagedown
+#bind-key u pageup
+#bind-key l open
+#bind-key h quit
+#bind-key a toggle-article-read
+#bind-key n next-unread
+#bind-key N prev-unread
+#bind-key D pb-download
+#bind-key U show-urls
+#bind-key x pb-delete
+#bind-key ^t next-unread
+
+
+#external programs 
+#browser w3m
+#player mpv
+#macro m set browser "mpv %u"; open-in-browser ; set browser "w3m %u"
+#macro i set browser "feh %u"; open-in-browser ; set browser "w3m %u"
+
 
