@@ -286,6 +286,7 @@ tablef()
 sedlinks()
 {
 	sed 's|>|&\n|g' | sed -nE "s|.*href=['\"]([^'\"]+)['\"].*|\1| p"
+	#sed -n 's/.*url="\([^"]*\)".*/\1/p'
 }
 #sed -r 's/.*"(http.*)".*/\1/g'
 
@@ -364,6 +365,10 @@ cdump()
 
 #feh automatically scale image to fit window 
 alias feh='feh --scale-down --auto-zoom'
+#newsboat
+alias nb=newsboat
+alias nbrc='vim ~/.newsboat/urls'
+
 
 #commas in ls, du, df output
 #export BLOCK_SIZE="'1"
@@ -723,6 +728,13 @@ gitup()
 	git add -A && git commit -msync && git push
 }
 
+#retrieve the remote git address of a repo?
+gaddr()
+{
+	git remote -v
+}
+#https://stackoverflow.com/questions/8816107/how-can-i-retrieve-the-remote-git-address-of-a-repo
+
 
 #my website
 #update contents
@@ -730,7 +742,7 @@ gitup()
 WWW()
 {
 	cd "$HOME/www/mountaineerbr.github.io" || return
-	bash "$HOME/www/mountaineerbr.github.io/portal.sh" "$@" && gitup
+	"$HOME/www/mountaineerbr.github.io/portal.sh" "$@" && gitup
 }
 
 #process audio for podcast (personal website)
@@ -1172,9 +1184,9 @@ zz()
 
 #pacman
 #sync pkg
-alias pac='sudo pacman -Sy'
+alias pac='sudo pacman -S'
 #search pkg
-alias pacs='sudo pacman -Sys'
+alias pacs='sudo pacman -Ss'
 #remove pkg and unnecessary deps
 #{ pacman -Rns ;}
 #remove pkg but do not check for deps
@@ -2818,6 +2830,11 @@ ytta()
 		mv "$2" "${2}.done.$RANDOM"
 }
 
+#https://github.com/xeronull/dotfiles/blob/master/.bashrc
+# search and play youtube audio with preferred player
+# how to use --- yt search_term_here
+yts() { youtube-dl -q -f bestaudio --max-downloads 1 --no-playlist --default-search ${2:-ytsearch} "$1" -o - | mpv -vo null /dev/fd/3 3<&0 </dev/tty; }
+
 
 ##shell globbing
 
@@ -3179,6 +3196,7 @@ xtfs()
 #also 'resize -s' for xterm
 #http://rtfm.etla.org/xterm/ctlseq.html
 #https://www.jpichon.net/blog/2010/06/xterm-control-sequences/
+#https://docstore.mik.ua/orelly/unix3/upt/ch05_18.htm
 
 #cpu stats
 model()
@@ -4076,6 +4094,10 @@ shmatrix()
 	GREP_COLOR="1;32" grep --color "[^ ]"
 }
 #https://www.pixelbeat.org/docs/terminal_colours/
+
+#get relatove date (now -1 hour)
+#sqlite3 /dev/null <<<'SELECT strftime("%m/%d/%Y-%H:%M:%S", "now", "-1 hour")'
+#https://community.unix.com/t/generating-dates-with-bash/381693/2
 
 
 # vi:filetype=sh
