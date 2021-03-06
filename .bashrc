@@ -1,6 +1,10 @@
 #
 # ~/.bashrc
 # 2021  by mountaineerbr
+#                        __       _                  ___     
+#  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
+# /  ' \/ _ \/ // / _ \/ __/ _ `/ / _ \/ -_) -_) __/ _  / __/
+#/_/_/_/\___/\_,_/_//_/\__/\_,_/_/_//_/\__/\__/_/ /____/_/   
 
 # This file is sourced by all *interactive* bash shells on startup,
 # including some apparently interactive shells such as scp and rcp

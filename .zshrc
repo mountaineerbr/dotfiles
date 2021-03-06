@@ -1,6 +1,11 @@
 #
 # ~/.zshrc
 # 2021  by mountaineerbr
+#               __  ___                  
+# _______ ____ / /_/ _ |_    _____ ___ __
+#/ __/ _ `(_-</ __/ __ | |/|/ / _ `/ // /
+#\__/\_,_/___/\__/_/ |_|__,__/\_,_/\_, / 
+#                                 /___/  
 
 #tmux
 #this enables one command to be run when tmux exits.
