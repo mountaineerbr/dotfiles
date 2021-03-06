@@ -1,6 +1,8 @@
 "
 " ~/.vimrc
-"
+"               ,                 .__    
+"._ _  _ . .._ -+- _.*._  _  _ ._.[__)._.
+"[ | )(_)(_|[ ) | (_]|[ )(/,(/,[  [__)[  
 
 " This initializes Vim for new users (as opposed to traditional Vi users)
 "source $VIMRUNTIME/defaults.vim
