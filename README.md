@@ -20,3 +20,13 @@ full-fledged scripts and moved to __[scripts repo](https://github.com/mountainee
 ![ScreenShot](https://github.com/mountaineerbr/dotfiles/blob/master/git_screenshot1.png)
 Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](https://www.youtube.com/watch?v=Mu3BfD6wmPg "Chilled Cow by Kupla")
 
+                   __  ___                  
+     _______ ____ / /_/ _ |_    _____ ___ __
+    / __/ _ `(_-</ __/ __ | |/|/ / _ `/ // /
+    \__/\_,_/___/\__/_/ |_|__,__/\_,_/\_, / 
+                                     /___/  
+                            __       _                  ___     
+      __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
+     /  ' \/ _ \/ // / _ \/ __/ _ `/ / _ \/ -_) -_) __/ _  / __/
+    /_/_/_/\___/\_,_/_//_/\__/\_,_/_/_//_/\__/\__/_/ /____/_/   
+                                                            
