@@ -1,6 +1,16 @@
 " vim: filetype=vifm :
 " vim:filetype=vim
 " ~/.config/vifm/vifmrc
+"                        o       .oo                         
+"                        8      .P 8                         
+" .oPYo. .oPYo. .oPYo.  o8P    .P  8 o   o   o .oPYo. o    o 
+" 8    ' .oooo8 Yb..     8    oPooo8 Y. .P. .P .oooo8 8    8 
+" 8    . 8    8   'Yb.   8   .P    8 `b.d'b.d' 8    8 8    8 
+" `YooP' `YooP8 `YooP'   8  .P     8  `Y' `Y'  `YooP8 `YooP8 
+" :.....::.....::.....:::..:..:::::..::..::..:::.....::....8 
+" ::::::::::::::::::::::::::::::::::::::::::::::::::::::ooP'.
+" ::::::::::::::::::::::::::::::::::::::::::::::::::::::...::
+
 
 " Sample configuration file for vifm (last updated: 21 January, 2018)
 " You can edit this file by hand.
@@ -831,9 +841,9 @@ noremap ,i :sync! <cr>
 
 " Examples
 " Open console in current directory
-nnoremap ,t :!xterm &<cr>
+nnoremap ,x :!xterm &<cr>
 " Open editor to edit vifmrc and apply settings after returning to vifm
-nnoremap ,c :write | edit $MYVIFMRC | restart full<cr>
+"nnoremap ,c :write | edit $MYVIFMRC | restart full<cr>
 " Open gvim to edit vifmrc
 " nnoremap ,C :!gvim --remote-tab-silent $MYVIFMRC &<cr>
 "https://wiki.vifm.info/index.php/Configuration_model#:restart_usage_example
@@ -841,6 +851,8 @@ nnoremap ,c :write | edit $MYVIFMRC | restart full<cr>
 " Toggle wrap setting on ,w key
 nnoremap ,w :set wrap!<cr>
 
+" Open with firefox
+nnoremap ,f :!firefox %c &<cr>
 
 "toggle lsview
 noremap ,l :set lsview! <cr>
