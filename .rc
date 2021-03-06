@@ -647,7 +647,7 @@ alias xbk='vim ~/.xbindkeysrc'
 alias trc='vim ~/.tmux.conf'
 alias mrc='vim ~/.mutt/muttrc'
 alias mrc='vim ~/bin/markets/mkt_func.sh'
-alias pkgl='vim ~/arq/docs/archInstallPkgSuggestion.txt'
+alias pkglist='vim ~/arq/docs/archInstallPkgSuggestion.txt'
 
 #edit and source
 sbrc()
