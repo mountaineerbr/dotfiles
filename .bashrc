@@ -144,7 +144,8 @@ shopt -s checkwinsize
 
 #.rc
 #comand-not-found hook from pkgfile
-for f in ~/.rc \
+for f in \
+	~/.rc \
 	/usr/share/doc/pkgfile/command-not-found.bash \
 	~/bin/bitcoin.sh
 do
@@ -225,6 +226,9 @@ cl()
 
 #quit like in z-shell
 alias bye=exit
+
+# Enable aliases to be sudo’ed
+#alias sudo='sudo '
 
 # "repeat" command.  Like:
 #
