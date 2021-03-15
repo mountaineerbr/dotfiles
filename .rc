@@ -918,7 +918,7 @@ gk()
 
 	(
 	#set shell options
-	[[ -n "$ZSH_VERSION" ]]  && setopt nullglob dotglob 
+	[[ -n "$ZSH_VERSION" ]]  && setopt nullglob dotglob globstarshort
 	[[ -n "$BASH_VERSION" ]] && shopt -s nullglob dotglob globstar
 
 	#get filename from user input
@@ -968,10 +968,7 @@ then
 fi
 
 #start conkies
-conkies()
-{
-	conkykiller.sh
-}
+alias conkies='conkykiller.sh'
 
 #slurm internet monitor
 slurm()
@@ -1147,8 +1144,8 @@ setxv()
 }
 
 #set combined sound sinks for my laptop
-alias sas='~/bin/sas.sh'
-alias sase='~/bin/sas.sh && exit'
+#alias sas='~/bin/sas.sh'
+#alias sase='~/bin/sas.sh && exit'
 
 #advanced bash scripting guide
 #http://tldp.org/LDP/abs/html/
@@ -1617,9 +1614,11 @@ hy()
 	[[ -t 1 ]] && tcol='-TWORD,HYPHENED'
 
 	#grep and format table
-	if ! grep -iE "^${expression}$" <<<"$diclist"
-	then grep -iE "${expression}" <<<"$diclist"
-	fi | column -et -s$'\t' -NWORD,HYPHENED $tcol
+	{
+		grep -iE "^$expression"$'\t' <<<"$diclist" ||
+		grep -iE "^$expression" <<<"$diclist" ||
+		grep -iE "$expression" <<<"$diclist"
+	} | column -et -s$'\t' -NWORD,HYPHENED $tcol
 }
 #also: http://www.gutenberg.org/ebooks/3204
 #https://raw.githubusercontent.com/mountaineerbr/dotfiles/master/mhyphMobyHyphenatorII.txt
