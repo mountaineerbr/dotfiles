@@ -454,9 +454,9 @@ out()
 	then
 		if [[ -n "$TMUX" ]]
 		then
-			echo 'xfce4-session-logout --fast --logout' > "$__TMUXSIG"
-			echo '[quit tmux and logout in 2 secs]' >&2
-			sleep 2.5
+			echo 'xfce4-session-logout --logout --fast' >"$__TMUXSIG"
+			echo '[quit tmux and logout]' >&2
+			sleep 1
 			exit
 		else
 			/usr/bin/xfce4-session-logout --logout --fast
@@ -464,6 +464,7 @@ out()
 	fi
 
 	echo '[nothing to do]' >&2
+	return 1
 }
 
 #startx
