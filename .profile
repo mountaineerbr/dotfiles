@@ -1,5 +1,29 @@
 # ~/.profile
 # 2021  by mountaineerbr
+#                                                                      
+#     ,o888888o.           .8.            d888888o. 8888888 8888888888 
+#    8888     `88.        .888.         .`8888:' `88.     8 8888       
+# ,8 8888       `8.      :88888.        8.`8888.   Y8     8 8888       
+# 88 8888               . `88888.       `8.`8888.         8 8888       
+# 88 8888              .8. `88888.       `8.`8888.        8 8888       
+# 88 8888             .8`8. `88888.       `8.`8888.       8 8888       
+# 88 8888            .8' `8. `88888.       `8.`8888.      8 8888       
+# `8 8888       .8' .8'   `8. `88888.  8b   `8.`8888.     8 8888       
+#    8888     ,88' .888888888. `88888. `8b.  ;8.`8888     8 8888       
+#     `8888888P'  .8'       `8. `88888. `Y8888P ,88P'     8 8888       
+#                                                                    
+#          .8. `8.`888b                 ,8' .8.   `8.`8888.      ,8' 
+#         .888. `8.`888b               ,8' .888.   `8.`8888.    ,8'  
+#        :88888. `8.`888b             ,8' :88888.   `8.`8888.  ,8'   
+#       . `88888. `8.`888b     .b    ,8' . `88888.   `8.`8888.,8'    
+#      .8. `88888. `8.`888b    88b  ,8' .8. `88888.   `8.`88888'     
+#     .8`8. `88888. `8.`888b .`888b,8' .8`8. `88888.   `8. 8888      
+#    .8' `8. `88888. `8.`888b8.`8888' .8' `8. `88888.   `8 8888      
+#   .8'   `8. `88888. `8.`888`8.`88' .8'   `8. `88888.   8 8888      
+#  .888888888. `88888. `8.`8' `8,`' .888888888. `88888.  8 8888      
+# .8'       `8. `88888. `8.`   `8' .8'       `8. `88888. 8 8888
+#
+# art: figlet
 
 # executed by the command interpreter for login shells.
 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login exists.
@@ -145,7 +169,7 @@ export BROWSER=w3m
 #{ echo -e '\033[?17;0;64c';}
 #bold white on red
 echo -e "\e[?16;0;74c"
-#is it really possible that the hardware default cursor colour (of some at least) is red?
+#is it possible that hardware has got default cursor colour?
 #https://linuxgazette.net/137/anonymous.html
 #VGA-softcursor.txt 
 #http://fxr.watson.org/fxr/source/Documentation/VGA-softcursor.txt?v=linux-2.4.22
@@ -172,14 +196,13 @@ echo -e "\e[?16;0;74c"
 #		case $REPLY in
 #			[Yy]* )
 # 				echo 'Yes!'
-#				unset REPLY
 # 				startx
 # 				;;
 #			[Nn]* )
 # 				echo 'Answer is no'
 # 				;;
 #			* )
-# 				echo 'No!'
+# 				echo 'No!' >&2
 # 				;;
 #		esac
 #	fi
