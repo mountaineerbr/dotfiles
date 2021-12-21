@@ -7,9 +7,8 @@
       888_,o8P'"888,_ _,88P   88,     888    888o88oo,.__888oo,__88b    dP
       MMMMP"`    "YMMMMMP"    MMM     "MM,   MMM""""YUMMM""""YUMMM"YMmMY" 
 
-Run control
+## Dotfiles, run control and c files
 
-## Dotfiles and other c files
 __Most shell functions and aliases are at file *.rc*__. That is sourced from
 both _.bashrc_ and _.zshrc_, which contains configs for each shell.
 
@@ -32,3 +31,5 @@ Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](htt
      /  ' \/ _ \/ // / _ \/ __/ _ `/ / _ \/ -_) -_) __/ _  / __/
     /_/_/_/\___/\_,_/_//_/\__/\_,_/_/_//_/\__/\__/_/ /____/_/   
                                                             
+
+***(ARCHIVE REPO)**
