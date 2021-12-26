@@ -1064,6 +1064,25 @@ most_useless_use_of_zsh()
 #usage:  haha [word] [+interger]
 haha() ( x=.2; y=0.00000002; i=$x; [[ $1 = [0-9+]* ]] && set - "$2" $1; while { i=$(( i ${sign:--} ( i / ${2:-10} ) )) } { print -n "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${1:-haha?}\e[0m"; ((i<y)) && sign=+; ((i>=x)) && sign=- ;sleep $i } )
 
+#print a list of html entities
+htmlentities()
+{
+	(( $1 )) || set -- 127 0
+
+	{
+	echo 'mapped entities<p>'
+	paste <(printf '%s\n' \#{${2}..${1}}) <(printf '%s\n' \&\#{${2}..${1}}\; ) | w3m -dump -T text/html
+
+	echo
+	echo '<br><br>entity glob<p>'
+	printf '%s\n' \&\#{${2}..${1}}\;
+	} | w3m -dump -T text/html
+}
+#see also:
+#recode html..ascii
+#xmlstarlet unesc #this works for &amp; &lt; etc only
+
+
 ## log out? set timeout in seconds...
 ## ...and do not log out in some specific terminals:
 #if [[ "${TERM}" == ([Exa]term*|rxvt|dtterm|screen*) ]] ; then

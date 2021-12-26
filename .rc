@@ -11,20 +11,17 @@
 # sourced by ~/.bashrc and ~/.zshrc
 
 #start sources
-for f in \
-	~/.apikeys
-do [[ -r "$f" ]] && . "$f"
-done
-unset f
+for f in  ~/.apikeys
+do 	[[ -r "$f" ]] && . "$f"
+done ;unset f
 
 #set dircolors
 if type dircolors >/dev/null
-then
-	if [[ -f "$HOME/.dir_colors" ]]
-	then eval "$( dircolors ~/.dir_colors )"
+then 	if [[ -f "$HOME/.dir_colors" ]]
+	then 	eval "$( dircolors ~/.dir_colors )"
 	elif [[ -f /etc/DIR_COLORS ]]
-	then eval "$( dircolors /etc/DIR_COLORS )"
-	else eval "$( dircolors )"
+	then 	eval "$( dircolors /etc/DIR_COLORS )"
+	else 	eval "$( dircolors )"
 	fi
 fi
 
@@ -36,8 +33,7 @@ fi
 man()
 {
 	if [[ "$TERM" = linux ]]
-	then
-		env \
+	then 	env \
 			LESS_TERMCAP_mb=$(printf "\e[34m") \
 			LESS_TERMCAP_md=$(printf "\e[1;31m") \
 			LESS_TERMCAP_me=$(printf "\e[0m") \
@@ -46,8 +42,7 @@ man()
 			LESS_TERMCAP_ue=$(printf "\e[0m") \
 			LESS_TERMCAP_us=$(printf "\e[32m") \
 					/usr/bin/man "$@"
-	else
-		env \
+	else 	env \
 			LESS_TERMCAP_mb=$(printf "\e[1;34m") \
 			LESS_TERMCAP_md=$(printf "\e[38;5;9m") \
 			LESS_TERMCAP_me=$(printf "\e[0m") \
@@ -92,11 +87,8 @@ Cyan='\e[0;36m'    BCyan='\e[1;36m'    On_Cyan='\e[46m'
 White='\e[0;37m'   BWhite='\e[1;37m'   On_White='\e[47m'
 
 Alert=$BWhite$On_Red 	# Bold White on red background
-
-NC='\e[m'               # Color Reset
-ENDC=$NC
-#\\e[0;0;0m \\e[m'
-#\e \E \033
+NC='\e[m' ENDC=$NC 	# Color Reset
+#\\e[0;0;0m \\e[m' #\e \E \033
 #http://tldp.org/LDP/abs/html/sample-bashrc.html
 
 #ex - archive extractor
@@ -104,8 +96,7 @@ ENDC=$NC
 extract()
 {
 	if [[ -f "$1" ]]
-	then
-		case "$1" in
+	then 	case "$1" in
 			*.tar.bz2) tar xvjf "$1";;
 			*.tar.gz)  tar xvzf "$1";;
 			*.bz2)     bunzip2 "$1";;
@@ -122,8 +113,7 @@ extract()
 			*.tar.*)   tar xvf "$1";;
 			*) echo "'$1' cannot be extracted via ex()" >&2;;
 		esac
-	else
-		echo "'$1' is not a valid file" >&2
+	else 	echo "'$1' is not a valid file" >&2
 	fi
 }
 #also check 'unp' script
@@ -139,9 +129,9 @@ gar()
 {
 	#decrypt (sigle file)
 	if [[ "$1" = *.tar.gpg* ]]
-	then gpg -d -- "$1" | tar xk
+	then 	gpg -d -- "$1" | tar xk
 	#encrypt (multiple files)
-	else tar c --format pax -- "$@" | gpg -ci -o "${1%/}".tar.gpg
+	else 	tar c --format pax -- "$@" | gpg -ci -o "${1%/}".tar.gpg
 	fi
 }
 
@@ -228,8 +218,8 @@ alias pl="printf '%s\n'"
 lsb()
 {
 	if (($#))
-	then ls /bin | grep "$@"
-	else ls /bin
+	then 	ls /bin | grep "$@"
+	else 	ls /bin
 	fi
 }
 
@@ -364,8 +354,9 @@ w3mu()
 #usenet extract tar and zip files
 unt()
 {
+	local f
 	for f in ./utzoo-wiseman-usenet-archive/*.tgz
-	do tar xzOf "$f"
+	do 	tar xzOf "$f"
 	done
 	printf '%s\n' ./*/*.zip | xargs -- gunzip -c
 }
@@ -432,7 +423,7 @@ alias nbrc='vim ~/.newsboat/urls'
 #shell history
 h()
 {
-	[[ -n "$ZSH_VERSION" ]] && set -- "${1:-0}"
+	[[ "$ZSH_VERSION" ]] && set -- "${1:-0}"
 	history "$@"
 }
 
@@ -474,14 +465,11 @@ sdr()
 out()
 {
 	if ps aux | grep \[x\]fce4-session | grep -q "^$(whoami)"
-	then
-		if [[ -n "$TMUX" ]]
-		then
-			echo 'xfce4-session-logout --logout --fast' >"$_TMUXSIG"
+	then 	if [[ "$TMUX" ]]
+		then 	echo 'xfce4-session-logout --logout --fast' >"$_TMUXSIG"
 			echo '[quit tmux and logout]' >&2
 			exit
-		else
-			/usr/bin/xfce4-session-logout --logout --fast
+		else 	/usr/bin/xfce4-session-logout --logout --fast
 		fi
 	fi
 
@@ -512,10 +500,10 @@ alias ta='tmux attach-session -t'
 #kill dettached tmux sessions
 tdk()
 {
+	local line
 	tmux list-sessions | grep -E -v '\(attached\)$' |
 		while read line
-		do
-    			tmux kill-session -t "${line%%:*}"
+		do 	tmux kill-session -t "${line%%:*}"
 		done
 }
 #https://superuser.com/questions/635904/how-to-delete-a-detached-tmux-session
@@ -645,13 +633,11 @@ rr()
 #xbindkeys rebind keys
 kk()
 {
-	if [[ -n $TMUX ]]
-	then
-		echo 'kk: avoid starting xbindkeys in tmux' >&2
+	if [[ $TMUX ]]
+	then 	echo 'kk(): avoid starting xbindkeys in tmux' >&2
 		sleep 1
 		exit 1
-	else
-		killall -15 xbindkeys
+	else 	killall -15 xbindkeys
 		sleep 1
 		xbindkeys  #-f ~/.xbindkeysrc
 		sleep 1
@@ -673,11 +659,11 @@ alias pkglist='vim ~/arq/docs/archInstallPkgSuggestion.txt'
 #edit and source
 sbrc()
 {
-	[[ -n "$BASH_VERSION" ]] && exec bash
+	[[ "$BASH_VERSION" ]] && exec bash
 }
 szrc()
 {
-	[[ -n "$ZSH_VERSION" ]] && exec zsh
+	[[ "$ZSH_VERSION" ]] && exec zsh
 }
 src()
 {
@@ -857,7 +843,7 @@ gres()
 grmlast()
 {
 	[[ -z "$1" ]] && set -- 'HEAD^'
-	[[ -n "$1" ]] && [[ "${#1}" -le 2 ]] && set -- "HEAD~$1"
+	[[ "$1" ]] && [[ "${#1}" -le 2 ]] && set -- "HEAD~$1"
 
 	git reset --hard "$1" && git push origin -f
 }
@@ -931,11 +917,9 @@ gd()
 
 	#download and print file
 	if [[ -t 1 ]]
-	then
-		#if stdout is free
+	then 	#if stdout is free
 		curl -L\# "$url"
-	else
-		#otherwise, copy to stderr for conference
+	else 	#otherwise, copy to stderr for conference
 		curl -L\# "$url" | tee /dev/stderr
 		echo -e '\a\ngd.func: copy sent to stderr' >&2
 	fi
@@ -950,30 +934,25 @@ gd()
 #usage:  gk  mountaineerbr dotfiles .bashrc
 #requires 'gd' function
 gk()
-{
+(
 	#check arg number
-	(( $# )) || return 1
+	(( $# )) || exit 1
 
-	(
 	#set shell options
-	[[ -n "$ZSH_VERSION" ]]  && setopt nullglob dotglob globstarshort
-	[[ -n "$BASH_VERSION" ]] && shopt -s nullglob dotglob globstar
+	[[ "$ZSH_VERSION" ]]  && setopt nullglob dotglob globstarshort
+	[[ "$BASH_VERSION" ]] && shopt -s nullglob dotglob globstar
 
 	#get filename from user input
 	file="${3:-${2:-$1}}"  file="${file%/}"  file=${file##*/}
 
 	#use func gd() to download file from repo
-	gd "$@" |
-		if [[ -e "$file" ]]
-		then
-			#$file is at current local dir
+	gd "$@" | if [[ -e "$file" ]]
+		then 	#$file is at current local dir
 			tee >(cksum -- - "$file" >&2)
-		else
-			#$file is down local dir hierarch
+		else 	#$file is down local dir hierarch
 			tee >(cksum -- - **/"$file" >&2 2>/dev/null)
 		fi
-	)
-}
+)
 
 #functions and aliases
 #declare -f
@@ -985,7 +964,7 @@ gk()
 q()
 {
 	echo '[bye..]'
-	exit 0
+	exit
 }
 
 alias :q=q
@@ -998,7 +977,7 @@ alias ezit=q
 
 #for compatibility between my shell configs
 if ! declare -f qq &>/dev/null
-then qq() { q ;}
+then 	qq() { q ;}
 fi
 
 #start conkies
@@ -1024,8 +1003,7 @@ countl()
 {
 	local user
 	for user in /home/*
-	do
-		echo -ne "$user\t"
+	do 	echo -ne "$user\t"
 		last "$user" | wc -l
 	done
 }
@@ -1034,10 +1012,8 @@ countl()
 #the holy trinity of memory information
 meminfo()
 {
-	cat /proc/meminfo
-	echo
-	free -m
-	echo
+	cat /proc/meminfo 	;echo
+	free -m 		;echo
 	vmstat
 }
 #https://www.linuxquestions.org/questions/linux-newbie-8/conky-has-me-like-why-is-my-ram-always-cached%5Cfull-so-%5Bbloged%5Dclean-ram-every-10-minutes-4175595656/
@@ -1073,7 +1049,7 @@ alias cdd='cd ~/arq/docs'
 alias cdD='cd ~/Documents'
 alias cde='cd ~/www/bionota.github.io/'
 alias cdm='cd ~/bin/markets'
-alias cdM='cd /media ;[[ -n "$(/bin/ls)" ]] || cd /run/media'
+alias cdM='cd /media ;[[ "$(/bin/ls)" ]] || cd /run/media'
 alias cdmedia=cdM
 #alias cdq='cd ~/www/mountaineerbr.github.io/'
 #alias cdQ='cd ~/www/mountaineerbr.github.io/blog'
@@ -1107,7 +1083,7 @@ mnt()
 #find out where a mount/partition or file is
 wherep()
 {
-	[[ -z "$@" ]] && set -- .
+	[[ -z "$*" ]] && set -- .
 	df -P  "$@" | tail -1 | cut -d' ' -f 1
 }
 #https://stackoverflow.com/questions/3274354/how-to-find-out-mount-partition-a-directory-or-file-is-on-linux-server
@@ -1127,8 +1103,7 @@ clip()
 clipboard()
 {
 	while :
-	do
-		echo -ne "\n${Purple}PRIMARY__:$NC "
+	do 	echo -ne "\n${Purple}PRIMARY__:$NC "
 		xsel -p -o
 		echo -ne "\n${Blue}CLIPBOARD:$NC "
 		xsel -b -o
@@ -1139,8 +1114,7 @@ clipboard()
 clipboard2()
 {
 	while :
-	do
-		echo -ne "\n${Purple}PRIMARY__:$NC "
+	do 	echo -ne "\n${Purple}PRIMARY__:$NC "
 		xclip -o -sel p
 		echo -ne "\n${Blue}CLIPBOARD:$NC "
 		xclip -o -sel c
@@ -1268,6 +1242,9 @@ alias pacdate='expac --timefmt="%F %T" "%l %n" | sort -n'
 #check packages of a base group
 #pacman -Sgq gnome
 
+#list all pkgs from a repo
+#{ LANG=C pacman -Sl multilib | grep installed | cut -d ' ' -f 2 ;}
+
 #Listing changed config files
 #If you want to backup your system configuration files you could copy all
 #files in /etc/, but usually you are only interested in the files that you
@@ -1280,8 +1257,7 @@ paci()
 {
 	#check for arg
 	[[ -z "$*" ]] && return
-	{
-		echo "[online mirror]"
+	{ 	echo "[online mirror]"
 		pacman -Si "$@"
 		echo "[local cache]"
 		pacman -Qi "$@"
@@ -1297,7 +1273,7 @@ alias unseen="perl -ne 'print unless \$seen{\$_}++'"
 #pkg file lists
 pls()
 {
-	[[ -n "$1" ]] || return
+	[[ "$1" ]] || return
 	printf '%s\n' /var/lib/pacman/local/"$1"*
 
 	tac /var/lib/pacman/local/"$1"[0-9-]*/files \
@@ -1330,8 +1306,7 @@ mlist()
 {
 	if (( ${#1} != 2 ))
 	then curl https://www.archlinux.org/mirrorlist/all/
-	else
-		set -- $( tr '[:lower:]' '[:upper:]' <<< "$1" )
+	else 	set -- $( tr '[:lower:]' '[:upper:]' <<< "$1" )
 		curl "https://www.archlinux.org/mirrorlist/?country=$1&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
 	fi
 }
@@ -1343,12 +1318,11 @@ mstatus()
 {
 	#get json?
 	if [[ "$1" = json ]]
-	then curl https://www.archlinux.org/mirrors/status/json/
-	else
-		w3m -dump https://www.archlinux.org/mirrors/status/ |
+	then 	curl https://www.archlinux.org/mirrors/status/json/
+	else 	w3m -dump https://www.archlinux.org/mirrors/status/ |
 			if [[ -z "$1" ]]
-			then cat
-			else grep --no-group-separator -Ei -e "$1" -e '^\s*(Successfully Syncing Mirrors|Out of Sync Mirrors|Mirror Syncing Error Log|Completion μ Delay|Mirror URL|\(s\)\s*\(s\)|hours|Last\s*Occurrences).*'
+			then 	cat
+			else 	grep --no-group-separator -Ei -e "$1" -e '^\s*(Successfully Syncing Mirrors|Out of Sync Mirrors|Mirror Syncing Error Log|Completion μ Delay|Mirror URL|\(s\)\s*\(s\)|hours|Last\s*Occurrences).*'
 			fi
 	fi
 }
@@ -1366,8 +1340,7 @@ mping()
 	sed -nE "/$q/ s|.*//([^/]*).*|\1|p" /etc/pacman.d/mirrorlist |
 		sort -u | tee >( echo "servs: $(wc -l)" ) |
 		while read
-		do
-			p=$( ping -c 1 "$REPLY" | grep -o --color=always 'time=.*' | tee >(read x ;echo -e "$x\t$REPLY" >&2) )
+		do 	p=$( ping -c 1 "$REPLY" | grep -o --color=always 'time=.*' | tee >(read x ;echo -e "$x\t$REPLY" >&2) )
 			printf '%s\t%s\n----\n' "$p" "$REPLY"
 		done | sort -Vru
 }
@@ -1392,15 +1365,12 @@ amail()
 {
 	local months list m
 	select list in arch-general arch-announce arch-commits arch-events arch-magazine arch-women arch-mirrors arch-security aur-dev aur-general aur-requests pacman-contrib pacman-dev
-	do
-		months=( $(curl -L https://lists.archlinux.org/pipermail/$list/ | sed -n '/<td><A/ p' | sed -En 's/.*"([^"]*)".*/\1/ p') )
-		select m in "${months[@]}"
-		do
-			#files are either plain `.txt' or `.txt.gz'
+	do 	select m in $(curl -L https://lists.archlinux.org/pipermail/$list/ | sed -n '/<td><A/ p' | sed -En 's/.*"([^"]*)".*/\1/ p')
+		do 	#files are either plain `.txt' or `.txt.gz'
 			curl -L https://lists.archlinux.org/pipermail/$list/$m |
 			if [[ "$m" = *.gz ]]
-			then gzip -c -d
-			else cat
+			then 	gzip -c -d
+			else 	cat
 			fi
 			echo "MONTH: $m" >&2
 			break 2
@@ -1443,7 +1413,7 @@ debian2()
 
 	echo 'List of all packages' >&2
 	for v in bullseye buster stretch jessie
-	do
+	do 
 		for r in main contrib non-free
 		do
 			printf '%s in %s\n' "$v" "$r" | tr a-z A-Z >&2
@@ -1509,11 +1479,9 @@ ubuntu2()
 }
 #w3m "http://packages.ubuntu.com/$1" -dump | sed -n '/^Package/,$p' | tac
 
-#freebsd ports
+#freebsd ports, list of all ports
 freebsd()
 {
-	echo 'List of all ports' >&2
-
 	curl -sL 'http://www.cz.freebsd.org/ports/master-index.html' \
 		| sed -n '/<p>/,$p' | sed -e 's/<[^>]*>//g' \
 		| grep -oe '^[[:alnum:]].*' -e 'Last modified.*'
@@ -1634,8 +1602,7 @@ hy()
 	[[ -t 1 ]] && tcol='-TWORD,HYPHENED'
 
 	#grep and format table
-	{
-		grep -iE "^$expression"$'\t' <<<"$diclist" \
+	{ 	grep -iE "^$expression"$'\t' <<<"$diclist" \
 			|| grep -iE "^$expression" <<<"$diclist" \
 			|| grep -iE "$expression" <<<"$diclist"
 	} | column -et -s$'\t' -NWORD,HYPHENED $tcol
@@ -1703,9 +1670,8 @@ sin()
 	dic="$HOME/arq/docs/dicionarioSinonimos_th_pt_BR.dat"
 
 	if [[ -f "$dic" ]]
-	then cat "$dic"
-	else
-		curl -Lo- "https://downloads.sourceforge.net/project/aoo-extensions/6212/0/dicsin-br.oxt?r=extensions.openoffice.org&ts=$( date +%s )&use_mirror=ufpr" \
+	then 	cat "$dic"
+	else 	curl -Lo- "https://downloads.sourceforge.net/project/aoo-extensions/6212/0/dicsin-br.oxt?r=extensions.openoffice.org&ts=$( date +%s )&use_mirror=ufpr" \
 			| bsdtar -xf - -O "*th_pt_BR.dat"
 	fi | sed -n "/^${1:-.*}|/,/^\s*$/ p" \
 		| sed -Ee 's/^([a-z.].*)\|([0-9]+)/\1  \[\2\]/' -e 's/^\(([^\)]+)\)(.*)/>>\1 -- \2/; s/\|/, /g' \
@@ -1962,9 +1928,8 @@ gene()
 {
 	local gencode ret
 	for gencode
-	do
-		curl --compressed -sL "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?report=fasta&id=$gencode"
-		ret=$((ret+$?))
+	do 	curl --compressed -sL "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?report=fasta&id=$gencode"
+		((ret+=$?))
 	done
 	return $ret
 }
@@ -1981,18 +1946,15 @@ gened()
 	for gencode in "$@"
 	do
 		tmpfile="${gencode}.fst.tmp"
-
 		#download and check for data validity
 		if gene "$gencode" >"$tmpfile" && grep -qF '>' "$tmpfile"
-		then
-			#rename it to something more meaningful
+		then 	#rename it to something more meaningful
 			filename=$(head -1 -- "$tmpfile" | tr -d '>\r' | tr '|/*,><}{&#@% ' '_')
 			filename="${filename:0:28}".fst  #limit filename length, add extension
 			mv -f -- "$tmpfile" "$filename"  #rename file
 			ls -- "$filename" >&2            #print file path
-		else
-			#error
-			ret=$((ret+1))
+		else 	#error
+			((ret+=$?))
 			cat -- "$tmpfile" >&2
 			#echo "err: id -- $gencode" >&2
 
@@ -2122,9 +2084,9 @@ urldecode()
     printf '%b' "${url_encoded//\%/\\x}"
 }
 urle()
-{ [[ "${1}" ]] || return 1; local LANG=C i x; for (( i = 0; i < ${#1}; i++ )); do x="${1:i:1}"; [[ "${x}" == [a-zA-Z0-9.~_-] ]] && echo -n "${x}" || printf '%%%02X' "'${x}"; done; echo; }
+{ 	[[ "${1}" ]] || return 1; local LANG=C i x; for (( i = 0; i < ${#1}; i++ )); do x="${1:i:1}"; [[ "${x}" == [a-zA-Z0-9.~_-] ]] && echo -n "${x}" || printf '%%%02X' "'${x}"; done; echo; }
 urld()
-{ [[ "${1}" ]] || return 1; : "${1//+/ }"; echo -e "${_//%/\\x}"; }
+{ 	[[ "${1}" ]] || return 1; : "${1//+/ }"; echo -e "${_//%/\\x}"; }
 #https://gist.github.com/cdown/1163649
 #https://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
 #
@@ -2225,10 +2187,9 @@ aworld()
 #ip adresses
 myip()
 {
-	{
-	#wget -cq http://jsonip.com/ -O -
-	wget -qO- https://ipv4.jsonip.com/
-	wget -qO- https://ipv6.jsonip.com/
+	{ 	#wget -cq http://jsonip.com/ -O -
+		wget -qO- https://ipv4.jsonip.com/
+		wget -qO- https://ipv6.jsonip.com/
 	} | jq -r '.ip'
 }
 #sed -Ee 's/.*("ip"[^,]*).*/\1/' -e 's/["]//g;s/:/ /;s/$/\n/'
@@ -2236,9 +2197,8 @@ myip()
 
 myip2()
 {
-	{
-	curl -s -4 'http://ifconfig.io'
-	curl -s -6 'http://ifconfig.io'
+	{ 	curl -s -4 'http://ifconfig.io'
+		curl -s -6 'http://ifconfig.io'
 	} | sed -e 's/<[^>]*>//g' -ne '/Your\sIP/p'
 }
 
@@ -2356,24 +2316,6 @@ codepoint()
 
 #escape html entities
 #{ perl -e 'use CGI qw(escapeHTML); print escapeHTML("<hello>\n");' ;}
-
-#print a list of html entities
-htmlentities()
-{
-	(( $1 )) || set -- 127 0
-
-	{
-	echo 'mapped entities<p>'
-	paste <(printf '%s\n' \#{${2}..${1}}) <(printf '%s\n' \&\#{${2}..${1}}\; ) | w3m -dump -T text/html
-
-	echo
-	echo '<br><br>entity glob<p>'
-	printf '%s\n' \&\#{${2}..${1}}\;
-	} | w3m -dump -T text/html
-}
-#see also:
-#recode html..ascii
-#xmlstarlet unesc #this works for &amp; &lt; etc only
 
 #char sets:
 #0-127   ASCII, 7-bit char
@@ -2522,8 +2464,8 @@ joke()
 	#NAME=John; LASTN=Doe; NAMEF="?firstName=${NAME}&lastName=${LASTN}"
 
 	if [[ "$*" = *id* ]]
-	then set -- ${@//id/} ;curl -s "http://api.icndb.com/jokes/$*$NAMEF"
-	else curl -s "http://api.icndb.com/jokes/random/$1$NAMEF"
+	then 	set -- ${@//id/} ;curl -s "http://api.icndb.com/jokes/$*$NAMEF"
+	else 	curl -s "http://api.icndb.com/jokes/random/$1$NAMEF"
 	fi | jq -r '..|"[\(.id?)]\t\(.joke?)"' | sed -e 's/&quot;/\"/g' -e '/null/d'
 }
 #multiple jokes: http://api.icndb.com/jokes/random/5
@@ -2562,28 +2504,16 @@ alias chessonline='telnet freechess.org 5000'
 #aria2
 alias a2='aria2c'
 
-#extract text from apple pages documents
-#pages documents are zip-compressed archives.
-#unzip it and you'll find an index.xml file
-#from which you can extract the contents
-#extract with `unzip`
-pages2txt()
-{
-	if [[ "$1" = *index.xml.gz* ]]
-	then gunzip -c "$1"
-	elif [[ "$1" = *index.xml* ]]
-	then cat "$1"
-	fi | sed 's|<sf:br/>|@@@&|g' | w3m -dump -T text/html |
-		sed 's|@@@|\n|g' | awk '!NF {if (++n <= 1) print; next}; {n=0;print}'
-}
-
 #youtube-dl troubleshooting
 #try removing:
 #~/.cache/youtube-dl
 #~/.config/youtube-dl
 
+
 #youtube-dl fun
+#command:
 YTDL_CMD=(yt-dlp)
+
 #simple download
 #usage: yt [urls..]
 yth()
@@ -2658,8 +2588,8 @@ yts()
 c()
 {
 	if ((ZSH_VERSION))
-	then noglob bcalc.sh -4 "$@"
-	else bcalc.sh -4 "$@"
+	then 	noglob bcalc.sh -v4 "$@"
+	else 	bcalc.sh -v4 "$@"
 	fi
 }
 
@@ -2690,8 +2620,8 @@ homesudo()
 octal()
 {
 	if [[ -z "$1" ]]
-	then /usr/bin/stat -c "%a %u %U >> %n" -- *
-	else /usr/bin/stat -c "%a %u %U >> %n" "$1"
+	then 	/usr/bin/stat -c "%a %u %U >> %n" -- *
+	else 	/usr/bin/stat -c "%a %u %U >> %n" "$1"
 	fi
 }
 #https://stackoverflow.com/questions/1795976/can-the-unix-list-command-ls-output-numerical-chmod-permissions
@@ -2819,7 +2749,7 @@ d2h()
 ## print hex value of a number
 #hex() {
 #    emulate -L zsh
-#    if [[ -n "$1" ]]; then
+#    if [[ "$1" ]]; then
 #        printf "%x\n" $1
 #    else
 #        printf '%s\n' 'Usage: hex <number-to-convert>'
@@ -3005,8 +2935,8 @@ xtfr()
 xtfs()
 {
 	if [[ "$1" = [[:digit:]]* ]]
-	then echo -e "\e]50;-xos4-terminus-medium-r-*--${1}-*-*-*-*-*-*-*\a"
-	else echo -e "\e]50;${1}\a"
+	then 	echo -e "\e]50;-xos4-terminus-medium-r-*--${1}-*-*-*-*-*-*-*\a"
+	else 	echo -e "\e]50;${1}\a"
 	fi
 
 	xlsfonts | grep xos4 | grep medium
@@ -3036,15 +2966,12 @@ ht()
 #disable one of each sibling ht
 dht()
 {
-	if [[ -n "$TMUX" ]]
-	then
-		echo 'err: command cannot be run under tmux' >&2
+	if [[ "$TMUX" ]]
+	then 	echo 'err: command cannot be run under tmux' >&2
 		return 1
-	else
-		local i
+	else 	local i
 		for i in 2 3
-		do
-			echo "Disabling logical HT core $i"
+		do 	echo "Disabling logical HT core $i"
 			echo 0 > /sys/devices/system/cpu/cpu${i}/online
 		done
 	fi
@@ -3053,15 +2980,12 @@ dht()
 #enable hyperthreading
 eht()
 {
-	if [[ -n "$TMUX" ]]
-	then
-		echo 'err: command cannot be run under tmux' >&2
+	if [[ "$TMUX" ]]
+	then 	echo 'err: command cannot be run under tmux' >&2
 		return 1
-	else
-		local i
+	else 	local i
 		for i in 2 3
-		do
-			echo "Enabling logical HT core $i"
+		do 	echo "Enabling logical HT core $i"
 			echo 1 > /sys/devices/system/cpu/cpu${i}/online
 		done
 	fi
@@ -3075,12 +2999,10 @@ eht()
 caps()
 {
 	if xmodmap -pk | grep -q "Caps_Lock"
-	then
-		xmodmap -e "clear Lock"
+	then 	xmodmap -e "clear Lock"
 		xmodmap -e "keycode 66 = Escape NoSymbol Escape"
 		printf "Caps Lock set to Escape\n"
-	else
-		xmodmap -e "clear Lock"
+	else 	xmodmap -e "clear Lock"
 		xmodmap -e "keycode 66 = Caps_Lock NoSymbol Caps_Lock"
 		printf "Caps Lock reset\n"
 	fi
@@ -3187,18 +3109,18 @@ loss()
 
 	#check for invalid notations
 	if [[ "$u" = *[a-zA-Z]* || "$u" != *[0-9]* || ! "${u/[,.-]*}" =~ ^.?.?$ ]]
-	then echo -e 'err\nusage: loss [+-]NUM[%] [SCALE]' >&2 ;return 1
+	then 	echo -e 'err\nusage: loss [+-]NUM[%] [SCALE]' >&2 ;return 1
 	fi
 
 	#use zshell maths or bash bc?
 	if ((ZSH_VERSION))
-	then float u ;g=$(( ( (1 / (1 - (u / 100) ) ) - 1) * 100))
-	else g=$( bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100" )
+	then 	float u ;g=$(( ( (1 / (1 - (u / 100) ) ) - 1) * 100))
+	else 	g=$( bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100" )
 	fi
 
 	if [[ "$u" = -* ]]
-	then printf "%4s: %6.${2:-4}f %%\n" gain ${u#-} loss ${g#-}
-	else printf "%4s: %6.${2:-4}f %%\n" loss $u gain $g
+	then 	printf "%4s: %6.${2:-4}f %%\n" gain ${u#-} loss ${g#-}
+	else 	printf "%4s: %6.${2:-4}f %%\n" loss $u gain $g
 	fi
 }
 #fausto botelho: https://www.youtube.com/watch?v=yY7d6gOIynU
@@ -3245,13 +3167,9 @@ percentagef()
 		#((perline = line - last))
 		((++n))
 		if ((ZSH_VERSION))
-		then
-			#zsh
-			typeset -F $scl rate line last
+		then 	typeset -F $scl rate line last
 			((rate = ( ( line / last ) - 1) * 100))
-		else
-			#bash bc
-			rate=$(bc -l <<<"scale=$scl; ( ( $line / $last ) - 1) * 100")
+		else 	rate=$(bc -l <<<"scale=$scl; ( ( $line / $last ) - 1) * 100")
 		fi
 		printf '%.*f%%\n' $scl $rate
 		#printf '%d\t%s\t+%.*f\t%.*f%%\n' $n "$line" $scl $perline $scl $rate
@@ -3265,21 +3183,18 @@ percentagef()
 #usage: wpop [italy|uk|us|saudi-arabia|world]
 wpop()
 {
-	[[ -n "$1" ]] && local country="$1-population/"
+	[[ "$1" ]] && local country="$1-population/"
 
 	if [[ "$1" = world ]] || [[ "$1" = all ]]
-	then
-		curl -s 'https://www.worldometers.info/geography/countries-of-the-world/' |
+	then 	curl -s 'https://www.worldometers.info/geography/countries-of-the-world/' |
 			awk 'length > max_length { max_length = length; longest_line = $0 } END { print longest_line }' |
 			sed -e 's/<td>/\n\n&/g' -e 's/<[^>]*>//g' | sed -e 1,2d  -e '$d' |
 			sed -e 'N;N;N;s/\n/ /g' -e 's/Dependenc/\n&/g' | sed -e '/^$/d'
-	else
-		curl -s --compressed "https://www.worldometers.info/world-population/$country" |
+	else 	curl -s --compressed "https://www.worldometers.info/world-population/$country" |
 			sed -e 's/<[^>]*>//g' -ne '/[:[]new Date/p' |
 			sed -Ee 's/([A-Za-z])\s+([A-Za-z])/\1\2/' |
 			awk -F' ' '$4 > 50 { print $2" "$4}'
 	fi
-
 	echo "${1:-world historical}" >&2
 }
 #https://www.worldometers.info/world-population/
@@ -3288,7 +3203,6 @@ wpop()
 warea()
 {
 	local cutcols=-c1-25,35-
-
 	w3m -dump -cols 100 'https://www.worldometers.info/geography/largest-countries-in-the-world/' \
 		| tee >( grep '^\s*#' | cut $cutcols >&2 ) \
 		| sed -n '/List of countries/,/^\[INS/p' | sed '$d' | tac | cut $cutcols
@@ -3300,7 +3214,6 @@ warea()
 localidade()
 {
 	local args data
-
 	args=$( tr A-Z a-z <<< "$*" )
 	data=$(curl --compressed 'https://servicodados.ibge.gov.br/api/v1/localidades/distritos')
 
@@ -3327,13 +3240,11 @@ nomef()
 {
 	local json
 	if [[ -z "$1" ]]
-	then
-		json=$( curl -s 'https://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking' )
+	then 	json=$( curl -s 'https://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking' )
 		jq -r '.[]|"Localidade: \(.localidade)"' <<<"$json"
 		jq -r '.[]|.res[]|"\(.nome)\t\(.frequencia)\t\(.ranking)"' <<<"$json" \
 			| column -et -NNOME,FREQ,RNK
-	else
-		set -- "$( tr A-Z a-z <<< "$1" )"
+	else 	set -- "$( tr A-Z a-z <<< "$1" )"
 		json=$(curl -s "https://servicodados.ibge.gov.br/api/v2/censos/nomes/$1")
 		jq -r '.[]|"Local: \(.localidade)","Nome_: \(.nome)"' <<<"$json"
 		jq -r '.[].res[]|"\(.periodo)\t\(.frequencia)"' <<<"$json" \
@@ -3564,13 +3475,14 @@ SUM()
 	perl -M'List::Util qw(sum max min)' -MPOSIX -0777 -a \
 	-ne 'printf "%-7s : %'".${1:-4}"'f\n"x6, "Sum", sum(@F), "Min", min(@F), "Max", max(@F), "Average", sum(@F)/@F,  "Median", sum( (sort {$a<=>$b} @F)[ int( $#F/2 ), ceil( $#F/2 ) ] )/2, "Values", scalar(@F);'
 }
-SUM2()  {
+SUM2()
+{
 	datamash --header-out -R "${1:-4}" \
 	sum 1 min 1 max 1 mean 1 q1 1 median 1 mad 1 madraw 1 q3 1 iqr 1 \
 	sstdev 1 pstdev 1 jarque 1 sskew 1 pskew 1 svar 1 pvar 1 \
 	range 1 count 1 \
-	| datamash transpose \
-	| perl -pe 's/\([^)]*\)//g'
+		| datamash transpose \
+		| perl -pe 's/\([^)]*\)//g'
 }
 #{ Rscript -e 'summary(as.numeric(read.table(file("stdin"))[,1]))' ;}
 #{ paste -sd+ | bc ;}
@@ -3931,7 +3843,7 @@ tmr()
 	max=${max//m/*60} max=${max//s} max=$((max)) || exit
 	[[ -z "$1" ]] || printf "max: %ss\n" $max ;trap break INT
 	while ((SECONDS<max))
-	do t=$SECONDS ;printf '\r%*d' 0 $t ;sleep 1
+	do 	t=$SECONDS ;printf '\r%*d' 0 $t ;sleep 1
 	done ;printf '\a\n%dh ~ %dm ~ %ds\n' $((t/3600)) $((t/60)) $t
 )
 
@@ -4069,24 +3981,6 @@ reducepdf() {
 #https://unix.stackexchange.com/questions/28803/how-can-i-reduce-a-videos-size-with-ffmpeg
 
 
-#price monitor
-#price must be an integer
-pmon()
-{
-	local REPLY sec sign tgt mail
-	sign=${1//[^><]} tgt=${1//[><+-]} tgt=${tgt%.*}
-	binance -s ${@:2} | while read ;do
-		if [[ "$REPLY" =~ ^\ *[0-9,.]+\ *$ ]] && ((${REPLY%[,.]*} ${sign:->} ${tgt:?err: price target required}))
-		then
-			(mplayer -really-quiet /usr/share/sounds/Smooth/stereo/dialog-warning.oga &>/dev/null &)
-			((mail)) || (mail "price target! ${@:2} ${REPLY%[,.]*} ${sign:->} $tgt" &)
-			echo -e "\aprice target! ${@:2} ${REPLY%[,.]*} ${sign:->} $tgt @ $(date -Isec)"
-			sec=$SECONDS  mail=1  
-			while ((SECONDS < sec+5)) && read ;do : ;done
-		fi
-	done
-}
-
 #libinput
 #{ xinput-list ;}
 #{ xinput set-prop 13 322 0.2 ;}
@@ -4156,7 +4050,7 @@ unset MSG
 
 
 #linus linux challenge watch
-linus() { echo -e "$(curlu 'https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw' | grep -e '<title>' -e 'X<uri>' | sed -E "s/(linux|manjaro|pop!|mint|daily driver|challenge)/\\$BRed&\\$ENDC/Ig")" ;}
+linus() { 	echo -e "$(curlu 'https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw' | grep -e '<title>' -e 'X<uri>' | sed -E "s/(linux|manjaro|pop!|mint|daily driver|challenge)/\\$BRed&\\$ENDC/Ig")" ;}
 
 
 ##################################################
@@ -4167,15 +4061,11 @@ linus() { echo -e "$(curlu 'https://www.youtube.com/feeds/videos.xml?channel_id=
 blist()
 {
 	local i
-
-	#user input
-	if [[ -n "$*" ]]
-	then set -- $( tr '[:lower:]' '[:upper:]' <<< "$*" )
-	#or defaults
-	else printf 'uso: blist [LETRA|NUM]\n\n' >&2 ;set -- {A..Z} {0..9}
+	if [[ "$*" ]]
+	then 	set -- $( tr '[:lower:]' '[:upper:]' <<< "$*" )
+	else 	printf 'uso: blist [LETRA|NUM]\n\n' >&2 ;set -- {A..Z} {0..9}
 	fi
 	
-	#laço para puxar os dados
 	for i in "$@"
 	do 	printf 'Puxando %s..\r' "$i" 1>&2
 		curl -s "https://br.advfn.com/bolsa-de-valores/bovespa/$i" |
@@ -4192,7 +4082,6 @@ blist()
 tesouro()
 {
 	local url data
-
 	#https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm
 	#http://www.tesouro.fazenda.gov.br/tesouro-direto-precos-e-taxas-dos-titulos
 	url=https://www.tesourodireto.com.br/json/br/com/b3/tesourodireto/service/api/treasurybondsinfo.json
@@ -4200,12 +4089,10 @@ tesouro()
 
 	#print status
 	jq '.response.TrsrBondMkt' <<<"$data"
-
 	jq -r '.response.TrsrBdTradgList[].TrsrBd |
 		"\(.nm)\t\(.FinIndxs| if .nm == "PREFIXADO" then "" else .nm end)+\(if .anulInvstmtRate == 0 then empty else .anulInvstmtRate end)%\t\(.minInvstmtAmt)\t\(.untrInvstmtVal)\t\(.mtrtyDt|.[:10])"' <<<"$data" |
 		sort |
 		column -s$'\t' -et -NTÍTULO,RENT/ANO,INVEST/MIN,PREÇO,VENCIMENTO -RRENT/ANO,INVEST/MIN,PREÇO
-
 	echo "<https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm>"
 
 }
@@ -4220,10 +4107,10 @@ ipcab()
 
 	#testar input do usuário, ano maior que 1980
 	set -- "${@//[\/.-]}"
-	[[ -n "$2" ]] && set -- "$1$2"
+	[[ "$2" ]] && set -- "$1$2"
 	
 	if [[ "$1" =~ ^[0-9]{4}$ ]] && (( $1 >= 1980 )) 2>/dev/null
-	then set -- "${1}01"
+	then 	set -- "${1}01"
 	fi
 
 	#user arg must be a six-digit integer and before 1980/jan
@@ -4259,12 +4146,12 @@ ipcab2()
 
 	#testar input do usuário, ano maior que 1980
 	if [[ "$1" =~ ^[0-9]{4}$ ]] && (( $1 >= 1980 )) 2>/dev/null
-	then set -- "${1}01"
+	then 	set -- "${1}01"
 	fi
 
 	#user arg must be a six-digit integer and before 1980
 	if [[ ! "$1" =~ ^[0-9]{6}$ ]] || (( $1 < 1980 )) 2>/dev/null
-	then set -- 199501  #199407 começo do plano real
+	then 	set -- 199501  #199407 começo do plano real
 	fi
 	
 	#inflação acumulada por ano #cod:69
@@ -4286,7 +4173,6 @@ ipcab2()
 		printf "%s dez %s%% %'.2f%% %.6f\n" "$year" "$val" "$tvalp" "$tval"
 		((year++))
 	done <<< "$( eval printf 'dezembro\ %s\\n' \{$year..$yearend\} )" |
-		#make table
 		column -ets' ' -NAno,Mes,Ac%Ano,Acu%Total,Fator -RAc%Ano,Acu%Total,Fator 
 }
 #orig:199512,199612,199712,199812,199912,200012,200112,200212,200312,200412,200512,200612,200712,200812,200912,201012,201112,201212,201312,201412,201512,201612,201712,201812,201912,202012,202112,202212,202312,202412,202512,202612,202712,202812,202912,203012,202001
@@ -4298,12 +4184,10 @@ ipca()
 {
 	#if user supplied no args
 	if [[ -z "${*}" ]]
-	then
-		printf 'usage: ipca [series_id]\n' >&2
+	then 	printf 'usage: ipca [series_id]\n' >&2
 		printf 'usage: ipca  .           #all series\n\n' >&2
 		set -- CUUR0000SA0
 	fi
-
 	#get data and grep a series
 	curl 'https://download.bls.gov/pub/time.series/cu/cu.data.1.AllItems' | grep "$1" | column -t
 }
@@ -4332,8 +4216,7 @@ kitco()
 	#parse options
 	while getopts hn c
 	do 	case $c in
-			#help
-			h ) cat <<-!
+			h*) cat <<-!
 			usage: kitco [CURRENCY] [UNIT]   #convert opts
 			usage: kitco -n NUM              #kitco news
 			usage: kitco -h                  #help page
@@ -4342,9 +4225,8 @@ kitco()
 			units: ounce, gram, kilo or tola
 			defts: USD ounce'
 			!
-			return 0 ;;
-			#news
-			n )
+			return ;;
+			n*) #news
 			curl -s "https://proxy.kitco.com/getvnews?type=json&df=2&max=${2:-8}" -H 'Origin: https://www.kitco.com' \
 				| jq  -r '.News.videoNews|reverse[]|.fullHeadline,.publishDate,.description,""' \
 				| sed 's/<br\/>//g'
@@ -4362,9 +4244,9 @@ kitco()
 	#check if $1 is empty
 	#set default currency
 	if [[ -z "$1" ]]
-	then set -- USD "$2"
+	then 	set -- USD "$2"
 	#set all uppercase
-	else set -- "$(tr a-z A-Z <<< "$1")" "$2"
+	else 	set -- "$(tr a-z A-Z <<< "$1")" "$2"
 	fi
 	#check for possible error in $1
 	if (( ${#1} - 3 ))
@@ -4388,7 +4270,7 @@ kitco()
 	#table
 	curl -Ls "https://proxy.kitco.com/getPM?symbol=AU,AG,PT,PD,RH&currency=${1}&unit=${2}&market=4" -H 'Origin: https://www.kitco.com' | sed -e 's/\s/T/' -e 's/\r//g' | column -ts, -NX,CUR,UNIT,TIME,BID,MID,ASK,CHG,CHG%,LOW,HIGH -RCUR,UNIT,BID,MID,ASK,CHG,CHG%,LOW,HIGH -OX,BID,MID,ASK,CHG,CHG%,LOW,HIGH,CUR,UNIT,TIME ${colconf[@]}
 	
-	printf '<https://www.kitco.com/market/>\n'
+	echo '<https://www.kitco.com/market/>'
 }
 #<<Exchange rates displayed are the middle point between bid and ask.>>
 
@@ -4399,7 +4281,6 @@ metals()
 	curl -sL https://www.mining.com/markets/ |
 		grep "class='commodity-name'" |
 		sed 's/<div/\n&/g ;s/<[^>]*>//g'
-
 	echo '<https://www.mining.com/markets/>'
 }
 #Metals and Commodities
@@ -4437,8 +4318,7 @@ gfin()
 	#get rates by 'mids'; max 100 mids per request
 	curl -s 'https://www.google.com/async/finance_wholepage_price_updates?ei=99InXuDmDNHY5OUPv-CguA0&yv=3&async=mids:%2Fg%2F11c319bxp1%7C%2Fg%2F11c6qr7_zl%7C%2Fg%2F11cjk7msnp%7C%2Fg%2F11f_p2h7tk%7C%2Fg%2F11fqt81yyy%7C%2Fg%2F11h06gmwhk%7C%2Fg%2F11h5q0hb4g%7C%2Fg%2F12fh0nz9c%7C%2Fg%2F12fh0nzb0%7C%2Fg%2F12fh0nzb3%7C%2Fg%2F12fh0p2yj%7C%2Fg%2F12fh0p2ys%7C%2Fg%2F12fh0p2zf%7C%2Fg%2F12fh0p73t%7C%2Fg%2F12fh0p75f%7C%2Fg%2F12fh0p75n%7C%2Fg%2F12fh0pcbj%7C%2Fg%2F12fh0ph_m%7C%2Fg%2F12fh0ph_n%7C%2Fg%2F12fh0ph_w%7C%2Fg%2F12fh0pj0n%7C%2Fg%2F12fh0pj11%7C%2Fg%2F12fh0pmvf%7C%2Fg%2F12fh0q03j%7C%2Fg%2F12fh0q03k%7C%2Fg%2F12fh0q40l%7C%2Fg%2F12fh0q40p%7C%2Fg%2F12fh0q417%7C%2Fg%2F12fh0q41w%7C%2Fg%2F12fh0q889%7C%2Fg%2F12fh0q89p%7C%2Fg%2F12fh0qdmr%7C%2Fg%2F12fh0qdp7%7C%2Fg%2F12fh0qdq2%7C%2Fg%2F12fh0qdq7%7C%2Fg%2F12hdlm_nd%7C%2Fg%2F12hdlm_nx%7C%2Fg%2F12hdlm_pq%7C%2Fg%2F12hdlr38s%7C%2Fg%2F12hdlrw86%7C%2Fg%2F12hdlsn8t%7C%2Fg%2F12hdlsn8x%7C%2Fg%2F12hdltfqt%7C%2Fg%2F12hdltfr0%7C%2Fg%2F12hdltfrc%7C%2Fg%2F12hdltfsh%7C%2Fg%2F1dtsbwq8%7C%2Fg%2F1hg1hklbg%7C%2Fg%2F1q4t94b6p%7C%2Fg%2F1q52g9wfq%7C%2Fg%2F1q52gbb7v%7C%2Fg%2F1q6b4f1pf%7C%2Fg%2F1yg5879fd%7C%2Fg%2F1yghbvnlq%7C%2Fg%2F1ylhlbf1j%7C%2Fm%2F016j14%7C%2Fm%2F016yss%7C%2Fm%2F02853rl%7C%2Fm%2F02hl6w%7C%2Fm%2F02xl7xj%7C%2Fm%2F034673%7C%2Fm%2F046k_p%7C%2Fm%2F04j8v0t%7C%2Fm%2F04t5sp%7C%2Fm%2F04ww1p%7C%2Fm%2F04xjcr%7C%2Fm%2F04xk2h%7C%2Fm%2F04zvfw%7C%2Fm%2F07zkq3x%7C%2Fm%2F07zkrds%7C%2Fm%2F07zk_ym%7C%2Fm%2F07zk_zc%7C%2Fm%2F07zkzv8%7C%2Fm%2F07zl90k%7C%2Fm%2F07zllzd%7C%2Fm%2F07zln7n%7C%2Fm%2F07zln_9%7C%2Fm%2F07zlw9w%7C%2Fm%2F07zm1ts%7C%2Fm%2F07zm2vb%7C%2Fm%2F07zm7zs%7C%2Fm%2F07zmbvf,currencies:,_fmt:json' | sed 1d
 	curl -s 'https://www.google.com/async/finance_wholepage_price_updates?ei=ywprXZHwMcCy5OUPqeK3qAw&yv=3&async=mids:%2Fm%2F0877z%7C%2Fm%2F09fld6%7C%2Fm%2F0b18t%7C%2Fm%2F0ckbkv_%7C%2Fm%2F0ckbnyv%7C%2Fm%2F0ckcq21%7C%2Fm%2F0ckcrh7%7C%2Fm%2F0ckcxmp%7C%2Fm%2F0ckd7nm%7C%2Fm%2F0ckd8tr%7C%2Fm%2F0ckdqsq%7C%2Fm%2F0ckf36v%7C%2Fm%2F0ckf8kv%7C%2Fm%2F0ckgsgx%7C%2Fm%2F0ckh859%7C%2Fm%2F0ckhqlx%7C%2Fm%2F0ck_hz6%7C%2Fm%2F0ckj0b3%7C%2Fm%2F0ckj76w%7C%2Fm%2F0ckjvmb%7C%2Fm%2F0ckk41t%7C%2Fm%2F0ckk6tq%7C%2Fm%2F0ckl1vg%7C%2Fm%2F0ckl258%7C%2Fm%2F0ckp030%7C%2Fm%2F0ckplt3%7C%2Fm%2F0ckpv1f%7C%2Fm%2F0ckpwbx%7C%2Fm%2F0ckq0pv%7C%2Fm%2F0ckq1xd%7C%2Fm%2F0ckq1yk%7C%2Fm%2F0ckqp37%7C%2Fm%2F0ckr0kx%7C%2Fm%2F0ckrjm4%7C%2Fm%2F0cks31m%7C%2Fm%2F0cks_60%7C%2Fm%2F0cksgss%7C%2Fm%2F0ckspft%7C%2Fm%2F0cksrc4%7C%2Fm%2F0cksx47%7C%2Fm%2F0ckt6ld%7C%2Fm%2F0cktgpy%7C%2Fm%2F0ckwf21%7C%2Fm%2F0ckxj89%7C%2Fm%2F0ckxkz6%7C%2Fm%2F0ckxpc8%7C%2Fm%2F0ckxrhc%7C%2Fm%2F0ckxvl0%7C%2Fm%2F0ckxvm7%7C%2Fm%2F0cky1hw%7C%2Fm%2F0ckynjl%7C%2Fm%2F0ckyv15%7C%2Fm%2F0ckzfjy%7C%2Fm%2F0cl015q%7C%2Fm%2F0cl0x5j%7C%2Fm%2F0cl19mp%7C%2Fm%2F0cl1_nd%7C%2Fm%2F0cl20h_%7C%2Fm%2F0cl20hl%7C%2Fm%2F0cl26k8%7C%2Fm%2F0cl3bt3%7C%2Fm%2F0cl3pfz%7C%2Fm%2F0clbbbp%7C%2Fm%2F0cqyw%7C%2Fm%2F0rz9htl,currencies:%2Fm%2F02l6h%2B%2Fm%2F09nqf%7C%2Fm%2F09nqf%2B%2Fm%2F088n7%7C%2Fm%2F01nv4h%2B%2Fm%2F09nqf%7C%2Fm%2F09nqf%2B%2Fm%2F0ptk_%7C%2Fm%2F09nqf%2B%2Fm%2F02nb4kq%7C%2Fm%2F09nqf%2B%2Fm%2F0hn4_%7C%2Fm%2F0kz1h%2B%2Fm%2F09nqf,_fmt:json' | sed 1d
-	} |
-		jq -r '.PriceUpdate.entities[]|
+	} | 	jq -r '.PriceUpdate.entities[]|
 			( .financial_entity // .currency_entity |
 				"\((.common_entity_data|"\(.symbol//.name)$\(.name)$\(.change)$\(.value_change)$\(if .change == "POSITIVE" then "+" else "-" end)\(.percent_change)$\(.last_value)$\(.last_updated_time)"))$\(.last_close_price//null|.value//"")$\(.exchange//"")"
 			)' |
@@ -4460,13 +4340,11 @@ yfin()
 (
 	#parse some opts
 	if [[ "$1" = -h ]]
-	then
-		printf 'usage: yfin [-jh] SYMBOL\n'
+	then 	printf 'usage: yfin [-jh] SYMBOL\n'
 		printf 'option -j to print raw json data\n'
 		return
 	elif [[ "$1" = -j ]]
-	then
-		PJSON=1
+	then 	PJSON=1
 		shift
 	fi
 	
@@ -4477,25 +4355,23 @@ yfin()
 	YJSON="$( curl -sL "https://query1.finance.yahoo.com/v7/finance/quote?symbols=${SYMBOL:-TSLA}&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance" )"
 
 	#print json?
-	if [[ -n "$PJSON" ]]
-	then
-		printf '%s\n' "$YJSON"
+	if [[ "$PJSON" ]]
+	then 	printf '%s\n' "$YJSON"
 		return
 	#check for error response
 	elif jq -e '.quoteResponse.error' <<< "$YJSON" &>/dev/null
-	then
-		jq -r '.quoteResponse.error' <<< "$YJSON"
+	then 	jq -r '.quoteResponse.error' <<< "$YJSON"
 		return 1
 	#empty response?
 	elif ! jq -e '.quoteResponse.result[]' <<<"$YJSON" &>/dev/null
-	then
-		return 1
+	then 	return 1
 	fi
 
 	#set timezone for displaying times
-	#export TZ="GMT"
+	#TZ="GMT"
 	#set timezone according to info from yahoo
-	export TZ="$( jq -r '.quoteResponse.result[]|.exchangeTimezoneName//.exchangeTimezoneShortName' <<< "$YJSON" )"
+	TZ="$(jq -r '.quoteResponse.result[]|.exchangeTimezoneName//.exchangeTimezoneShortName' <<< "$YJSON")"
+	export TZ
 
 	#format ticker
 	jq -r '.quoteResponse.result[]|
@@ -4576,15 +4452,8 @@ yfin()
 		"Price__: \(.regularMarketPrice)"
 		' <<<"$YJSON" | grep -Fv 'null' | cat -s
 )
-#currency
-#language
-#triggerable
-#region
-#tradeable
-#priceHint
-#messageBoardId
-#shortName -- symbol short name
-#gmtOffSetMilliseconds
+#currency, language, triggerable, region, tradeable, priceHint, messageBoardId
+#shortName -- symbol short name; gmtOffSetMilliseconds
 #https://query1.finance.yahoo.com/v7/finance/quote?symbols=DANSKE.CO,ERIC-B.ST,FPKPEN.CO,SSO.OL,VWS.CO&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance
 
 
@@ -4594,12 +4463,10 @@ yfin2()
 (
 	#parse some opts
 	if [[ "$1" = -h ]]
-	then
-		printf 'usage: yfin2 [-jh] SYMBOL [RANGE] [GRANULARITY]\n'
+	then 	printf 'usage: yfin2 [-jh] SYMBOL [RANGE] [GRANULARITY]\n'
 		return
 	elif [[ "$1" = -j ]]
-	then
-		PJSON=1
+	then 	PJSON=1
 		set -- "${@:2:4}"
 	fi
 	
@@ -4610,7 +4477,7 @@ yfin2()
 	YJSON="$( curl -s "https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOL}?region=US&lang=en-US&includePrePost=true&interval=${2:-1d}&range=${3:-1d}&corsDomain=finance.yahoo.com&.tsrc=finance" --compressed )"
 
 	#print json?
-	if [[ -n "$PJSON" ]]
+	if [[ "$PJSON" ]]
 	then
 		printf '%s\n' "$YJSON"
 		return
@@ -4622,9 +4489,10 @@ yfin2()
 	fi
 
 	#set timezone for displaying times
-	#export TZ="GMT"
+	#TZ="GMT"
 	#set timezone according to info from yahoo
-	export TZ="$( jq -r '.chart.result[].meta.exchangeTimezoneName//.timezone' <<< "$YJSON" )"
+	TZ="$(jq -r '.chart.result[].meta.exchangeTimezoneName//.timezone' <<< "$YJSON")"
+	export TZ
 	
 	#print ticker config
 	jq -r '.chart.result[]|
@@ -4648,7 +4516,7 @@ yfin2()
 					)
 				),
 				""
-			)' <<< "$YJSON"
+			)' <<<"$YJSON"
 
 	#tickers and indicators
 	jq -r '.chart.result[]|
@@ -4679,7 +4547,7 @@ yfin2()
 			"MktPrice: \(.regularMarketPrice//empty)"
 			#"PriceHnt: \(.priceHint//empty)"
 		)
-		' <<< "$YJSON"
+		' <<<"$YJSON"
 )
 
 
@@ -4697,11 +4565,9 @@ ylist()
 
 	#if there is no local copy, try to download it
 	if [[ ! -e "$LISTF" ]]
-	then
-		#check for downloaded temp file
+	then 	#check for downloaded temp file
 		if [[ ! -e "$TMPF" ]]
-		then
-			curl -L -o "$TMPF" 'https://github.com/mountaineerbr/extra/raw/master/yahooFinanceSymbols/yahooFinanceSymbols.txt' || return 1
+		then 	curl -L -o "$TMPF" 'https://github.com/mountaineerbr/extra/raw/master/yahooFinanceSymbols/yahooFinanceSymbols.txt' || return
 			printf 'File at %s\n' "$TMPF" >&2
 		fi
 		
@@ -4717,13 +4583,10 @@ ylist()
 nlist()
 {
 	local line
-
-	#get data
 	curl --compressed 'ftp://ftp.nasdaqtrader.com/symboldirectory/'|
 		sed 's/<[^>]*>//g' | sort -nk3 | awk '$4{print $4}' |
 		while read line
-		do
-			#for line in nasdaqlisted.txt otherlisted.txt
+		do 	#for line in nasdaqlisted.txt otherlisted.txt
 			printf 'Fetching %s\r' "$line" >&2
 			curl --compressed "ftp://ftp.nasdaqtrader.com/symboldirectory/$line"
 		done
@@ -4744,9 +4607,9 @@ nlistjson()
 rates()
 {
 	if [[ ${*} =~ (-h|:?help) ]]
-	then curl -s 'rate.sx/:help' ;return
+	then 	curl -s 'rate.sx/:help'
+	else 	curl -s 'rate.sx/?TFq' | sed -e '1,6d' -e '$d'
 	fi
-	curl -s 'rate.sx/?TFq' | sed -e '1,6d' -e '$d'
 }
 
 #single symbol graph
@@ -4754,11 +4617,9 @@ rate()
 {
 	#usage: rate [from_currency] [to_currency] [@date|?T|..]
 	if [[ -z "$2" ]] || [[ "$2" =~ [0-9]+ ]]
-	then
-		set -- "$1" usd "$2"
+	then 	set -- "$1" usd "$2"
 	elif [[ ${*} =~ (-h|:?help) ]]
-	then
-		curl -s 'rate.sx/:help'
+	then 	curl -s 'rate.sx/:help'
 		printf '\nusage: rate [from_currency] [to_currency] [@date|?T|..]\n' 
 		return
 	fi		
@@ -4769,71 +4630,68 @@ rate()
 
 #fun with <datahub.io>
 #time series
-
-#gold monthly
 gold()
 {
-	curl -sL 'https://datahub.io/core/gold-prices/r/1.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
-}
-#gold annual
-golda()
-{
-	curl -sL 'https://datahub.io/core/gold-prices/r/0.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
+	case "$1" in
+		a*) #annual
+			curl -sL 'https://datahub.io/core/gold-prices/r/0.json'
+			;;
+		*)  #monthly
+			curl -sL 'https://datahub.io/core/gold-prices/r/1.json'
+			;;
+	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
 }
 
-#oil daily brent 
+#oil brent 
 brent()
 {
-	curl -sL 'https://datahub.io/core/oil-prices/r/0.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
+	case "$1" in
+		a*) #annual
+			curl -sL 'https://datahub.io/core/oil-prices/r/3.json'
+			;;
+		m*) #monthly
+			curl -sL 'https://datahub.io/core/oil-prices/r/2.json'
+			;;
+		w*) #weekly
+			curl -sL 'https://datahub.io/core/oil-prices/r/1.json'
+			;;
+		*)  #daily
+			curl -sL 'https://datahub.io/core/oil-prices/r/0.json'
+			;;
+	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
 }
-#oil weekly brent 
-brentw()
-{
-	curl -sL 'https://datahub.io/core/oil-prices/r/1.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
-}
-#oil monthly brent 
-brentm()
-{
-	curl -sL 'https://datahub.io/core/oil-prices/r/2.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
-}
-#oil annual brent 
-brenta()
-{
-	curl -sL 'https://datahub.io/core/oil-prices/r/3.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
-}
-alias brenty=brenta
+alias brenty=brent
 
-#oil daily wti 
+#oil wti 
 wti()
 {
-	curl -sL 'https://datahub.io/core/oil-prices/r/4.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
+	case "$1" in
+		a*) #annual
+			curl -sL 'https://datahub.io/core/oil-prices/r/7.json'
+			;;
+		m*) #monthly
+			curl -sL 'https://datahub.io/core/oil-prices/r/6.json'
+			;;
+		w*) #weekly
+			curl -sL 'https://datahub.io/core/oil-prices/r/5.json'
+			;;
+		*)  #daily
+			curl -sL 'https://datahub.io/core/oil-prices/r/4.json'
+			;;
+	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
 }
-#oil weekly wti 
-wtiw()
-{
-	curl -sL 'https://datahub.io/core/oil-prices/r/5.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
-}
-#oil monthly wti 
-wtim()
-{
-	curl -sL 'https://datahub.io/core/oil-prices/r/6.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
-}
-#oil annual wti 
-wtia()
-{
-	curl -sL 'https://datahub.io/core/oil-prices/r/7.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
-}
-alias wtiy=wtia
 
-#gas monthly
+#gas
 gas()
 {
-	curl -sL 'https://datahub.io/core/natural-gas/r/1.json' | jq -r '.[]|"\(.Month)\t\(.Price)"'
-}
-#gas daily
-gasd()
-{
-	curl -sL 'https://datahub.io/core/natural-gas/r/0.json' | jq -r '.[]|"\(.Date)\t\(.Price)"'
+	case "$1" in 
+		m*) #monthly
+			curl -sL 'https://datahub.io/core/natural-gas/r/1.json'
+			;;
+		*)  #daily
+			curl -sL 'https://datahub.io/core/natural-gas/r/0.json'
+			;;
+	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
 }
 
 #consumer price index
@@ -4869,11 +4727,9 @@ btcsupply()
 #coin market cap stats
 cmcstats()
 {
-	{
-		curl -sL "https://web-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=10&start=1"
+	{ 	curl -sL "https://web-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=10&start=1"
 		curl -sL "https://web-api.coinmarketcap.com/v1/global-metrics/quotes/latest"
 	} | jq
-
 }
 
 #btc historical prices
@@ -4888,11 +4744,9 @@ cmcbtchist()
 
 	curl -sL "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical?convert=${vscur}&slug=${slug}&time_end=${end}&time_start=${start}" | jq
 
-
 	#if no positional argument, print usage
 	if [[ -z "$1" ]]
-	then
-		echo 'usage: cmcbtchist VS_CURRENCY CRYPTO_SLUG START_TIME END_TIME' >&2
+	then 	echo 'usage: cmcbtchist VS_CURRENCY CRYPTO_SLUG START_TIME END_TIME' >&2
 		echo 'usage: cmcbtchist USD bitcoin' >&2
 	fi
 }
