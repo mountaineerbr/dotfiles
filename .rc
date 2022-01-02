@@ -1058,9 +1058,14 @@ alias cdt='cd /tmp'
 alias cdT='cd ~/tmp'
 alias cdw='cd ~/Downloads'
 alias cdW='cd ~/www'
+
 alias winecd='cd /home/jsn/.wine/drive_c/users/jsn'
 alias battle='WINEPREFIX="/home/jsn/.wine" wine "/home/jsn/.wine/drive_c/Program Files (x86)/Battle.net/Battle.net Launcher.exe"'
 
+alias open='exo-open'
+#alias open='xdg-open'
+
+alias T='~/bin/ctemp.sh'
 
 #make dir and change dir to it - GRML has one mkcd function
 #mkcd() { mkdir "$1" && cd "$1" ;}
@@ -3086,6 +3091,7 @@ alias bitstamp='~/bin/markets/bitstamp.sh'
 alias binance='~/bin/markets/binance.sh'
 alias cgk='~/bin/markets/cgk.sh -3'
 alias cmc='~/bin/markets/cmc.sh -3'
+alias myc='~/bin/markets/myc.sh -3'
 alias uol='~/bin/markets/uol.sh'
 alias cointop='/bin/cointop --cache-dir ~/.cache'
 alias ctop=cointop
@@ -4005,6 +4011,7 @@ mail()
 	echo $EMAIL - $subj
 	mutt -s "$subj" $EMAIL <<<"$text"
 }
+#alias mail=xdg-email
 
 #xfce4 numlock keyboard
 #{ xfconf-query -c keyboards -lv | grep -i numlock ;}
@@ -4037,6 +4044,7 @@ estarmos preparados pois já enfrentamo-lá.'
 'Dont you see your father?'
 'If it is to be, it is up to me!!! -- Rusty78609'
 'Dont let the perfect be the enemy of the good -- Voltaire'
+'<https://www.reddit.com/r/getdisciplined/comments/rod44e/plan_day_29_no_videogames_and_no_porn_slowly/>'
 
 )
 if [[ "$-" = *i* ]]  #only in interactive shells
@@ -4065,8 +4073,8 @@ blist()
 	then 	set -- $( tr '[:lower:]' '[:upper:]' <<< "$*" )
 	else 	printf 'uso: blist [LETRA|NUM]\n\n' >&2 ;set -- {A..Z} {0..9}
 	fi
-	
-	for i in "$@"
+
+	for i
 	do 	printf 'Puxando %s..\r' "$i" 1>&2
 		curl -s "https://br.advfn.com/bolsa-de-valores/bovespa/$i" |
 			sed 's/<[^>]*>//g' | sed -n '/Ação/,/var ZD_USER/p' |
@@ -4082,12 +4090,9 @@ blist()
 tesouro()
 {
 	local url data
-	#https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm
-	#http://www.tesouro.fazenda.gov.br/tesouro-direto-precos-e-taxas-dos-titulos
 	url=https://www.tesourodireto.com.br/json/br/com/b3/tesourodireto/service/api/treasurybondsinfo.json
 	data="$(curl -L --compressed --insecure "$url" )"
 
-	#print status
 	jq '.response.TrsrBondMkt' <<<"$data"
 	jq -r '.response.TrsrBdTradgList[].TrsrBd |
 		"\(.nm)\t\(.FinIndxs| if .nm == "PREFIXADO" then "" else .nm end)+\(if .anulInvstmtRate == 0 then empty else .anulInvstmtRate end)%\t\(.minInvstmtAmt)\t\(.untrInvstmtVal)\t\(.mtrtyDt|.[:10])"' <<<"$data" |
@@ -4096,6 +4101,8 @@ tesouro()
 	echo "<https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm>"
 
 }
+#url=https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm
+#url=http://www.tesouro.fazenda.gov.br/tesouro-direto-precos-e-taxas-dos-titulos
 #https://stackoverflow.com/questions/47593807/how-to-scrape-a-html-table-and-print-it-on-terminal-using-bash
 
 
@@ -4104,34 +4111,26 @@ ipcab()
 {
 	local val tval tvalp line data 
 	(($#)) || printf 'uso: ipcab  ANO/MES  # >= 1980/01\n\n' >&2
-
-	#testar input do usuário, ano maior que 1980
-	set -- "${@//[\/.-]}"
-	[[ "$2" ]] && set -- "$1$2"
-	
-	if [[ "$1" =~ ^[0-9]{4}$ ]] && (( $1 >= 1980 )) 2>/dev/null
-	then 	set -- "${1}01"
+	set -- "${@//[\/.-]}" ;[[ "$2" ]] && set -- "$1$2"
+	if ((${#1} == 4 && ${1:-0} >= 1980))
+	then 	set -- "${1}01" #ano+janeiro
 	fi
-
-	#user arg must be a six-digit integer and before 1980/jan
-	if [[ ! "$1" =~ ^[0-9]{6}$ ]] || (( $1 < 198001 )) 2>/dev/null
+	if ((${#1} != 6 || ${1:-0} < 198001))
 	then set -- 199501  #199407 começo do plano real
 	fi
 
-	data="$( curl --compressed -s "https://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=63&p=${1}-203701&ng=1(1)&c=" )"
+	data=$(curl --compressed -s "https://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=63&p=${1}-203701&ng=1(1)&c=")
 
 	#inflação variação mensal #cod:63
-	jq -er '.[0].var' <<< "$data" || return 1
+	jq -er '.[0].var' <<<"$data" || return 1
 
-	jq -r '.[]|"\(.p) \(.v)"' <<< "$data" |
+	jq -r '.[]|"\(.p) \(.v)"' <<<"$data" |
 	while read line
-	do 	val="$( cut -d' ' -f3 <<< "$line" )"
-		tval="$( bc <<< "scale=16; (1+ ( $val /100) ) * ${tval:-1}" )"
-		tvalp="$( bc <<< "scale=16; ( $tval -1) * 100" )"
+	do 	val="$(cut -d' ' -f3 <<<"$line")"
+		tval="$(bc <<<"scale=16; (1+ ($val /100) ) * ${tval:-1}")"
+		tvalp="$(bc <<<"scale=16; ($tval -1) * 100")"
 		printf "%s%% %'.2f%% %.6f\n" "$line" "$tvalp" "$tval"
-	#make table
 	done | column -ets' ' -NMes,Ano,Var%Mes,Acu%Total,Fator -OAno,Mes,Var%Mes,Acu%Total,Fator -RVar%Mes,Acu%Total,Fator
-
 }
 #calculadora: https://www3.bcb.gov.br/CALCIDADAO/publico/corrigirPorIndice.do?method=corrigirPorIndice
 
@@ -4140,55 +4139,45 @@ ipcab()
 #uso: %s [ANO]  #ANO>=1980 e calcula de jan/ANO a DEZ/ANO_ATUAL-1 
 ipcab2()
 {
-	local data year yearend line val tval tvalp
+	local data year yearend val tval tvalp
 	#print usage if user did not supply any argument
 	(($#)) || printf 'uso: ipcab2 ANO  #ANO >= 1980\n\n' >&2
-
-	#testar input do usuário, ano maior que 1980
-	if [[ "$1" =~ ^[0-9]{4}$ ]] && (( $1 >= 1980 )) 2>/dev/null
-	then 	set -- "${1}01"
+	if ((${#1} == 4 && ${1:-0} >= 1980))
+	then 	set -- "${1}01" #ano+janeiro
 	fi
-
-	#user arg must be a six-digit integer and before 1980
-	if [[ ! "$1" =~ ^[0-9]{6}$ ]] || (( $1 < 1980 )) 2>/dev/null
+	if ((${#1} != 6 || ${1:-0} < 1980))
 	then 	set -- 199501  #199407 começo do plano real
 	fi
 	
 	#inflação acumulada por ano #cod:69
-	data="$( curl -sLb non-existing "https://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=69&p=${1}-203012&ng=1(1)&c=" )"
+	data=$(curl -sLb non-existing "https://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=69&p=${1}-203012&ng=1(1)&c=")
 
-	jq -er '.[0].var' <<< "$data" || return 1
-	jq -r '.[]|"\(.p) \(.v)"' <<< "$data" | column -ets' ' -NMes,Ano,Acu%Ano -OAno,Mes,Acu%Ano
+	jq -er '.[0].var' <<<"$data" || return 1
+	jq -r '.[]|"\(.p) \(.v)"' <<<"$data" | column -ets' ' -NMes,Ano,Acu%Ano -OAno,Mes,Acu%Ano
 	
 	#inflação acumulada a partir de um ano específicado pelo usuário
-	yearend="$(( $( date +%Y ) - 1 ))"
+	yearend=$(($( date +%Y ) - 1))
 	year="${1:0:4}"
 
 	printf '\nPeríodo %s/jan - %s/dez\n' "$year" "$yearend"
-	
-	while read line
-	do 	val="$( jq -r ".[]|select( .p == \"${line}\")|.v" <<< "$data" )"
-		tval="$( bc <<< "scale=16; (1+ ( $val /100) ) * ${tval:-1}" )"
-		tvalp="$( bc <<< "scale=16; ( $tval -1) * 100" )"
+	for ((year=year;year<=yearend;++year))
+	do 	val="$(jq -r ".[]|select(.p == \"dezembro ${year}\")|.v" <<<"$data")"
+		tval="$(bc <<<"scale=16; (1+ ($val /100) ) * ${tval:-1}")"
+		tvalp="$(bc <<<"scale=16; ($tval -1) * 100")"
 		printf "%s dez %s%% %'.2f%% %.6f\n" "$year" "$val" "$tvalp" "$tval"
-		((year++))
-	done <<< "$( eval printf 'dezembro\ %s\\n' \{$year..$yearend\} )" |
-		column -ets' ' -NAno,Mes,Ac%Ano,Acu%Total,Fator -RAc%Ano,Acu%Total,Fator 
+	done | column -ets' ' -NAno,Mes,Ac%Ano,Acu%Total,Fator -RAc%Ano,Acu%Total,Fator 
 }
-#orig:199512,199612,199712,199812,199912,200012,200112,200212,200312,200412,200512,200612,200712,200812,200912,201012,201112,201212,201312,201412,201512,201612,201712,201812,201912,202012,202112,202212,202312,202412,202512,202612,202712,202812,202912,203012,202001
 #https://www.ibge.gov.br/estatisticas/economicas/precos-e-custos/9256-indice-nacional-de-precos-ao-consumidor-amplo.html?t=series-historicas&utm_source=landing&utm_medium=explica&utm_campaign=inflacao#plano-real-mes
 
 
 #american inflation
 ipca()
 {
-	#if user supplied no args
-	if [[ -z "${*}" ]]
+	if [[ -z "$*" ]]
 	then 	printf 'usage: ipca [series_id]\n' >&2
 		printf 'usage: ipca  .           #all series\n\n' >&2
 		set -- CUUR0000SA0
 	fi
-	#get data and grep a series
 	curl 'https://download.bls.gov/pub/time.series/cu/cu.data.1.AllItems' | grep "$1" | column -t
 }
 #??Daily query limit Version 1.0 (Unregistered) 25
@@ -4248,8 +4237,7 @@ kitco()
 	#set all uppercase
 	else 	set -- "$(tr a-z A-Z <<< "$1")" "$2"
 	fi
-	#check for possible error in $1
-	if (( ${#1} - 3 ))
+	if ((${#1} - 3))
 	then echo 'Err: invalid currency symbol' >&2 ;return 1
 	fi
 
@@ -4556,10 +4544,8 @@ ylist()
 {
 	#assign local vars
 	local LISTF TMPF
-
 	#local file?
 	LISTF="$HOME/arq/docs/yahooFinanceSymbols/yahooFinanceSymbols.txt" 
-
 	#temp file for download
 	TMPF='/tmp/yahooFinanceSymbols.txt'
 
@@ -4570,12 +4556,9 @@ ylist()
 		then 	curl -L -o "$TMPF" 'https://github.com/mountaineerbr/extra/raw/master/yahooFinanceSymbols/yahooFinanceSymbols.txt' || return
 			printf 'File at %s\n' "$TMPF" >&2
 		fi
-		
 		#set new path
 		LISTF="$TMPF"
 	fi
-
-	#make table
 	column -et -s $'\t' -N'TICKER,NAME,EXCHANGE,CATEGORY,COUNTRY' -T'CATEGORY,NAME' "$LISTF"
 }
 
