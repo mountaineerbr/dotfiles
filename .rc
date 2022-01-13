@@ -195,7 +195,6 @@ alias Z=zathura
 #grep cmds
 #colorise grep (useful for retrieving logs)
 alias ls='ls --color=auto'
-alias grep=egrep
 alias cgrep='grep --colour=always'
 alias egrep='egrep --colour=auto'
 alias fgrep='fgrep --colour=auto'
@@ -1482,25 +1481,23 @@ ubuntu()
 {
 	local v vv r
 	echo 'List of all packages' >&2
-	for v in  hirsute groovy focal eoan bionic xenial trusty precise
-	do
-		case "$v" in
+	for v in impish hirsute focal bionic xenial trusty
+	do 	case "$v" in
 			devel  ) vv=development;;
-			precise) vv='12.04 LTS';;
+			precise) vv='12.04 LTS';;  #removed
 			trusty ) vv='14.04 LTS';;
 			xenial ) vv='16.04 LTS';;
 			bionic ) vv='18.04 LTS';;
 			cosmic ) vv='18.10';;
 			disco  ) vv='19.04';;  #removed from server
-			eoan   ) vv='19.10';;
+			eoan   ) vv='19.10';;  #removed
 			focal  ) vv='20.04 LTS';;
-			groovy ) vv='20.10';;
+			groovy ) vv='20.10';;  #removed
 			hirsute) vv='21.04';;
+			impish ) vv='21.10';;
 		esac
-
 		for r in main multiverse restricted universe
-		do
-			echo "$v $vv in $r" | tr a-z A-Z >&2
+		do 	echo "$v $vv in $r" | tr a-z A-Z >&2
 			curl -Ls "http://archive.ubuntu.com/ubuntu/dists/${v}/${r}/source/Sources.gz" \
 				| gzip -dc | grep -F Package:
 		done
