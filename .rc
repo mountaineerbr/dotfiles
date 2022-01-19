@@ -1324,8 +1324,6 @@ pls()
 #pkg update count
 puc()
 {
-	printf "Package Update Counts\n"
-
 	grep upgraded /var/log/pacman.log \
 	| awk -F ' ' '{print $5}' \
 	| sort | uniq -c | sort -nr
@@ -1403,10 +1401,9 @@ alias ala='~/bin/ala.sh'
 amail()
 {
 	local months list m
-	select list in arch-general arch-announce arch-commits arch-events arch-magazine arch-women arch-mirrors arch-security aur-dev aur-general aur-requests pacman-contrib pacman-dev
+	select list in arch-{general,announce,commits,events,magazine,women,mirrors,security} aur-{dev,general,requests} pacman-{contrib,dev}
 	do 	select m in $(curl -L https://lists.archlinux.org/pipermail/$list/ | sed -n '/<td><A/ p' | sed -En 's/.*"([^"]*)".*/\1/ p')
-		do 	#files are either plain `.txt' or `.txt.gz'
-			curl -L https://lists.archlinux.org/pipermail/$list/$m |
+		do 	curl -L https://lists.archlinux.org/pipermail/$list/$m |
 			if [[ "$m" = *.gz ]]
 			then 	gzip -c -d
 			else 	cat
@@ -1432,17 +1429,12 @@ debian()
 	echo 'List of all packages' >&2
 	curl -sL "https://packages.debian.org/${1:-stable}/allpackages?format=txt.gz"
 }
-#Distribution:
-#  experimental
-#  unstable
-#  testing
-#  stable
+#Distribution:   #Section:
+#  experimental  #  main
+#  unstable      #  contrib
+#  testing       #  non-free
+#  stable        #  any     
 #  oldstable
-#  any
-#Section:
-#  main
-#  contrib
-#  non-free
 #  any
 
 #debian -- list of all packages by repo (without version)
@@ -1452,29 +1444,19 @@ debian2()
 
 	echo 'List of all packages' >&2
 	for v in bullseye buster stretch jessie
-	do 
-		for r in main contrib non-free
-		do
-			printf '%s in %s\n' "$v" "$r" | tr a-z A-Z >&2
+	do  	for r in main contrib non-free
+		do 	printf '%s in %s\n' "$v" "$r" | tr a-z A-Z >&2
 			curl -Ls "http://ftp.br.debian.org/debian/dists/${v}/${r}/source/Sources.xz" \
 				| unxz | grep Package:
 		done
 	done
 }
-##other mirrors
-#ftp.us.debian.org/debian/
-#ftp.de.debian.org/debian/
-#ftp.uk.debian.org/debian/
-##other dists/ entries
+#ftp.us.debian.org/debian/,ftp.de.debian.org/debian/ ,ftp.uk.debian.org/debian/
 #Debian8.11 	#jessie
 #Debian9.12 	#stretch
 #Debian10.3 	#buster
 #Debian 	#next bullseye
-#stable
-#testing
-#unstable
-#experimental
-#sid
+#stable, testing, unstable, experimental, sid
 
 #ubuntu -- list all pkg names (without version)
 ubuntu()
@@ -1519,9 +1501,19 @@ ubuntu2()
 #freebsd ports, list of all ports
 freebsd()
 {
-	curl -sL 'http://www.cz.freebsd.org/ports/master-index.html' \
-		| sed -n '/<p>/,$p' | sed -e 's/<[^>]*>//g' \
-		| grep -oe '^[[:alnum:]].*' -e 'Last modified.*'
+	local category
+	for category in accessibility arabic archivers astro audio base \
+		benchmarks biology cad chinese comms converters \
+		databases deskutils devel dns editors emulators finance \
+		french ftp games german graphics hebrew hungarian \
+		irc japanese java korean lang mail math misc \
+		multimedia net-im net-mgmt net-p2p net news \
+		polish ports-mgmt portuguese print russian science security \
+		shells sysutils textproc ukrainian vietnamese www x11-clocks \
+		x11-drivers x11-fm x11-fonts x11-servers x11-themes x11-toolkits x11-wm x11
+	do 	curl -sL "https://cgit.freebsd.org/ports/tree/$category" | hf
+	done
+	#older: http://www.cz.freebsd.org/ports/master-index.html
 }
 ##mirrors
 #https://www.freebsd.org/doc/handbook/mirrors-ftp.html
@@ -1540,8 +1532,7 @@ freebsd2()
 #gentoo pkg list from mirror
 gentoo()
 {
-	echo -e 'List of all packages\nDownloading..' >&2
-	curl -Ls 'https://mirrors.evowise.com/gentoo/distfiles/' | sed 's/<[^>]*>//g'
+	curl -Ls 'https://gentoo.osuosl.org/distfiles/' | sed 's/<[^>]*>//g'
 }
 #https://mirrors.lug.mtu.edu/gentoo/distfiles/
 
@@ -1553,52 +1544,20 @@ gentoo2()
 		| sed -n '/^Results/,/^Next/p' | cat -s
 }
 
-#linux mint
-mint()
-{
-	echo 'List of all packages' >&2
-	curl --compressed -Lo - http://mirrors.evowise.com/linuxmint/packages/db/packages.db \
-		| tr -cd '\11\12\15\40-\176'  #remove binary chars
-}
-#https://www.linuxmint.com/mirrors.php
-
-mint2()
-{
-	w3m -dump "http://packages.linuxmint.com/search.php?release=any&section=any&keyword=${1:?pkg name required}" \
-		| tac
-}
-
 #fedora
 fedora()
 {
 	local ver index
 	echo 'List of (almost) all packages' >&2
-	for ver in 33
-	do
-		for index in {a..z} {0..9}
-		do
-			curl --compressed -sL "http://fedora.c3sl.ufpr.br/linux/releases/$ver/Everything/aarch64/os/Packages/$index" \
+	for ver in 35
+	do 	for index in {a..z} {0..9}
+		do 	curl --compressed -sL "http://fedora.c3sl.ufpr.br/linux/releases/$ver/Everything/aarch64/os/Packages/$index" \
 				| sed -e 's/</\t&/g; s/<[^>]*>//g' -e 's/^[\s\t]*//; s/\t\+/\t/g; s/&nbsp;//' | cat -s
 		done
 		echo "Packages above from Fedora $ver repos" >&2
 	done
 }
 #https://admin.fedoraproject.org/mirrormanager/
-
-fedora2()
-{
-	curl -Ls "https://apps.fedoraproject.org/packages/fcomm_connector/xapian/query/search_packages/%7B%22filters%22:%7B%22search%22:%22${1:?pkg name required}%22%7D,%22rows_per_page%22:100,%22start_row%22:0%7D" \
-		| jq -r '.rows[].name' | tac
-	echo 'Top results'
-}
-
-#pkgs from all distros
-#use with grep
-alldist()
-{
-	echo 'Loading..' >&2
-	w3m -dump "https://pkgs.org/search/?q=${1:?pkg name required}"
-}
 
 
 #test shell performance
@@ -3828,6 +3787,10 @@ spacevis()
 #{ cat /proc/meminfo | grep Slab ;}
 #https://askubuntu.com/questions/743649/new-16gb-of-ram-installed-yet-i-see-15-3-on-my-system-why
 #https://www.linuxatemyram.com/
+
+#RAM stress test
+#{ /usr/bin/yes 00000000000 |head -c 3000m | pv | tail ;}  #3GB
+#https://unix.stackexchange.com/questions/99334/how-to-fill-90-of-the-free-memory
 
 #If it seems that rustup did not successfully install and
 #configure the stable toolchain, you can do it manually:
