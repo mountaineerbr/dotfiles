@@ -1,5 +1,5 @@
 #env
-LESS = --IGNORE-CASE --SEARCH-SKIP-SCREEN --jump-target=5 --status-column  --LONG-PROMPT --hilite-unread --no-init --RAW-CONTROL-CHARS
+LESS = --IGNORE-CASE --SEARCH-SKIP-SCREEN --jump-target=5 --status-column  --LONG-PROMPT --hilite-unread --no-init --RAW-CONTROL-CHARS --mouse --wheel-lines=4
 
 VISUAL = vim
 
@@ -8,7 +8,7 @@ l	repaint
 ^L	flush-repaint
 ^D	quit
 
-# unused
+# obs: `lesskey` compilation is not necessary anymore as of version 582.
 # --LINE-NUMBERS --quit-if-one-screen --quit-at-eof 
 # https://linux.die.net/man/1/lesskey
 # https://ascending.wordpress.com/2011/02/11/unix-tip-make-less-more-friendly/
