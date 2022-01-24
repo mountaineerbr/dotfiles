@@ -182,22 +182,16 @@ rml()
 	read
 	/usr/bin/rm -I "$@"
 }
-yes()
-{
-	local REPLY
-	printf '%s ' 'Are you sure? y/N' ;read
-	[[ $REPLY = [yY]* ]] || return
-	/usr/bin/yes "$@"
-}
 
 alias Z=zathura
 
 #grep cmds
 #colorise grep (useful for retrieving logs)
 alias ls='ls --color=auto'
-alias cgrep='grep --colour=always'
-alias egrep='egrep --colour=auto'
-alias fgrep='fgrep --colour=auto'
+alias grep='grep --color=auto'
+alias cgrep='grep --color=always'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
 alias igrep='grep -i'
 #'agrep' for approximate search from the 'tre' pkg
 
