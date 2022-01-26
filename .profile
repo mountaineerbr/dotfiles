@@ -51,7 +51,7 @@
 #set custom $PATH
 for d in  \
 	"/opt" \
-	"$GOPATH/bin"
+	"$GOPATH/bin" \
 	"$HOME/.local/bin" \
 	"$HOME/bin/more" \
 	"$HOME/bin/markets" \
