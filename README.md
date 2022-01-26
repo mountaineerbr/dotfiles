@@ -16,7 +16,7 @@ The _.rc file_ changes constantly and is also a testcamp for new code.
 When functions become too large and mature, they may be promoted to
 full-fledged scripts and moved to __[scripts repo](https://github.com/mountaineerbr/scripts)__.
 
-Some configuration files from `/etc` (such as `motd`) and subdirectories under `~/.config` (such as `vifmrc`) are present but not hierarchically organised in this repo. 
+Some configuration files from `/etc` (such as `issue`) and subdirectories under `~/.config` (such as `vifmrc`) are present but not hierarchically organised in this repo. 
 
 ---
 
