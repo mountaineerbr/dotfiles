@@ -45,20 +45,21 @@
 
 #if running bash
 #source from .bashrc if it exists
-[[ -n "$BASH_VERSION" ]] &&
-	[[ -f "$HOME/.bashrc" ]] && . "$HOME/.bashrc"
+[[ "$BASH_VERSION" ]] &&
+	[[ -e "$HOME/.bashrc" ]] && . "$HOME/.bashrc"
 
 #set custom $PATH
 for d in  \
 	"/opt" \
+	"$GOPATH/bin"
 	"$HOME/.local/bin" \
 	"$HOME/bin/more" \
-	"$HOME/bin" \
 	"$HOME/bin/markets" \
+	"$HOME/bin" \
 	.
 do
 	if [[ -d "$d" ]] && [[ :"$PATH": != *:"${d:-x}":* ]]
-	then PATH="$d:$PATH"
+	then 	PATH="$d:$PATH"
 	fi
 done
 unset d
@@ -183,6 +184,14 @@ export MOZ_USE_OMTC=1
 #pvkrun  [demo]
 #OBS: `optirun' is the only which enables NVIDIA renderer for me
 
+#config for bitcoin.{blk,tx}.sh
+export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
+
+#cgk.sh
+#expiration of cache files in seconds
+#set to 0 or unset to disable expiration
+#export CGKEXPIRATION=259200  #(3 days)
+
 
 #is it linux tty?
 if [[ "$TERM" = linux ]]
@@ -215,21 +224,12 @@ then
 	#https://unix.stackexchange.com/questions/55423/how-to-change-cursor-shape-color-and-blinkrate-of-linux-console
 fi
 
-#config for bitcoin.{blk,tx}.sh
-export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
-
-#cgk.sh
-#expiration of cache files in seconds
-#set to 0 or unset to disable expiration
-#export CGKEXPIRATION=259200  #(3 days)
-
 
 #start x? - simple x init
 #mystartxf()
 #{
 #	local REPLY
-#	# If other than ROOT
-#	if (( EUID > 0 ))
+#	if [[ "$EUID" -gt 0 ]] && [[ "$XDG_VTNR" -eq 1 ]] && [[ -z "$DISPLAY" ]]
 # 	then
 #		## Start X Server?
 #		printf 'Start X Server? y/N ' ;read

@@ -1093,6 +1093,11 @@ alias usd='cmc usd brl ;cgk usd brl ;uol.sh|sed -n 8p\;17p'
 #termux-setup-storage
 #this creates a new directory in termux, ~/storage, which contains simlinks to /storage/emulated/0 and can be accessed by a standard gui file manager. 
 
+#keep cpu from sleep, may improve performance
+#alias lock=termux-wake-lock
+#alias unlock=termux-wake-unlock
+
+alias shh='echo ssh $(whoami)@$(ip -4 n | awk "{print \$3;exit}" | ip -br -4 a s $(echo Device: >&2 ;cat /dev/stdin) | grep -Eo "[0-9.]{7,}")' 
 
 
 #make dir and change dir to it - GRML has one mkcd function

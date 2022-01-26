@@ -345,7 +345,7 @@ command Xbrc !vim ~/.xbindkeysrc
 
 " Pdf
 " note: xreader cannot open from tmux
-filextype {*.pdf},<application/pdf> xpdf %c %i &, xreader %c %i &, evince %c %i &, zathura %c %i &, apvlv %c
+filextype {*.pdf},<application/pdf> zathura %c %i &, xpdf %c %i &, xreader %c %i &, evince %c %i &, apvlv %c
 fileviewer {*.pdf},<application/pdf> pdftotext -nopgbrk %c -
 
 " PostScript
@@ -359,10 +359,10 @@ filextype {*.ps,*.eps,*.ps.gz},<application/postscript>
 
 " Djvu
 filextype {*.djvu},<image/vnd.djvu>
-	\ {View in evince}
-	\ evince %f,
         \ {View in zathura}
         \ zathura %f,
+	\ {View in evince}
+	\ evince %f,
         \ {View in apvlv}
         \ apvlv %f,
 
@@ -555,7 +555,8 @@ filextype {*.odt,*.doc,*.docx,*.xls,*.xlsx,*.odp,*.pptx,*.ppt},
          \<application/vnd.openxmlformats-officedocument.*,
           \application/msword,
           \application/vnd.ms-excel>
-        \ libreoffice %f %i &
+        \ libreoffice %f %i &,
+	  \ zaread %f &
 fileviewer {*.doc},<application/msword> catdoc %c
 fileviewer {*.docx},
           \<application/
@@ -937,4 +938,17 @@ highlight  OtherLine   cterm=none     ctermfg=yellow  ctermbg=236
 "cd into directory on vifm exit
 "https://wiki.vifm.info/index.php?title=How_to_set_shell_working_directory_after_leaving_Vifm
 
-
+"░█▀▀▄░░░░░░░░░░░▄▀▀█
+"░█░░░▀▄░▄▄▄▄▄░▄▀░░░█
+"░░▀▄░░░▀░░░░░▀░░░▄▀
+"░░░░▌░▄▄░░░▄▄░▐▀▀
+"░░░▐░░█▄░░░▄█░░▌▄▄▀▀▀▀█
+"░░░▌▄▄▀▀░▄░▀▀▄▄▐░░░░░░█
+"▄▀▀▐▀▀░▄▄▄▄▄░▀▀▌▄▄▄░░░█
+"█░░░▀▄░█░░░█░▄▀░░░░█▀▀▀
+"░▀▄░░▀░░▀▀▀░░▀░░░▄█▀
+"░░░█░░░░░░░░░░░▄▀▄░▀▄
+"░░░█░░░░░░░░░▄▀█░░█░░█
+"░░░█░░░░░░░░░░░█▄█░░▄▀
+"░░░█░░░░░░░░░░░████▀
+"░░░▀▄▄▀▀▄▄▀▀▄▄▄█▀ 

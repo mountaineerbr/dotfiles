@@ -399,6 +399,26 @@ set clipboard=unnamedplus
 "  set clipboard=unnamed,unnamedplus
 "endif
 
+
+"termux clipboard
+vnoremap <C-x> :!termux-clipboard-set<CR>
+vnoremap <C-c> :w !termux-clipboard-set<CR><CR>
+inoremap <C-v> <ESC>:read !termux-clipboard-get<CR>i
+"https://ibnishak.github.io/blog/post/copy-to-termux-clip/
+
+au TextYankPost * call system('termux-clipboard-set &', @")
+function Paste(p)
+    let sysclip=system('termux-clipboard-get')
+    if sysclip != @"
+        let @"=sysclip
+    endif
+    return a:p
+endfunction
+noremap <expr> p Paste('p')
+noremap <expr> P Paste('P')
+"https://github.com/termux/termux-packages/issues/2308
+
+
 "PRIMARY BUFFER ACCESS ------> *Use XTerm PRIMARY_copy/paste keys!*
 " Copy to PRIMARY
 "nnoremap <F7> "*y
@@ -544,7 +564,7 @@ set viminfo=%,'400,n~/.vim/viminfo
 "Using :saveas keeps the undo history intact.
 ":saveas is equivalent to the combination of :w newname followed by :e #.
 ""I usually find it more handy than the :w + :e, especially since
-"with :saveas it's not really 
+"with :saveas it's not really
 "https://vi.stackexchange.com/questions/25331/possible-to-rename-file-and-maintain-undo
 
 " Do not redraw screen in the middlw of macro (makes them complete faster)
@@ -720,10 +740,14 @@ let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
 
 " MISC KEYBINDDINGS
 
+" Command aliases
+command! -nargs=* Set set <args>
+"https://vi.stackexchange.com/questions/20720/how-can-i-alias-a-command-with-arguments
+
+
 " One-stroke type ":" for cmd
 noremap ; :
 "https://vim.fandom.com/wiki/Map_semicolon_to_colon
-
 
 " Autocorrect writing two colons
 noremap :: :
@@ -939,7 +963,7 @@ nnoremap <Leader>s :shell<cr>
 "    \ :unlet _s<Bar>
 "    \ :call setpos('.', _save_pos)<Bar>
 "    \ :unlet _save_pos<CR><CR>
-nnoremap <leader>ww mz:%s/\s\+$//<cr>:let @/=''<cr>`z
+nnoremap <leader>whs mz:%s/\s\+$//<cr>:let @/=''<cr>`z
 
 
 "Remove bash variable dust when possible ${VAR} --> $VAR
