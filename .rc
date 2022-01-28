@@ -1097,6 +1097,7 @@ alias usd='cmc usd brl ;cgk usd brl ;uol.sh|sed -n 8p\;17p'
 #alias lock=termux-wake-lock
 #alias unlock=termux-wake-unlock
 
+#print ssh command to connect to current machine
 alias shh='echo ssh $(whoami)@$(ip -4 n | awk "{print \$3;exit}" | ip -br -4 a s $(echo Device: >&2 ;cat /dev/stdin) | grep -Eo "[0-9.]{7,}")' 
 
 
@@ -2004,38 +2005,58 @@ codons()
 #firefox alias
 alias ff=firefox
 
-#url lists (from urlgrep.sh)
+#URL lists (from ugrep.sh)
+
 #firefox user database
 FFUSER="$HOME/.mozilla/firefox/sdqosrgm.jsn_firefox/places.sqlite"
-#
+
 #google chrome user database
 GCUSER="$HOME/.config/google-chrome/Default/History"
-#
+
 #temp file
 TEMPFILE="$HOME/Downloads/urls.sqlite"
-#
+
 #firefox -- all urls (history, etc)
-faurls() {
-	sqlite3 "$TEMPFILE" <<< 'select url from moz_places where 1;'
+faurls()
+{ 
+	/bin/cp "$FFUSER" "$TEMPFILE" <<<y || return
+	sqlite3 "$TEMPFILE" <<<'select url from moz_places where 1;'
+	/bin/rm "$TEMPFILE"
 }
-#
+
 #firefox -- bookmarks
-fburls() {
-	sqlite3 "$TEMPFILE" <<< 'select url from moz_bookmarks, moz_places where moz_places.id=moz_bookmarks.fk;'
+fburls()
+{ 
+	/bin/cp "$FFUSER" "$TEMPFILE" <<<y || return
+	sqlite3 "$TEMPFILE" <<<'select url from moz_bookmarks, moz_places where moz_places.id=moz_bookmarks.fk;'
+	/bin/rm "$TEMPFILE"
 }
-#
+
 #chrome -- all urls (history, etc)
-caurls() {
-	sqlite3 "$TEMPFILE" <<< 'select url from urls where 1;'
+caurls()
+{ 
+	/bin/cp "$GCUSER" "$TEMPFILE" <<<y || return
+	sqlite3 "$TEMPFILE" <<<'select url from urls where 1;'
+	/bin/rm "$TEMPFILE"
 }
-#
+
 #chrome -- bookmarks
-cburls() {
-	jq -r '..|.url? // empty' "$HOME/.config/google-chrome/Default/Bookmarks"
+cburls()
+{
+	jq -r '..|.url? //empty' "$HOME/.config/google-chrome/Default/Bookmarks"
 }
 
 #url grep
-alias ug='faurls | tac | urlgrep.sh --color=always'
+alias ugrep='faurls | tac | urlgrep.sh --color=always'
+
+#grep full text from URL sent via stdin
+ugrepfun()
+{
+        while read
+        do 	curl -s "$REPLY" | grep "$@" && echo ">>>$REPLY"
+        done
+}
+
 
 #check unicode chars
 #usage: unichar ⛄
