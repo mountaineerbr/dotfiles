@@ -195,10 +195,9 @@ alias fgrep='fgrep --color=auto'
 alias igrep='grep -i'
 #'agrep' for approximate search from the 'tre' pkg
 
-#ls, du, df output with commas
+#ls, du, df output with commas:
 #export BLOCK_SIZE="'1"
 
-#(grml's config has ls aliases)
 #l() { ls -hF --group-directories-first "$@" | cut -c1-22 | column -c 80 ;}
 #la() { ls -ahF --group-directories-first "$@" | cut -c1-22 | column -c 80 ;}
 alias ll='ls++ --potsf'
@@ -248,7 +247,6 @@ grepid()
 pscom()
 {
 	local pid=$1
-
 	ps -p $pid -o command
 	#ps -p $pid -o comm=
 }
@@ -257,7 +255,7 @@ pscom()
 #silver searcher
 alias ag='/usr/bin/ag --nofollow --hidden --smart-case'
 #alias grep=ag
-#also check 'vimgrep'
+#also check vimgrep, ripgrep, agrep
 
 #user agent
 #usage: curl/wget --header "$UAG"
@@ -275,15 +273,10 @@ alias curlu='curl --compressed -Lb non-existing --header "$UAG"'
 alias hf='w3m -dump -T text/html'
 #{ lynx -force_html -stdin -dump -nolist ;}
 #{ elinks -dump ;}
-hf2()
-{
-	sed -Ee 's/<\/\?(script|style)[^>]*>/\n&\n/g' \
-		| sed -Ee '/^<(script|style)[^>]*>/,/^<\/(script|style)>/ d' -e '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }'
-}
+alias hf2="sed -Ee 's/<\/\?(script|style)[^>]*>/\n&\n/g' | sed -Ee '/^<(script|style)[^>]*>/,/^<\/(script|style)>/ d' -e '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }"
 alias hf3="sed '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }'"
 alias hf4="sed 's/<[^>]*>//g'"
 #https://www.thegeekstuff.com/2009/12/unix-sed-tutorial-6-examples-for-sed-branching-operation/
-
 
 #Remove the data between pattern ” ” in a whole file
 #{ sed ':loop ;$!{ N ;/\n$/!b loop } ;s/\"[^\"]*\"//g' ;}
@@ -468,7 +461,7 @@ out()
 		then 	echo 'xfce4-session-logout --logout --fast' >"$_TMUXSIG"
 			echo '[quit tmux and logout]' >&2
 			exit
-		else 	/usr/bin/xfce4-session-logout --logout --fast
+		else 	xfce4-session-logout --logout --fast
 		fi
 	fi
 
@@ -652,7 +645,6 @@ alias xbk='vim ~/.xbindkeysrc'
 #alias scrc='vim ~/.screenrc'
 alias trc='vim ~/.tmux.conf'
 alias mrc='vim ~/.mutt/muttrc'
-alias mrc='vim ~/bin/markets/mkt_func.sh'
 alias pkglist='vim ~/arq/docs/archInstallPkgSuggestion.txt'
 
 #edit and source
@@ -686,7 +678,7 @@ zrc()
 rc()
 {
 	vim ~/.rc
-	szrc || szrc
+	szrc || sbrc
 }
 
 #git aliases
@@ -811,21 +803,21 @@ thumblr()
 #{ git config --local credential.helper "" ;} ;{ git push origin master ;}
 
 #init new git repo (must have created it on GitHub website)
-gnew()
-{
-	local usr repo
-	usr=bionota repo="${1:?repo name required}"
-	#create a new repository on the command line
-	echo "# $repo" >> README.md
-	git init &&
-	git add README.md &&
-	git commit -m "init" &&
-	git branch -M main &&  #used to be `master`
-	#or only push an existing repository from the command line
-	git remote add origin https://github.com/$usr/$repo.git &&
-	git remote set-url origin git@github.com:$usr/$repo.git &&
-	git push -u origin main
-}
+#gnew()
+#{
+#	local usr repo
+#	usr=bionota repo="${1:?repo name required}"
+#	#create a new repository on the command line
+#	echo "# $repo" >> README.md
+#	git init &&
+#	git add README.md &&
+#	git commit -m "init" &&
+#	git branch -M main &&  #used to be `master`
+#	#or only push an existing repository from the command line
+#	git remote add origin https://github.com/$usr/$repo.git &&
+#	git remote set-url origin git@github.com:$usr/$repo.git &&
+#	git push -u origin main
+#}
 
 #reset/refresh cloned repo
 gres()
@@ -988,7 +980,7 @@ conkies()
 #slurm internet monitor
 slurm()
 {
-	/usr/bin/slurm -i "$( iw dev | awk '/Interface/ {print $2}' )"
+	slurm -i "$( iw dev | awk '/Interface/ {print $2}' )"
 }
 #alias slurm="slurm -i enp3s0"
 
@@ -1071,7 +1063,6 @@ alias open='exo-open'
 alias T='~/bin/ctemp.sh'
 
 #alias b=binance.sh\ -3
-alias ezit=exit
 alias cd0='/storage/emulated/0'
 alias usd='cmc usd brl ;cgk usd brl ;uol.sh|sed -n 8p\;17p'
 
@@ -1198,9 +1189,7 @@ setxv()
 #z-shell original user guide by Paul Falstad
 z()
 {
-	#if file descriptor 1 is closed, do not print line numbers
 	[[ -t 1 ]] && local numopt='-n'
-
 	cat $numopt ~/arq/docs/zShellDocs/zshGuide/plainTxt/zShellGuideAll.man
 }
 #also check the mailing list!
@@ -1778,22 +1767,14 @@ tz3()
 		| sed -e 's/<[^>]*>//g' -e 's/\r//g' | sed -e 'N;s/\n/ /' -e 's/^\s*//'
 }
 
-#wikipedia timezone abbreviations
-tz4()
-{
-	curl -sL "https://en.wikipedia.org/wiki/List_of_time_zone_abbreviations" \
-		| grep -A1 '</a></td>' | grep -v '^--' \
-		| sed -e 's/<[^>]*>//g' | sed -e 'N;s/\n/  /'
-}
-
 #systemd tzs
-tz5()
+tz4()
 {
 	timedatectl list-timezones | cat
 }
 
 #system tzs
-tz6()
+tz5()
 {
 	ls /usr/share/zoneinfo*/*
 }
@@ -1802,7 +1783,7 @@ tz6()
 #use with grep
 tza()
 (
-	tz & tz2 & tz3 & tz4 & tz5 & tz6
+	tz & tz2 & tz3 & tz4 & tz5
 	wait
 )
 
@@ -2056,8 +2037,9 @@ alias ugrep='faurls | tac | urlgrep.sh --color=always'
 #grep full text from URL sent via stdin
 ugrepfun()
 {
-        while read
-        do 	curl -s "$REPLY" | grep "$@" && echo ">>>$REPLY"
+	local url
+        while read url
+        do 	curl -s "$url" | grep "$@" && echo ">>>$REPLY"
         done
 }
 
@@ -2162,33 +2144,26 @@ wf3()
 {
     local request="wttr.in/${1}"  #it chooses location automatically
     [[ "$COLUMNS" -lt 125 ]] && request+='?nMAFqT'
-
     curl -sH "Accept-Language: ${LANG%_*}" --compressed "$request" | tac
 }
 #<curl wttr.in/:bash.function>
-
-#US only
-alias wf4='telnet rainmaker.wunderground.com'
 
 
 #latitude and longitude
 gps()
 {
 	[[ -z "$1" ]] && set -- sao paulo
-
-	local query=$( sed 's/\s/%20/g' <<< "$*" )
-	local data=$( curl -sL "https://api.opencagedata.com/geocode/v1/json?q=${query}&key=641c51bed8ab490184632ad8526e29ad&no_annotations=1&language=en" )
-
-	jq -r '.results[0]|.formatted,(.geometry|"\(.lat) \(.lng)")' <<< "$data"
+	local key=54f6cb1814a4426484b8f28c0b6adbb6
+	local query=$(sed 's/\s/%20/g' <<< "$*")
+	curl -sL "https://api.opencagedata.com/geocode/v1/json?q=${query}&key=$key&no_annotations=1&language=en" |
+		jq -r '.results[0]|.formatted,(.geometry|"\(.lat) \(.lng)")'
 }
-
 #not many locations, only big cities
 gps2()
 {
 	[[ -z "$1" ]] && set -- são paulo
-	local query=$( sed 's/\s/%20/g' <<<"$*" )
-	curl -Ls "https://www.metaweather.com/api/location/search/?query=$query" |
-		jq '.[]'
+	local query=$(sed 's/\s/%20/g' <<<"$*")
+	curl -Ls "https://www.metaweather.com/api/location/search/?query=$query" | jq '.[]'
 }
 
 
@@ -2217,9 +2192,8 @@ myip()
 
 myip2()
 {
-	{ 	curl -s -4 'http://ifconfig.io'
-		curl -s -6 'http://ifconfig.io'
-	} | sed -e 's/<[^>]*>//g' -ne '/Your\sIP/p'
+	curl -s -4 'http://ifconfig.io'
+	curl -s -6 'http://ifconfig.io'
 }
 
 #ip by dns lookup utility
@@ -2503,6 +2477,7 @@ emmetcht()
 {
 	curl https://raw.githubusercontent.com/mattn/emmet-vim/master/TUTORIAL
 }
+#see also `emmets' command
 
 #gnu screen cheat sheet
 screencht()
@@ -2757,12 +2732,12 @@ clr()
 # Hex to Decimal Conversion Helper functions
 h2d()
 {
-  str=$(echo $@ | awk '{print toupper($0)}')
-  echo "ibase=16; $str" | bc
+	str=$(echo $@ | awk '{print toupper($0)}')
+	echo "ibase=16; $str" | bc
 }
 d2h()
 {
-  echo "obase=16; $@" | bc
+	echo "obase=16; $@" | bc
 }
 #https://www.soroushjp.com/2014/11/21/helpful-bash-scripts-for-working-with-byte-arrays-and-hex-in-bitcoin/
 
