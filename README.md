@@ -10,7 +10,7 @@
 ## Dotfiles, run control and c files
 
 __Most shell functions and aliases are at file *.rc*__. That is sourced from
-both _.bashrc_ and _.zshrc_, which contains configs for each shell.
+both _.bashrc_ and _.zshrc_, which contain configs for each shell.
 
 The _.rc file_ changes constantly and is also a testcamp for new code.
 When functions become too large and mature, they may be promoted to
