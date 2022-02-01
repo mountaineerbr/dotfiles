@@ -1099,7 +1099,7 @@ alias shh='echo ssh $(whoami)@$(ip -4 n | awk "{print \$3;exit}" | ip -br -4 a s
 tmpd()
 {
 	(( $# )) && set -- .${1##*/}
-	builtin cd "$( mktemp -d "/tmp/$( date +%s )${1}.XXXXXX" )" || return
+	builtin cd "$( mktemp -d "${TMPDIR:-/tmp}/$( date +%s )${1}.XXXXXX" )" || return
 	echo "$PWD"
 }
 
@@ -2038,9 +2038,9 @@ alias ugrep='faurls | tac | urlgrep.sh --color=always'
 ugrepfun()
 {
 	local url
-        while read url
-        do 	curl -s "$url" | grep "$@" && echo ">>>$REPLY"
-        done
+	while read url
+	do 	curl -s "$url" | grep "$@" && echo ">>>$REPLY"
+	done
 }
 
 
@@ -3095,34 +3095,6 @@ mop()
 #alias W=walletmonitor.sh
 #alias T=tradingview.sh
 
-#loss/gain reciprocal or symetrical ratio
-#usage: loss [+-]NUM[%] [SCALE]
-#usage: NUM is an integer and if negative reads as gain
-loss()
-{
-	local u g
-	u=${1%\%} u="${u#+}"
-
-	#check for invalid notations
-	if [[ "$u" = *[a-zA-Z]* || "$u" != *[0-9]* || ! "${u/[,.-]*}" =~ ^.?.?$ ]]
-	then 	echo -e 'err\nusage: loss [+-]NUM[%] [SCALE]' >&2 ;return 1
-	fi
-
-	#use zshell maths or bash bc?
-	if ((ZSH_VERSION))
-	then 	float u ;g=$(( ( (1 / (1 - (u / 100) ) ) - 1) * 100))
-	else 	g=$( bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100" )
-	fi
-
-	if [[ "$u" = -* ]]
-	then 	printf "%4s: %6.${2:-4}f %%\n" gain ${u#-} loss ${g#-}
-	else 	printf "%4s: %6.${2:-4}f %%\n" loss $u gain $g
-	fi
-}
-#fausto botelho: https://www.youtube.com/watch?v=yY7d6gOIynU
-#formula: 100/(100-loss)
-
-
 
 #misc
 
@@ -3468,8 +3440,7 @@ snow() { clear;while :;do echo $LINES $COLUMNS $(($RANDOM%$COLUMNS));sleep ${2:-
 #sum all numbers in column 1
 SUM()
 {
-	perl -M'List::Util qw(sum max min)' -MPOSIX -0777 -a \
-	-ne 'printf "%-7s : %'".${1:-4}"'f\n"x6, "Sum", sum(@F), "Min", min(@F), "Max", max(@F), "Average", sum(@F)/@F,  "Median", sum( (sort {$a<=>$b} @F)[ int( $#F/2 ), ceil( $#F/2 ) ] )/2, "Values", scalar(@F);'
+	perl -M'List::Util qw(sum max min)' -MPOSIX -0777 -a -ne 'printf "%-7s : %'".${1:-4}"'f\n"x6, "Sum", sum(@F), "Min", min(@F), "Max", max(@F), "Average", sum(@F)/@F,  "Median", sum( (sort {$a<=>$b} @F)[ int( $#F/2 ), ceil( $#F/2 ) ] )/2, "Values", scalar(@F);'
 }
 SUM2()
 {
@@ -4067,6 +4038,33 @@ linus() { 	echo -e "$(curlu 'https://www.youtube.com/feeds/videos.xml?channel_id
 ##################################################
 # 2021  by mountaineerbr
 
+#loss/gain reciprocal or symetrical ratio
+#usage: loss [+-]NUM[%] [SCALE]
+#usage: NUM is an integer and if negative reads as gain
+loss()
+{
+	local u g
+	u=${1%\%} u="${u#+}"
+
+	#check for invalid notations
+	if [[ "$u" = *[a-zA-Z]* || "$u" != *[0-9]* || ! "${u/[,.-]*}" =~ ^.?.?$ ]]
+	then 	echo -e 'err\nusage: loss [+-]NUM[%] [SCALE]' >&2 ;return 1
+	fi
+
+	#use zshell maths or bash bc?
+	if ((ZSH_VERSION))
+	then 	float u ;g=$(( ( (1 / (1 - (u / 100) ) ) - 1) * 100))
+	else 	g=$( bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100" )
+	fi
+
+	if [[ "$u" = -* ]]
+	then 	printf "%4s: %6.${2:-4}f %%\n" gain ${u#-} loss ${g#-}
+	else 	printf "%4s: %6.${2:-4}f %%\n" loss $u gain $g
+	fi
+}
+#fausto botelho: https://www.youtube.com/watch?v=yY7d6gOIynU
+#formula: 100/(100-loss)
+
 #lista de ações da bovespa b3
 blist()
 {
@@ -4549,7 +4547,7 @@ ylist()
 	#local file?
 	LISTF="$HOME/arq/docs/yahooFinanceSymbols/yahooFinanceSymbols.txt" 
 	#temp file for download
-	TMPF='/tmp/yahooFinanceSymbols.txt'
+	TMPF='${TMPDIR:-/tmp}/yahooFinanceSymbols.txt'
 
 	#if there is no local copy, try to download it
 	if [[ ! -e "$LISTF" ]]
@@ -4792,7 +4790,7 @@ coronab()
 {
 	local url tempfile
 	url='caso_full'
-	tempfile="${TMPD:-/tmp}/$url.$(date -I).csv"
+	tempfile="${TMPDIR:-/tmp}/$url.$(date -I).csv"
 	case "$1" in
 		csv) 	#dados brutos em csv
 			curl -o - -L -H 'user-agent: Mozilla/5.0 Gecko' 'https://brasil.io/dataset/covid19/caso/?is_last=True&place_type=city&format=csv'
