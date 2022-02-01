@@ -60,13 +60,15 @@ prompt_git="\$( branch=\$(git rev-parse --abbrev-ref HEAD 2>/dev/null) && echo \
 #check exit code of last command line
 prompt_exit="\$( ((e=\$? , e)) && echo \"${bred}\${e}${endc} \" )"
 #check how many background jobs
-prompt_jobs='$([ \j -gt 0 ] && echo %\j)'
+#prompt_jobs='$([[ \j -gt 0 ]] && echo %\j)'
+prompt_jobs='$([[ \j -gt 0 ]] && echo "(%\j)")'
 #https://stackoverflow.com/questions/12646917/show-job-count-in-bash-prompt-only-if-nonzero
 
 #number of trailing directory components to retain when expanding \w and \W
 PROMPT_DIRTRIM=3
 #set ps1 string
-PS1="${prompt_exit}${c0}\u${bwhite} \h:${bcyan}\w${endc} ${prompt_git}(\!${prompt_jobs})${prompt_ssl}\$ "
+#PS1="${prompt_exit}${c0}\u${bwhite} \h:${bcyan}\w${endc} ${prompt_git}(\!${prompt_jobs})${prompt_ssl}\$ "
+PS1="${prompt_exit}${c0}\u${bwhite} \h:${bcyan}\w${endc} ${prompt_git}\${prompt_git:+ }${prompt_jobs}${prompt_ssl}\$ "
 #keep environment clean
 unset end bwhite bcyan bgreen bpink bred yellow c0 prompt_ssl_max prompt_ssl prompt_git prompt_exit prompt_jobs
 
