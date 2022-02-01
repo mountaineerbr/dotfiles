@@ -1363,8 +1363,12 @@ mstatus()
 			fi
 	fi
 }
-#for my arch installer, may use:
 #{ curl --compressed -L https://www.archlinux.org/mirrors/status/json/ | jq -r '.urls[]|select(.country=="Brazil")|"\(.completion_pct)\t\(.url)"' ;}
+
+#"Can't update: signature from *** is marginal trust" or "invalid or corrupted package"
+#you probably just need to update your package signing keys:
+#{ sudo pacman -Sy archlinux-keyring ;sudo pacman-key --populate archlinux ;sudo pacman-key --refresh-keys ;}
+#https://archived.forum.manjaro.org/t/pacman-is-not-working-fine/120878
 
 #test ping of arch mirror
 #usage: mping \.nz
@@ -4008,25 +4012,31 @@ reducepdf() {
 #{ xinput set-prop 13 341 0 ;}
 
 
-#send quick mail
+#send quick mail (mutt)
+#usage: mail [TEXT|ASCII FILE]
+#usage: mail -a [FILE]  #attach file, set automatically for binary files
 mail()
 {
 	local text subj buf
-        if [[ -e "$1" ]]
-	then 	text=$(<"$1") subj="${1##*/} - "
+        if [[ $1 = -a || $(file --mime "$1") = *charset=binary* ]] 
+	then 	[[ $1 = -a ]] && set -- "${@:2}"
+		subj="${1##*/} - " ;set -- -a "$@" --
+        elif [[ -f $1 ]]
+	then 	text=$(<"$1") subj="${1##*/} - " ;set --
 	elif (($#))
-	then 	text="$*"
+	then 	text="$*" ;set --
 	elif [[ ! -t 0 ]]
-	then 	text=$(cat)
+	then 	text=$(cat) ;set --
 	else 	return 1
 	fi
 	subj="$subj${text//[$IFS]/ }" subj="${subj:0:50}" buf=$LC_ALL LC_ALL=C
 	echo ${#text} B \| $((${#text}/(2**10) )) KB \| $((${#text}/(2**20) )) MB
 	LC_ALL=$buf
 	echo $EMAIL - $subj
-	mutt -s "$subj" $EMAIL <<<"$text"
+	mutt -s "$subj" "$@" $EMAIL <<<"$text"
 }
-#alias mail=xdg-email
+#aliasing `mail' may conflict with shell auto completion.
+#also see: xdg-email
 
 #xfce4 numlock keyboard
 #{ xfconf-query -c keyboards -lv | grep -i numlock ;}
