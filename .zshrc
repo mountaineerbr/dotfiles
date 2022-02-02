@@ -510,14 +510,11 @@ accept-line-hack()
 }
 #replace all instances of accept-line() with accept-line-hack()
 zle -N accept-line accept-line-hack
-#can revert with:
-#zle -A .accept-line accept-line
+#revert with: `zle -A .accept-line accept-line'
 #mailing list, 22 May 1997
 
 #custom up and down history fun
-#IPC#OBS#Try to fork up-history code itself and customise it, how to print up-history code?
 #history up and down, readline-like
-#!#this is a hack and multiline bufferes may present problems
 up-history-hack()
 {
 	((CURSOR==${#BUFFER} || CURSOR==CURSORLAST)) || local curs=$CURSOR
@@ -546,6 +543,7 @@ down-history-hack()
 	fi
 	CURSOR=${CURSORLAST:-${curs:-${#BUFFER}}}
 }
+#!#multiline buffers may present problems
 zle -N up-history-hack
 zle -N down-history-hack
 bindkey - $key[Up]   up-history-hack
