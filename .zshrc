@@ -522,26 +522,16 @@ up-history-hack()
 	if ((! CURSOR || CURSOR==${#BUFFER} || CURSOR==CURSORLAST))
 	then
  		local curs=$CURSOR
-		CURSOR=${#BUFFER} zle .up-line-or-search
+		CURSOR=${#BUFFER} zle .${1:-up}-line-or-search
 	else
-		zle .up-line-or-search $LBUFFER
+		zle .${1:-up}-line-or-search $LBUFFER
 		CURSORLAST=
 	fi
 	CURSOR=${CURSORLAST:-${curs:-${#BUFFER}}}
 }
 down-history-hack()
 {
-	((CURSOR==${#BUFFER} || CURSOR==CURSORLAST)) || local curs=$CURSOR
-	((BUFFERLINES>1 && CURSOR==CURSORLAST)) && BUFFER= LBUFFER=
-	if ((! CURSOR || CURSOR == ${#BUFFER} || CURSOR==CURSORLAST))
-	then
- 		local curs=$CURSOR
-		CURSOR=${#BUFFER} zle .down-line-or-search
-	else
-		zle .down-line-or-search $LBUFFER
-		CURSORLAST=
-	fi
-	CURSOR=${CURSORLAST:-${curs:-${#BUFFER}}}
+	zle up-history-hack down
 }
 #!#multiline buffers may present problems
 zle -N up-history-hack
