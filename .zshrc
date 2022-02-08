@@ -518,7 +518,7 @@ zle -N accept-line accept-line-hack
 up-history-hack()
 {
 	((CURSOR==${#BUFFER} || CURSOR==CURSORLAST)) || local curs=$CURSOR
-	((BUFFERLINES>1 && CURSOR==CURSORLAST)) && BUFFER= LBUFFER=
+	[[ $BUFFER = *$'\n'* ]] && ((CURSOR==CURSORLAST)) && BUFFER= LBUFFER=
 	if ((! CURSOR || CURSOR==${#BUFFER} || CURSOR==CURSORLAST))
 	then
  		local curs=$CURSOR
