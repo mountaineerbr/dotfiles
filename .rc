@@ -2536,8 +2536,7 @@ ytm()
 #dl general audio only stream (GENERAL AUDIO)
 yta()
 {
-	"${YTDL_CMD[@]}" -k -f bestaudio --restrict-filenames --embed-thumbnail \
-		--add-metadata -o "%(title)s.%(ext)s" "$@"
+	"${YTDL_CMD[@]}" -k -f bestaudio --restrict-filenames -o "%(title)s.%(ext)s" "$@"
 }
 #dl audio and video of best quality
 ytb()
