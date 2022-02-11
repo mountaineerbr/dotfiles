@@ -1220,3 +1220,8 @@ ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue,bold
 #https://blog.patshead.com/2012/01/using-and-customizing-zsh-syntax-highlighting-with-oh-my-zsh.html
 #https://blog.aktsbot.in/color-me-baby.html
 
+
+#aliasing `mail' may conflict with Z-shell autocompletion
+compdef _files mail
+#https://unix.stackexchange.com/questions/677280/disable-zsh-smart-autocompletion-for-gem-command-but-keep-ordinary-path-compl
+

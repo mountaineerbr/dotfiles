@@ -3978,12 +3978,9 @@ mail()
 		size=$(LC_ALL=C ;echo "${#text}")
 	fi
 	subj="$subj${text//[$IFS]/ }" subj="${subj:0:50}"
-	echo $size B \| $((size/(2**10) )) KB \| $((size/(2**20) )) MB $'\n'$EMAIL - $subj
+	echo $size B \| $((size/(2**10) )) KB \| $((size/(2**20) )) MB $'\n'${EMAIL:?e-mail address required} - $subj
 	mutt -s "$subj" "$@" $EMAIL <<<"$text"
 }
-#aliasing `mail' may conflict with Z-shell autocompletion
-[[ $ZSH_VERSION ]] && compdef _files mail
-#https://unix.stackexchange.com/questions/677280/disable-zsh-smart-autocompletion-for-gem-command-but-keep-ordinary-path-compl
 #also see: xdg-email
 
 #xfce4 numlock keyboard
