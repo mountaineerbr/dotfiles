@@ -3958,21 +3958,23 @@ reducepdf() {
 
 
 #send quick mail (mutt)
-#usage: mail [TEXT|ASCII FILE]
-#usage: mail -a [FILE]  #attach file, set automatically for binary files
+#usage: mail [EMAIL] [TEXT|ASCII FILE]
+#usage: mail [EMAIL] -a [FILE]  #attach file, set automatically for binary files
 mail()
-{
-	local text size subj buf
+{ 	local text size subj buf
+	if [[ $1 = *\@* ]]
+	then 	local EMAIL=$1 ;set -- "${@:2}"
+	fi
         if [[ $1 = -a || $(file --mime "$1") = *charset=binary* ]] 
-	then 	[[ $1 = -a ]] && set -- "${@:2}"
-		size=$(wc -c <"$1") subj="${1##*/} - file" ;set -- -a "$@" --
+	then 	[[ $1 != \-\a ]] && set -- -a "$@" ;set -- "$@" --
+		size=$(wc -c <"$2") subj="${2##*/} - file"
 	else 	if [[ -f $1 ]]
 		then 	text=$(<"$1") subj="${1##*/} - " ;set --
 		elif (($#))
 		then 	text="$*" ;set --
 		elif [[ ! -t 0 ]]
 		then 	text=$(cat) ;set --
-		else 	return 1
+		else 	return
 		fi
 		size=$(LC_ALL=C ;echo "${#text}")
 	fi
