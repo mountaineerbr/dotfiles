@@ -1168,6 +1168,12 @@ let g:user_emmet_leader_key=','
 "https://medium.com/vim-drops/be-a-html-ninja-with-emmet-for-vim-feee15447ef1
 
 
+" plasticboy vim-markdown
+"https://github.com/preservim/vim-markdown/
+let g:vim_markdown_folding_disabled = 1
+
+
+
 "netrw
 "Note: toggle view type with 'i'
 "

@@ -1688,7 +1688,7 @@ sin()
 #ISO 8601: strftime({"%Y-%m-%dT%H:%M:%SZ"}, var.time);
 
 #date ranges script
-alias d='ddate.sh -d'
+alias d='ddate_older.sh -d'
 
 # Calculate the difference in whole days between two dates, ignoring timezone changes
 datedifference()
@@ -3963,25 +3963,27 @@ reducepdf() {
 #usage: mail -a [FILE]  #attach file, set automatically for binary files
 mail()
 {
-	local text subj buf
+	local text size subj buf
         if [[ $1 = -a || $(file --mime "$1") = *charset=binary* ]] 
 	then 	[[ $1 = -a ]] && set -- "${@:2}"
-		subj="${1##*/} - " ;set -- -a "$@" --
-        elif [[ -f $1 ]]
-	then 	text=$(<"$1") subj="${1##*/} - " ;set --
-	elif (($#))
-	then 	text="$*" ;set --
-	elif [[ ! -t 0 ]]
-	then 	text=$(cat) ;set --
-	else 	return 1
+		size=$(wc -c <"$1") subj="${1##*/} - file" ;set -- -a "$@" --
+	else 	if [[ -f $1 ]]
+		then 	text=$(<"$1") subj="${1##*/} - " ;set --
+		elif (($#))
+		then 	text="$*" ;set --
+		elif [[ ! -t 0 ]]
+		then 	text=$(cat) ;set --
+		else 	return 1
+		fi
+		size=$(LC_ALL=C ;echo "${#text}")
 	fi
-	subj="$subj${text//[$IFS]/ }" subj="${subj:0:50}" buf=$LC_ALL LC_ALL=C
-	echo ${#text} B \| $((${#text}/(2**10) )) KB \| $((${#text}/(2**20) )) MB
-	LC_ALL=$buf
-	echo $EMAIL - $subj
+	subj="$subj${text//[$IFS]/ }" subj="${subj:0:50}"
+	echo $size B \| $((size/(2**10) )) KB \| $((size/(2**20) )) MB $'\n'$EMAIL - $subj
 	mutt -s "$subj" "$@" $EMAIL <<<"$text"
 }
-#aliasing `mail' may conflict with shell auto completion.
+#aliasing `mail' may conflict with Z-shell autocompletion
+[[ $ZSH_VERSION ]] && compdef _files mail
+#https://unix.stackexchange.com/questions/677280/disable-zsh-smart-autocompletion-for-gem-command-but-keep-ordinary-path-compl
 #also see: xdg-email
 
 #xfce4 numlock keyboard
@@ -4021,8 +4023,8 @@ estarmos preparados pois já enfrentamo-lá.'
 )
 if [[ $- = *i* ]] && [[ $TMUX ]]
 then
-	[[ -e notes ]] && lolcat -F 0.05 notes
-	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}]}\e[0m\n" | cowthink -sn
+	((RANDOM%3)) && [[ -e notes ]] && cat notes  #lolcat -F 0.05 notes
+	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}]}\e[0m\n"  #| cowthink -sn
 fi
 unset MSG
 #{ fortune | cowsay ;}
