@@ -1189,8 +1189,7 @@ setxv()
 #z-shell original user guide by Paul Falstad
 z()
 {
-	[[ -t 1 ]] && local numopt='-n'
-	cat $numopt ~/arq/docs/zShellDocs/zshGuide/plainTxt/zShellGuideAll.man
+	man ~/arq/docs/zShellDocs/zshGuide/plainTxt/zShellGuideAll.man
 }
 #also check the mailing list!
 #https://www.zsh.org/mla/users/
@@ -2954,7 +2953,7 @@ cores()
 #prints 'ht' if enabled
 ht()
 {
-	grep -o ht /proc/cpuinfo | uniq
+	grep -o ht /proc/cpuinfo #| uniq
 }
 
 #disable one of each sibling ht
