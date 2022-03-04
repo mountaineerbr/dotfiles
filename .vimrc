@@ -401,22 +401,24 @@ set clipboard=unnamedplus
 
 
 "termux clipboard
-vnoremap <C-x> :!termux-clipboard-set<CR>
-vnoremap <C-c> :w !termux-clipboard-set<CR><CR>
-inoremap <C-v> <ESC>:read !termux-clipboard-get<CR>i
-"https://ibnishak.github.io/blog/post/copy-to-termux-clip/
-
-au TextYankPost * call system('termux-clipboard-set &', @")
-function Paste(p)
-    let sysclip=system('termux-clipboard-get')
-    if sysclip != @"
-        let @"=sysclip
-    endif
-    return a:p
-endfunction
-noremap <expr> p Paste('p')
-noremap <expr> P Paste('P')
-"https://github.com/termux/termux-packages/issues/2308
+if !empty($TERMUX_VERSION)
+    vnoremap <C-x> :!termux-clipboard-set<CR>
+    vnoremap <C-c> :w !termux-clipboard-set<CR><CR>
+    inoremap <C-v> <ESC>:read !termux-clipboard-get<CR>i
+    "https://ibnishak.github.io/blog/post/copy-to-termux-clip/
+    
+    au TextYankPost * call system('termux-clipboard-set &', @")
+    function Paste(p)
+        let sysclip=system('termux-clipboard-get')
+        if sysclip != @"
+            let @"=sysclip
+        endif
+        return a:p
+    endfunction
+    noremap <expr> p Paste('p')
+    noremap <expr> P Paste('P')
+    "https://github.com/termux/termux-packages/issues/2308
+endif
 
 
 "PRIMARY BUFFER ACCESS ------> *Use XTerm PRIMARY_copy/paste keys!*
