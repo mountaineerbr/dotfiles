@@ -2580,7 +2580,7 @@ yts()
 #disable infernal glob in zshell
 c()
 {
-	if ((ZSH_VERSION))
+	if [[ $ZSH_VERSION ]]
 	then 	noglob bcalc.sh -v4 "$@"
 	else 	bcalc.sh -v4 "$@"
 	fi
@@ -3132,7 +3132,7 @@ percentagef()
 		[[ -z "$last" ]] && last="$line"
 		#((perline = line - last))
 		((++n))
-		if ((ZSH_VERSION))
+		if [[ $ZSH_VERSION ]]
 		then 	typeset -F $scl rate line last
 			((rate = ( ( line / last ) - 1) * 100))
 		else 	rate=$(bc -l <<<"scale=$scl; ( ( $line / $last ) - 1) * 100")
@@ -4051,7 +4051,7 @@ loss()
 	fi
 
 	#use zshell maths or bash bc?
-	if ((ZSH_VERSION))
+	if [[ $ZSH_VERSION ]]
 	then 	float u ;g=$(( ( (1 / (1 - (u / 100) ) ) - 1) * 100))
 	else 	g=$( bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100" )
 	fi
