@@ -15,11 +15,11 @@
 
 #set dircolors
 if type dircolors >/dev/null
-then 	if [[ -f "$HOME/.dir_colors" ]]
-	then 	eval "$( dircolors ~/.dir_colors )"
+then 	if [[ -f ~/.dir_colors ]]
+	then 	eval "$(dircolors ~/.dir_colors)"
 	elif [[ -f /etc/DIR_COLORS ]]
-	then 	eval "$( dircolors /etc/DIR_COLORS )"
-	else 	eval "$( dircolors )"
+	then 	eval "$(dircolors /etc/DIR_COLORS)"
+	else 	eval "$(dircolors)"
 	fi
 fi
 
@@ -1208,6 +1208,11 @@ zz()
 zzz()
 {
 	curl https://zsh.sourceforge.io/releases.html| hf
+}
+
+xtitle () 
+{ 
+	echo -n -e "\033]0;$*\007"
 }
 
 #check which library files a binary points to
@@ -3923,6 +3928,14 @@ checkports() { sudo ss -tulpn | sed -nE '/LISTEN/ s/.*:([0-9]+)\s*.*/\1/ p' ;}
 #{ perl -n -e 'print unless /pattern2/ .. /pattern2/' ;}
 #https://stackoverflow.com/questions/55845906/perl-how-to-remove-particular-word-or-pattern-in-between-two-patterns
 
+#grep for line and field (TSV) of pattern
+#usage: fldgrep PATTERN FILE.TSV
+fldgrep()
+{
+	awk -F"\t" -v target="$1" -v blue="\x1b[1;34m" -v red="\x1b[1;31m" -v reset="\x1b[0m" 'NR==1 {for (i=1;i<=NF;i++) a[i]=$i} NR>1 {for (j=1;j<=NF;j++) if ($j ~ target) {n=split($j,m,target,sep); printf("%s","line " blue NR reset ", field " blue j reset " (" blue a[j] reset "): "); for (k=1;k<=n;k++) printf("%s", m[k] red sep[k] reset); print ""}}' "$2"
+}
+#https://www.datafix.com.au/BASHing/2022-03-09.html
+
 #reduce pdf size
 reducepdf() {
 	gs -sDEVICE=pdfwrite \
@@ -4020,7 +4033,7 @@ estarmos preparados pois já enfrentamo-lá.'
 )
 if [[ $- = *i* ]] && [[ $TMUX ]]
 then
-	((RANDOM%3)) && [[ -e notes ]] && cat notes  #lolcat -F 0.05 notes
+	#[[ -e notes ]] && cat notes  ##lolcat -F 0.05 notes
 	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}]}\e[0m\n"  #| cowthink -sn
 fi
 unset MSG
