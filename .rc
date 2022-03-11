@@ -207,6 +207,10 @@ alias ll='ls++ --potsf'
 #alias ll='ls -l'
 #alias ls='ls -F'
 alias pl="printf '%s\n'"
+p()
+{
+	printf '%s\n' "$*"
+}
 
 #alias j='jobs -l'
 #alias pu=pushd
