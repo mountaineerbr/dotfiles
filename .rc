@@ -1936,7 +1936,7 @@ gened()
 	do
 		tmpfile="${gencode}.fst.tmp"
 		#download and check for data validity
-		if gene "$gencode" >"$tmpfile" && grep -qF '>' "$tmpfile"
+		if gene "$gencode" >"$tmpfile" && grep -q '^>' "$tmpfile"
 		then 	#rename it to something more meaningful
 			filename=$(head -1 -- "$tmpfile" | tr -d '>\r' | tr '|/*,><}{&#@% ' '_')
 			filename="${filename:0:28}".fst  #limit filename length, add extension
@@ -2093,10 +2093,6 @@ urldecode()
     local url_encoded="${1//+/ }"
     printf '%b' "${url_encoded//\%/\\x}"
 }
-urle()
-{ 	[[ "${1}" ]] || return 1; local LANG=C i x; for (( i = 0; i < ${#1}; i++ )); do x="${1:i:1}"; [[ "${x}" == [a-zA-Z0-9.~_-] ]] && echo -n "${x}" || printf '%%%02X' "'${x}"; done; echo; }
-urld()
-{ 	[[ "${1}" ]] || return 1; : "${1//+/ }"; echo -e "${_//%/\\x}"; }
 #https://gist.github.com/cdown/1163649
 #https://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
 #
@@ -2454,7 +2450,7 @@ tron()
 }
 
 # the terminal rickroll
-alias rick='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh | bash'
+#alias rick='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh  #| bash'
 
 #chuck norris jokes
 #usage: joke 2      #two random jokes
@@ -2496,9 +2492,6 @@ screencht()
 
 #parrot fun
 alias parrot='curl parrot.live'
-
-#rick roll
-alias rick='curl -sL https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh | bash'
 
 #chess online
 alias chessonline='telnet freechess.org 5000'
@@ -2721,7 +2714,9 @@ trspecial()
 #remove accentuation
 rmaccent()
 {
-	sed 'y/äÄáÁàÀãÃâÂëËéÉèÈẽẼêÊïÏíÍìÌĩĨîÎöÖóÓòÒõÕôÔüÜúÚùÙũŨûÛçÇñÑ/aAaAaAaAaAeEeEeEeEeEiIiIiIiIiIoOoOoOoOoOuUuUuUuUuUcCnN/'
+	sed 'y/\
+äÄáÁàÀãÃâÂëËéÉèÈẽẼêÊïÏíÍìÌĩĨîÎöÖóÓòÒõÕôÔüÜúÚùÙũŨûÛçÇñÑ/\
+aAaAaAaAaAeEeEeEeEeEiIiIiIiIiIoOoOoOoOoOuUuUuUuUuUcCnN/'
 }
 
 #translte special chars (ex: "\xe7") to utf-8
@@ -3080,9 +3075,8 @@ alias espeakngbr='espeakng -v pt-br'
 #open with *mplayer or vlc
 
 ####################
-###markets###
+ #####markets######
 ####################
-
 alias binfo='~/bin/markets/binfo.sh'
 alias bitstamp='~/bin/markets/bitstamp.sh'
 alias binance='~/bin/markets/binance.sh'
@@ -3092,7 +3086,6 @@ alias myc='~/bin/markets/myc.sh -3'
 alias uol='~/bin/markets/uol.sh'
 alias cointop='/bin/cointop --cache-dir ~/.cache'
 alias ctop=cointop
-
 #mop - stocks the hacker way
 mop()
 {
@@ -3978,17 +3971,17 @@ reducepdf() {
 #usage: mail [EMAIL] -a [FILE]  #attach file, set automatically for binary files
 mail()
 { 	local text size subj buf
-	if [[ $1 = *\@* ]]
+	if [[ $1 = *\@* ]]         #$1 is e-mail address
 	then 	local EMAIL=$1 ;set -- "${@:2}"
 	fi
-        if [[ $1 = -a || $(file --mime "$1") = *charset=binary* ]] 
+        if [[ $1 = -a || $(file --mime "$1") = *charset=binary* ]]  #option -a or filename of binary
 	then 	[[ $1 != \-\a ]] && set -- -a "$@" ;set -- "$@" --
 		size=$(wc -c <"$2") subj="${2##*/} - file"
-	else 	if [[ -f $1 ]]
+	else 	if [[ -f $1 ]]     #text file
 		then 	text=$(<"$1") subj="${1##*/} - " ;set --
-		elif (($#))
+		elif (($#))        #simple positional args
 		then 	text="$*" ;set --
-		elif [[ ! -t 0 ]]
+		elif [[ ! -t 0 ]]  #stdin text
 		then 	text=$(cat) ;set --
 		else 	return
 		fi
@@ -4037,7 +4030,7 @@ estarmos preparados pois já enfrentamo-lá.'
 )
 if [[ $- = *i* ]] && [[ $TMUX ]]
 then
-	#[[ -e notes ]] && cat notes  ##lolcat -F 0.05 notes
+	#[[ -e notes ]] && cat notes  #lolcat -F 0.05 notes
 	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}]}\e[0m\n"  #| cowthink -sn
 fi
 unset MSG
