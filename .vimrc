@@ -708,7 +708,8 @@ nnoremap vv ^vg_
 "
 "the default is to press <CTR-X> + <CTR-O> to activate omni-completion
 " the following setting means you can just press Tab instead
-let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
+"let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
+let g:SuperTabDefaultCompletionType = "context"
 "https://vim.fandom.com/wiki/Omni_completion_popup_menu
 "
 "or:https://stackoverflow.com/questions/7722177/how-do-i-map-ctrl-x-ctrl-o-to-ctrl-space-in-terminal-vim
