@@ -136,7 +136,6 @@ color astronaut "dr chimp's astronaut theme
 "Ref:https://stackoverflow.com/questions/2419624/how-to-tell-which-colorscheme-a-vim-session-currently-uses
 "Ref:https://alvinalexander.com/linux/vi-vim-editor-color-scheme-colorscheme
 
-
 " Screen Buffer
 " Use Main Screen Buffer of XTerm to keep last Vim Buffer on screen,
 " otherwise, leave buffer at Alternate Screen.
@@ -152,6 +151,9 @@ set t_ti= t_te=
 "talking to is capable of.
 "Ref:https://serverfault.com/questions/270103/gnu-screen-clearing-on-vim-less-etc-exit
 "
+"set t_Co=0" to tell vim the terminal supports zero colors,
+"or `TERM=vt220 vi' or `TERM=vt100 vi' or `TERM=dumb vi' 
+
 
 " LESS-like Mode Options
 func LessInitFunc()
@@ -263,6 +265,13 @@ if &t_Co > 2 || has("gui_running")
   syntax on
   set hlsearch
 endif
+
+"Unset syntax highlighting in `diff' mode
+if &diff
+  syntax off
+  au VimEnter * RainbowParenthesesToggle
+endif
+"https://odd.blog/2016/11/24/howto-disable-syntax-highlighting-in-vimdiff/
 
 
 " Matching brakets
@@ -433,6 +442,11 @@ endif
 " 	"*y 		"*p
 "Ref: https://stackoverflow.com/questions/11489428/how-to-make-vim-paste-from-and-copy-to-systems-clipboard
 "Ref: https://vim.fandom.com/wiki/Copy,_cut_and_paste
+
+"paste in insert mode
+inoremap <c-s> <c-r>*
+inoremap <c-S> <c-r>+
+"https://stackoverflow.com/questions/2861627/paste-in-insert-mode
 
 
 " HISTORY AND UNDO
@@ -797,10 +811,15 @@ cnoremap jj <Esc>
 nnoremap Q @q
 
 " Resize splits
-map + <c-w>-
-map - <c-w>+
-map > <c-w><
-map < <c-w>>
+"map + <c-w>-
+"map - <c-w>+
+"map < <c-w><
+"map > <c-w>>
+
+"easier indenting
+"vnoremap > <gv
+"vnoremap < <gv
+"https://vim.fandom.com/wiki/Shifting_blocks_visually
 
 " Escape spaces in command-mode by pressing space twice
 "cnoremap <space><space> \<space>
