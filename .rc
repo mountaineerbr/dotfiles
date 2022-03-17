@@ -2124,7 +2124,7 @@ gsitemap()
 
 #weather forecast
 #requires the script 'ansiweather'
-alias wf='ansiweather -l'
+wf() { 	ansiweather -l "${*:-${CITY:-londrina}}" ;}
 
 #google weather forecast
 wf2()
@@ -2620,6 +2620,18 @@ octal()
 	fi
 }
 #https://stackoverflow.com/questions/1795976/can-the-unix-list-command-ls-output-numerical-chmod-permissions
+
+islink()
+{
+	local s
+	if [[ -h $1 ]]
+	then 	echo Soft link
+	elif s=$(stat -c %h -- "$1") ;[[ $s -gt 1 ]]
+	then 	echo Hard links -- $s
+	else 	false
+	fi
+}
+#https://unix.stackexchange.com/questions/167610/determining-if-a-file-is-a-hard-link-or-symbolic-link
 
 #grep media info the correct way
 ffinfo()
@@ -4026,6 +4038,10 @@ estarmos preparados pois já enfrentamo-lá.'
 'Dont let the perfect be the enemy of the good -- Voltaire'
 '<https://www.reddit.com/r/getdisciplined/comments/rod44e/plan_day_29_no_videogames_and_no_porn_slowly/>'
 'Turn on, tune in, drop out - Timothy Leary'
+'Si te cansas aprende a descansar, no a renunciar.'
+'InSiStIr, ReSiStIr, PeRsIsTiR y NuNcA dEsIsTiR.'
+'Gues what. No one cares.'
+'Key word is "addiction", nothing wrong with any of these if the addiction is not there. -- @woonomic'
 
 )
 if [[ $- = *i* ]] && [[ $TMUX ]]

@@ -153,6 +153,8 @@ set t_ti= t_te=
 "
 "set t_Co=0" to tell vim the terminal supports zero colors,
 "or `TERM=vt220 vi' or `TERM=vt100 vi' or `TERM=dumb vi' 
+"
+"<c-a> may be taken by `tmux' (custom config), type it twice to reach `vim'.
 
 
 " LESS-like Mode Options
@@ -270,6 +272,7 @@ endif
 if &diff
   syntax off
   au VimEnter * RainbowParenthesesToggle
+  set nohls
 endif
 "https://odd.blog/2016/11/24/howto-disable-syntax-highlighting-in-vimdiff/
 
@@ -704,12 +707,11 @@ nnoremap vv ^vg_
 "https://github.com/tpope/vim-eunuch
 
 " VIM-SUPERTAB
-"let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabDefaultCompletionType = "context"
 "
 "the default is to press <CTR-X> + <CTR-O> to activate omni-completion
 " the following setting means you can just press Tab instead
-"let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
-let g:SuperTabDefaultCompletionType = "context"
+"let g:SuperTabDefaultCompletionType = "<C-X><C-O>"  "good for HTML+CSS
 "https://vim.fandom.com/wiki/Omni_completion_popup_menu
 "
 "or:https://stackoverflow.com/questions/7722177/how-do-i-map-ctrl-x-ctrl-o-to-ctrl-space-in-terminal-vim
@@ -723,7 +725,6 @@ let g:SuperTabDefaultCompletionType = "context"
 " THINGS TO CONSIDER
 " 	- :b lets you autocomplete any open buffer
 "https://www.youtube.com/watch?v=XA2WjJbmmoM
-
 
 
 " KEYBINDINGS
