@@ -13,19 +13,69 @@
 #sources
 [[ -e ~/.apikeys ]] && . ~/.apikeys
 
-#set dircolors
-if type dircolors >/dev/null
-then 	if [[ -f ~/.dir_colors ]]
-	then 	eval "$(dircolors ~/.dir_colors)"
-	elif [[ -f /etc/DIR_COLORS ]]
-	then 	eval "$(dircolors /etc/DIR_COLORS)"
-	else 	eval "$(dircolors)"
+# Set colorful PS1 only on colorful terminals.
+# dircolors --print-database uses its own built-in database
+# instead of using /etc/DIR_COLORS.  Try to use the external file
+# first to take advantage of user additions.
+# We run dircolors directly due to its changes in file syntax and
+# terminal name patching.
+use_color=false
+if 	[[ $BASH_VERSION ]] && type -P dircolors >/dev/null || whence -p dircolors >/dev/null
+then
+	# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
+	LS_COLORS=
+	if [[ -f ~/.dir_colors ]] ; then
+		eval "$(dircolors -b ~/.dir_colors)"
+	elif [[ -f /etc/DIR_COLORS ]] ; then
+		eval "$(dircolors -b /etc/DIR_COLORS)"
+	else
+		eval "$(dircolors -b)"
 	fi
+	# Note: We always evaluate the LS_COLORS setting even when it's the
+	# default.  If it isn't set, then `ls` will only colorize by default
+	# based on file attributes and ignore extensions (even the compiled
+	# in defaults of dircolors). #583814
+	if [[ -n ${LS_COLORS:+set} ]] ; then
+		use_color=true
+	else
+		# Delete it if it's empty as it's useless in that case.
+		unset LS_COLORS
+	fi
+else
+	# Some systems (e.g. BSD & embedded) don't typically come with
+	# dircolors so we need to hardcode some terminals in here.
+	case ${TERM} in
+	[aEkx]term*|rxvt*|gnome*|konsole*|screen|tmux|cons25|*color) use_color=true;;
+	esac
 fi
+
+#if ${use_color} ; then
+#	if [[ ${EUID} == 0 ]] ; then
+#		PS1+='\[\033[01;31m\]\h\[\033[01;34m\] \w \$\[\033[00m\] '
+#	else
+#		PS1+='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
+#	fi
+#	#BSD#@export CLICOLOR=1
+#	#GNU#@alias ls='ls --color=auto'
+#	alias grep='grep --colour=auto'
+#	alias egrep='grep -E --colour=auto'
+#	alias fgrep='grep -F --colour=auto'
+#else
+#	# show root@ when we don't have colors
+#	PS1+='\u@\h \w \$ '
+#fi
+
+# Try to keep environment pollution down, EPA loves us.
+unset use_color
+#https://gitweb.gentoo.org/repo/gentoo.git/tree/app-shells/bash/files/bashrc
+#https://github.com/magnuskiro/configs/blob/ddb877dbd344fd9000bdcd47fc4b3d44e188b8ba/color.bashrc
+
 
 #colour packages
 #colorize-git, ccat, rainbow, lolcat, ls++
 #pipe.sh, cmatrix
+#<https://misc.flogisoft.com/bash/tip_colors_and_formatting>
+#<https://www.reddit.com/r/linux/comments/94nh4w/what_is_your_ps1/>
 
 #coloured man pages
 man()
@@ -1165,7 +1215,7 @@ TOZ=31.1034768  #also? 31.1034807
 #https://goldprice.com/troy-ounce-vs-ounce/
 
 #AST bin
-AST="/usr/local/ast/arch/linux.i386-64/bin"
+AST="/opt/ast/arch/linux.i386-64/bin"
 #https://github.com/att/ast/
 
 #emulate ksh with zsh
@@ -1218,6 +1268,7 @@ xtitle ()
 { 
 	echo -n -e "\033]0;$*\007"
 }
+#also see bashrc of gentoo and arch linux
 
 #check which library files a binary points to
 #ldd $( which bash )
@@ -2726,9 +2777,7 @@ trspecial()
 #remove accentuation
 rmaccent()
 {
-	sed 'y/\
-äÄáÁàÀãÃâÂëËéÉèÈẽẼêÊïÏíÍìÌĩĨîÎöÖóÓòÒõÕôÔüÜúÚùÙũŨûÛçÇñÑ/\
-aAaAaAaAaAeEeEeEeEeEiIiIiIiIiIoOoOoOoOoOuUuUuUuUuUcCnN/'
+	sed 'y/äÄáÁàÀãÃâÂëËéÉèÈẽẼêÊïÏíÍìÌĩĨîÎöÖóÓòÒõÕôÔüÜúÚùÙũŨûÛçÇñÑ/aAaAaAaAaAeEeEeEeEeEiIiIiIiIiIoOoOoOoOoOuUuUuUuUuUcCnN/'
 }
 
 #translte special chars (ex: "\xe7") to utf-8

@@ -315,10 +315,10 @@ done ;unset f
 #the fuck
 eval "$(thefuck --alias)"
 
-#https://github.com/scop/bash-completion
-#complete Cmd Names (-c and subsequent cmds)
-#complete file names ( -f )
+##https://github.com/scop/bash-completion
+##complete Cmd Names (-c and subsequent cmds)
+##complete file names ( -f )
 #complete -cf sudo
-#this complete built-in may interfere with bash-completions
-#https://forum.manjaro.org/t/how-to-auto-complete-a-command-with-sudo-privilege/50263/24
+##this complete built-in may interfere with bash-completions
+##https://forum.manjaro.org/t/how-to-auto-complete-a-command-with-sudo-privilege/50263/24
 
