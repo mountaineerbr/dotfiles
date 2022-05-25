@@ -145,23 +145,25 @@ extract()
 {
 	if [[ -f "$1" ]]
 	then 	case "$1" in
-			*.tar.bz2) tar xvjf "$1";;
-			*.tar.gz)  tar xvzf "$1";;
-			*.bz2)     bunzip2 "$1";;
-			*.rar)     unrar x "$1";;
-			*.gz)      gunzip "$1";;
-			*.tar)     tar xvf "$1";;
-			*.tbz2)    tar xvjf "$1";;
-			*.tgz)     tar xvzf "$1";;
-			*.zip)     unzip "$1";;
-			*.Z)       uncompress "$1";;
-			*.7z)      7z x "$1";;
-			*.deb)     ar x "$1";;
-			*.zstd)    zstd -d "$1";;
-			*.tar.*)   tar xvf "$1";;
-			*) echo "'$1' cannot be extracted via ex()" >&2;;
+			*.tar.bz2) tar xvjf "$1" ;;
+			*.tar.gz)  tar xvzf "$1" ;;
+			*.bz2)     bunzip2 "$1" ;;
+			*.rar)     unrar x "$1" ;;
+			*.gz)      gunzip "$1" ;;
+			*.tar)     tar xvf "$1" ;;
+			*.tbz2)    tar xvjf "$1" ;;
+			*.tgz)     tar xvzf "$1" ;;
+			*.zip)     unzip "$1" ;;
+			*.Z)       uncompress "$1" ;;
+			*.7z)      7z x "$1" ;;
+			*.deb)     ar x "$1" ;;
+			*.zstd)    zstd -d "$1" ;;
+			*.xz)      unxz "$1" ;;
+			*.exe)     cabextract "$1" ;;
+			*.tar.*)   tar xvf "$1" ;;
+			*)  echo "'$1' cannot be extracted via ex()" >&2;;
 		esac
-	else 	echo "'$1' is not a valid file" >&2
+	else  echo "'$1' is not a valid file" >&2
 	fi
 }
 #also check 'unp' script
@@ -320,7 +322,7 @@ UAG2='user-agent: Mozilla/5.0 Gecko'
 
 #ask for compressed data
 alias curl='curl --compressed'
-alias curlu='curl --compressed -Lb non-existing --header "$UAG"'
+alias curlu='curl --compressed --insecure -Lb non-existing --header "$UAG"'
 
 #html filter
 #w3m
@@ -388,6 +390,8 @@ jqpath2()
 
 }
 #https://github.com/stedolan/jq/issues/243
+#also see `gron' package to flatten json
+#https://www.datafix.com.au/BASHing/2022-03-23.html
 
 #browse usenet
 #from w3m man page
@@ -790,16 +794,15 @@ gaddr()
 
 
 #my website
-#update contents
-#and sync to github
-WWW()
-{
-	cd "$HOME/www/bionota.github.io" || return
-	"$HOME/www/bionota.github.io/portal.sh" "$@" && gitup
-}
-
-#creat blog entry
-bloga() { ~/www/bionota.github.io/bin/blog.sh -a "$@" ;}
+#update contents and sync to github
+#WWW()
+#{
+#	cd "$HOME/www/bionota.github.io" || return
+#	"$HOME/www/bionota.github.io/portal.sh" "$@" && gitup
+#}
+#
+##creat blog entry
+#bloga() { ~/www/bionota.github.io/bin/blog.sh -a "$@" ;}
 
 #process audio for podcast (personal website)
 #fblog()
@@ -830,7 +833,7 @@ thumblr()
 	local f size
 	[[ "$1" =~ ^[0-9x]+ ]] && size=$1 && shift || size=200x150
 	for file in "$@"
-	do convert "$file" -resize $size\> "${file%.*}Thumb.${file##*.}"
+	do 	convert "$file" -resize $size\> "${file%.*}Thumb.${file##*.}"
 	done
 }
 #OBS: prefer to use programme `thumb' from imagemagickA6
@@ -956,9 +959,8 @@ gd()
 	(( ${#@} - 1 )) || set -- "${3:-$defuser}" "${2:-$defrepo}" "$1"
 	(( ${#@} - 2 )) || set -- "${3:-$defuser}" "$1" "$2"
 	set -- ${@%/} ;set -- ${@#/}
-
-	#set url
 	url="https://raw.githubusercontent.com/$1/$2/master/$3"
+	url="https://gitlab.com/$1/$2/-/raw/main/$3"
 
 	#download and print file
 	if [[ -t 1 ]]
@@ -969,7 +971,6 @@ gd()
 		echo -e '\a\ngd.func: copy sent to stderr' >&2
 	fi
 
-	#print url address
 	echo "$url" >&2
 }
 #"https://github.com/$1/$2/blob/master/${3}?raw=true"
@@ -980,7 +981,6 @@ gd()
 #requires 'gd' function
 gk()
 (
-	#check arg number
 	(( $# )) || return 1
 
 	#set shell options
@@ -1114,7 +1114,10 @@ alias ipmet=ipmet.sh
 alias open='exo-open'
 #alias open='xdg-open'
 
-alias T='~/bin/ctemp.sh'
+#alias T='~/bin/ctemp.sh'
+alias ct='~/bin/ctemp.sh'
+alias ctemp='~/bin/ctemp.sh'
+
 
 #alias b=binance.sh\ -3
 alias cd0='/storage/emulated/0'
@@ -1829,7 +1832,7 @@ tz3()
 #systemd tzs
 tz4()
 {
-	timedatectl list-timezones | cat
+	timedatectl list-timezones
 }
 
 #system tzs
@@ -4091,6 +4094,7 @@ estarmos preparados pois já enfrentamo-lá.'
 'InSiStIr, ReSiStIr, PeRsIsTiR y NuNcA dEsIsTiR.'
 'Gues what. No one cares.'
 'Key word is "addiction", nothing wrong with any of these if the addiction is not there. -- @woonomic'
+'The difference between a smart person and a clever person is that a smart person knows how to get out of trouble that a clever person wouldnt have gotten into in the first place.'
 
 )
 if [[ $- = *i* ]] && [[ $TMUX ]]
@@ -4113,8 +4117,8 @@ linus() { 	echo -e "$(curlu 'https://www.youtube.com/feeds/videos.xml?channel_id
 # 2021  by mountaineerbr
 
 #loss/gain reciprocal or symetrical ratio
-#usage: loss [+-]NUM[%] [SCALE]
-#usage: NUM is an integer and if negative reads as gain
+#usage: loss [+|-]VAL[%] [SCALE]
+#usage: VAL is an integer and if negative reads as gain
 loss()
 {
 	local u g
@@ -4122,7 +4126,7 @@ loss()
 
 	#check for invalid notations
 	if [[ "$u" = *[a-zA-Z]* || "$u" != *[0-9]* || ! "${u/[,.-]*}" =~ ^.?.?$ ]]
-	then 	echo -e 'err\nusage: loss [+-]NUM[%] [SCALE]' >&2 ;return 1
+	then 	echo -e 'err\nusage: loss [+|-]VAL[%] [SCALE]' >&2 ;return 1
 	fi
 
 	#use zshell maths or bash bc?
