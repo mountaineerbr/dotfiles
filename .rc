@@ -163,7 +163,7 @@ extract()
 			*.tar.*)   tar xvf "$1" ;;
 			*)  echo "'$1' cannot be extracted via ex()" >&2;;
 		esac
-	else  echo "'$1' is not a valid file" >&2
+	else 	echo "'$1' is not a valid file" >&2
 	fi
 }
 #also check 'unp' script
@@ -714,10 +714,10 @@ szrc()
 {
 	[[ "$ZSH_VERSION" ]] && exec zsh
 }
-src()
-{
-	szrc || sbrc
-}
+#src()
+#{
+#	szrc || sbrc
+#}
 
 #~/.bashrc
 brc()
@@ -1034,9 +1034,9 @@ conkies()
 #slurm internet monitor
 slurm()
 {
-	slurm -i "$( iw dev | awk '/Interface/ {print $2}' )"
+	/bin/slurm -i "$( iw dev | awk '/Interface/ {print $2}' )"
 }
-#alias slurm="slurm -i enp3s0"
+#alias slurm="/bin/slurm -i enp3s0"
 
 #speedtest
 alias st='speedtest'
