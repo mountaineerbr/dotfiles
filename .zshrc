@@ -679,7 +679,7 @@ bindkey - '\e'$key[Left]  backward-word
 #GRML-zshrc
 # completion system
 
-# A newly added command will may not be found or will cause false
+# A newly added command may not be found or will cause false
 # correction attempts, if you got auto-correction set.
 #zstyle ':completion:*' rehash true
 

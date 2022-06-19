@@ -795,14 +795,14 @@ gaddr()
 
 #my website
 #update contents and sync to github
-#WWW()
-#{
-#	cd "$HOME/www/bionota.github.io" || return
-#	"$HOME/www/bionota.github.io/portal.sh" "$@" && gitup
-#}
-#
-##creat blog entry
-#bloga() { ~/www/bionota.github.io/bin/blog.sh -a "$@" ;}
+WWW()
+{
+	cd "$HOME/www/bionota.github.io" || return
+	"$HOME/www/bionota.github.io/portal.sh" "$@" && gitup
+}
+
+#creat blog entry
+bloga() { ~/www/bionota.github.io/bin/blog.sh -a "$@" ;}
 
 #process audio for podcast (personal website)
 #fblog()
@@ -2175,6 +2175,9 @@ gsitemap()
 #{ primusrun /usr/lib/firefox/firefox ;}
 #primus_vk
 #'nvidia-smi' to check gpu load
+#TROUBLESHOOTING:
+#Cannot access secondary GPU
+#https://bbs.archlinux.org/viewtopic.php?id=271469
 
 #weather forecast
 #requires the script 'ansiweather'
@@ -2191,7 +2194,7 @@ wf2()
 		grep -E -e \"wob_wc\" -e \"wob_loc\" -e \"wob_dts\" \
 		-e \"wob_dcp\" -e \"wob_dc\" -e id=\"wob_t\" -e \"wob_t\?tm\" \
 		-e \"wob_pp\" -e \"wob_hm\" -e \"wob_ws\"|
-		sed 's/<[^>]*>//g'
+		sed 's/<[^>]*>//g' | sed '2s/$/ °C/' | sed '3s/$/ °F/'
 }
 #sed -nE 's/(.*)(id="wob_loc.{4000})(.*)/<\2/ p' | sed 's/>/&\n/g' | sed 's/<[^>]*>//g ; /^ *$/d ; /[<>]/d ; /&nbsp;/d'
 
@@ -2616,31 +2619,23 @@ yts()
 
 
 ##shell globbing
-
-#zshell has a built-in noglob cmd
-
-#bash
-#check: https://www.chiark.greenend.org.uk/~sgtatham/aliases.html
+##Z-SHELL has built-in `noglob' cmd
+## ~/.bashrc
 #noglob_helper() {
-#    "$@"
-#    case "$shopts" in
-#        *noglob*) ;;
-#        *) set +f ;;
-#    esac
-#    unset shopts
+#	"$@"
+#	case "$shopts" in
+#		*noglob*) 	;;
+#		*) 	set +f ;;
+#	esac
+#	unset shopts
 #}
 #alias noglob='shopts="$SHELLOPTS"; set -f; noglob_helper'
+##check: https://www.chiark.greenend.org.uk/~sgtatham/aliases.html
 
 
 #bcalc.sh
-#disable infernal glob in zshell
-c()
-{
-	if [[ $ZSH_VERSION ]]
-	then 	noglob bcalc.sh -v4 "$@"
-	else 	bcalc.sh -v4 "$@"
-	fi
-}
+#disable globbing
+alias c='noglob bcalc.sh -v4'
 
 #bash calculator - bc
 #function c() { bc -l <<< "$*" ;}
@@ -2657,6 +2652,17 @@ c()
 #printf %.<precision>f "$((10**<multiplier> * <expression>))e-<multiplier>
 #printf %.3f "$((10**3 * 2/3))e-3"
 #https://www.shell-tips.com/bash/math-arithmetic-calculation/
+
+#mount sshfs (phone)
+moto()
+{
+	sshfs u0_a214@moto:/data/data/com.termux/files/home "${1:-$HOME/mnt}" -C -o idmap=user -o follow_symlinks
+}
+umoto()
+{
+	fusermount3 -u "${1:-$HOME/mnt}"
+}
+
 
 #find files not owned by user in $HOM
 homesudo()
@@ -4969,6 +4975,5 @@ corona4()
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 #%%%%%%%%%%%% END CORONA PANDEMICS %%%%%%%%%%%%%%#
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
-
 
 # vi:filetype=sh

@@ -220,6 +220,18 @@ alias d='dirs -v'
 #https://www.redhat.com/sysadmin/cd-command
 
 
+##shell globbing
+noglob_helper() {
+	"$@"
+	case "$shopts" in
+		*noglob*) 	;;
+		*) 	set +f ;;
+	esac
+	unset shopts
+}
+alias noglob='shopts="$SHELLOPTS"; set -f; noglob_helper'
+#check: https://www.chiark.greenend.org.uk/~sgtatham/aliases.html
+
 #custom ls
 l()
 {
