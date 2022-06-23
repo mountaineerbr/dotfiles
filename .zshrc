@@ -10,7 +10,7 @@
 #Global Order: zshenv, zprofile, zshrc, zlogin
 
 #source important files
-[[ -r ~/.rc ]] && . ~/.rc
+[[ -e ~/.rc ]] && . ~/.rc
 
 #tmux
 #file to hold Tmux signal
@@ -20,7 +20,7 @@ if [[ -z "$TMUX$VIFMSET" && "$EUID" -gt 0 ]]
 then
 	command tmux
 	#is exit signal file present?
-	if [[ -f "$_TMUXSIG" ]]
+	if [[ -e "$_TMUXSIG" ]]
 	then
 		#execute a simple command
 		set - "$(<"$_TMUXSIG")"
@@ -162,8 +162,6 @@ setopt NO_HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
 setopt HIST_NO_FUNCTIONS 
 setopt HIST_FIND_NO_DUPS #!#important
-setopt HIST_NO_FUNCTIONS
-setopt HIST_REDUCE_BLANKS
 #setopt HIST_VERIFY
 
 # import new commands from the history file also in other zsh-session
@@ -972,7 +970,7 @@ clot()
 #example: while true ;do semaphore ; (cmd ;cmd) & done
 semaphore()
 {
-	while ((${#jobstates[@]} > ${1:-4})) ;do sleep ${2:-1} ;done
+	while ((${#jobstates[@]} > ${1:-4})) ;do sleep ${2:-0.2} ;done
 }
 
 # cd to directory and list files
@@ -1186,7 +1184,7 @@ htmlentities()
 for f in \
 	/usr/share/doc/pkgfile/command-not-found.zsh \
 	/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-do [[ -r "$f" ]] && . "$f"
+do [[ -e "$f" ]] && . "$f"
 done ;unset f
 
 #highlight brackets

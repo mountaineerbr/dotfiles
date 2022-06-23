@@ -20,7 +20,7 @@
 # We run dircolors directly due to its changes in file syntax and
 # terminal name patching.
 use_color=false
-if 	[[ $BASH_VERSION ]] && type -P dircolors >/dev/null || whence -p dircolors >/dev/null
+if [[ $BASH_VERSION ]] && type -P dircolors >/dev/null || whence -p dircolors >/dev/null
 then
 	# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
 	LS_COLORS=
@@ -3268,7 +3268,7 @@ bpop2()
 {
 	local title="estimativa_TCU_2019_20200427.pdf"
 	local tmpfile="/tmp/$title"
-	[[ -r "$tmpfile" ]] || curl -L -H"$UAG" -o "$tmpfile" "ftp://ftp.ibge.gov.br/Estimativas_de_Populacao/Estimativas_2019/$title"
+	[[ -e "$tmpfile" ]] || curl -L -H"$UAG" -o "$tmpfile" "ftp://ftp.ibge.gov.br/Estimativas_de_Populacao/Estimativas_2019/$title"
 	pdftotext -layout "$tmpfile" -
 }
 

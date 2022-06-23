@@ -22,7 +22,7 @@
 # outputting anything in those cases.
 
 # If not running interactively, don't do anything
-[[ "$-" != *i* ]] && return
+[[ $- != *i* ]] && return
 #https://wiki.archlinux.org/index.php/Talk:Bash
 
 #set xterm font
@@ -272,7 +272,7 @@ repeat()
 	local i=  count="$1"
 	shift
 	for i in $(seq 1 "$count")
-	do eval "$@"
+	do 	eval "$@"
 	done
 }
 
@@ -321,7 +321,7 @@ for f in \
 	~/.rc \
 	/usr/share/bash-completion/bash_completion \
 	/usr/share/doc/pkgfile/command-not-found.bash
-do [[ -r "$f" ]] && . "$f"
+do 	[[ -e "$f" ]] && . "$f"
 done ;unset f
 
 #the fuck
