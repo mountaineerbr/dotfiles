@@ -94,8 +94,8 @@ export PAGER=less
 #less config
 #LESS='-i -e -M -P%t?f%f :stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
 
-#timezone config
-export TZ=America/Sao_Paulo
+#timezone config (unix system can automatically set locale time)
+#export TZ=America/Sao_Paulo
 
 #mail
 #export MAIL="/var/mail/$USER"
