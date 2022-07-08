@@ -1,0 +1,13 @@
+#/etc/pacman.d/hooks/
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = bitcoin-daemon
+
+[Action]
+Description = Check /etc/bitcoin/ permission (is 755?)..
+When = PostTransaction
+Exec = /home/jsn/bin/configNotes/zz-bitcoind.perm.sh
+
