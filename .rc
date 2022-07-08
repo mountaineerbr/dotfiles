@@ -327,6 +327,7 @@ alias curlu='curl --compressed --insecure -Lb non-existing --header "$UAG"'
 #html filter
 #w3m
 alias hf='w3m -dump -T text/html'
+alias htmlfilter=hf
 #{ lynx -force_html -stdin -dump -nolist ;}
 #{ elinks -dump ;}
 alias hf2="sed -Ee 's/<\/\?(script|style)[^>]*>/\n&\n/g' | sed -Ee '/^<(script|style)[^>]*>/,/^<\/(script|style)>/ d' -e '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }"
@@ -414,11 +415,13 @@ unt()
 #start virtualbox from command line
 bsd13()
 {
+	~/bin/vbox_wall.sh & disown
 	VBoxManage startvm "bsd13" --type headless
 }
 bsd13halt()
 {
-	VBoxManage controlvm "bsd13" poweroff --type headless
+	echo actions: \`resume\' or \`pause' or \*\`poweroff\'
+	VBoxManage controlvm "bsd13" ${1:-poweroff} --type headless
 	#resume or pause or poweroff
 }
 #https://www.techrepublic.com/article/how-to-run-virtualbox-virtual-machines-from-the-command-line/
@@ -1264,7 +1267,7 @@ zz()
 #zsh release notes
 zzz()
 {
-	curl https://zsh.sourceforge.io/releases.html| hf
+	curl https://zsh.sourceforge.io/releases.html| htmlfilter
 }
 
 xtitle () 
@@ -1566,7 +1569,7 @@ freebsd()
 		polish ports-mgmt portuguese print russian science security \
 		shells sysutils textproc ukrainian vietnamese www x11-clocks \
 		x11-drivers x11-fm x11-fonts x11-servers x11-themes x11-toolkits x11-wm x11
-	do 	curl -sL "https://cgit.freebsd.org/ports/tree/$category" | hf
+	do 	curl -sL "https://cgit.freebsd.org/ports/tree/$category" | htmlfilter
 	done
 	#older: http://www.cz.freebsd.org/ports/master-index.html
 }
@@ -1730,6 +1733,27 @@ sin()
 }
 #extensão do OpenOffice
 #https://extensions.openoffice.org/en/node/6213
+
+#dicionários michaelis do uol
+#uso: inglês para português: $ dic en dog
+#uso: português para inglês: $ dic pt cachorro
+#uso: português-português:   $ dic cachorro
+dic()
+{
+	local url
+	case $1 in
+		english|ingl[eê]s|en|e|i)
+			url=https://michaelis.uol.com.br/moderno-ingles/busca/ingles-portugues-moderno/$2
+			;;
+		portugu[eê]s|pt|p)
+			url=https://michaelis.uol.com.br/moderno-ingles/busca/portugues-ingles-moderno/$2
+			;;
+		*) 	url=https://michaelis.uol.com.br/moderno-portugues/busca/portugues-brasileiro/$1
+			;;
+	esac
+	[[ $(curlu "$url") =~ ('<!-- MAIN CONTENT -->')(.*)'<!-- END MAIN CONTENT -->' ]] &&
+	htmlfilter <<<"${BASH_REMATCH[2]:-$MATCH}"
+}
 
 #for acronym list, check
 # package wtf
@@ -3692,6 +3716,11 @@ bintext()
 #perl -pie 's/../../g' file
 #https://askubuntu.com/questions/1050693/sed-with-pcre-like-grep-p
 
+#Modulus on Negative Numbers
+#in C/C++ language we always find remainder as (a%b + b)%b ,
+#i.e. add quotient to remainder and again take remainder,
+#to avoid negative remainder.
+#https://www.geeksforgeeks.org/modulus-on-negative-numbers/
 
 #chage new line for something else (X) in a string
 #${string//$'\n'/X}
@@ -3848,6 +3877,7 @@ spacevis()
 #$ help [
 #in bsd (macos)
 #man [
+#man -K keyword
 
 #useful sed expressions
 #https://gist.github.com/worker8/69d084c59a075fec589741ea0924e6d9
@@ -4113,10 +4143,6 @@ unset MSG
 #{ repo-elephant ;}
 
 
-#linus linux challenge watch
-linus() { 	echo -e "$(curlu 'https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw' | grep -e '<title>' -e 'X<uri>' | sed -E "s/(linux|manjaro|pop!|mint|daily driver|challenge)/\\$BRed&\\$ENDC/Ig")" ;}
-
-
 ##################################################
 ############### FINANCIAL MARKETS ################
 ##################################################
@@ -4180,8 +4206,7 @@ tesouro()
 	jq '.response.TrsrBondMkt' <<<"$data"
 	jq -r '.response.TrsrBdTradgList[].TrsrBd |
 		"\(.nm)\t\(.FinIndxs| if .nm == "PREFIXADO" then "" else .nm end)+\(if .anulInvstmtRate == 0 then empty else .anulInvstmtRate end)%\t\(.minInvstmtAmt)\t\(.untrInvstmtVal)\t\(.mtrtyDt|.[:10])"' <<<"$data" |
-		sort |
-		column -s$'\t' -et -NTÍTULO,RENT/ANO,INVEST/MIN,PREÇO,VENCIMENTO -RRENT/ANO,INVEST/MIN,PREÇO
+		sort | column -et -NTÍTULO,RENT/ANO,INVEST/MIN,PREÇO,VENCIMENTO -RRENT/ANO,INVEST/MIN,PREÇO
 	echo "<https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm>"
 
 }
@@ -4193,29 +4218,30 @@ tesouro()
 #ibge inflação brasileira IPCA - Variação mensal
 ipcab()
 {
-	local val tval tvalp line data 
-	(($#)) || printf 'uso: ipcab  ANO/MES  # >= 1980/01\n\n' >&2
+	local data mes ano v
+	(($#)) || printf %s\\n\\n 'uso: ipcab  ANO/MES  # >= 1980/01' >&2
+	
 	set -- "${@//[\/.-]}" ;[[ "$2" ]] && set -- "$1$2"
-	if ((${#1} == 4 && ${1:-0} >= 1980))
-	then 	set -- "${1}01" #ano+janeiro
-	fi
-	if ((${#1} != 6 || ${1:-0} < 198001))
-	then set -- 199501  #199407 começo do plano real
-	fi
+	((${#1} == 4 && ${1:-0} >= 1980)) && set -- "${1}01" #ano+janeiro
+	((${#1} != 6 || ${1:-0} < 198001)) && set -- 199501  #199407 começo do plano real
+
 
 	data=$(curl --compressed -s "https://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=63&p=${1}-203701&ng=1(1)&c=")
+	set -- 1
 
 	#inflação variação mensal #cod:63
-	jq -er '.[0].var' <<<"$data" || return 1
+	jq -er '.[0].var' <<<"$data" || return
 
-	jq -r '.[]|"\(.p) \(.v)"' <<<"$data" |
-	while read line
-	do 	val="$(cut -d' ' -f3 <<<"$line")"
-		tval="$(bc <<<"scale=16; (1+ ($val /100) ) * ${tval:-1}")"
-		tvalp="$(bc <<<"scale=16; ($tval -1) * 100")"
-		printf "%s%% %'.2f%% %.6f\n" "$line" "$tvalp" "$tval"
-	done | column -ets' ' -NMes,Ano,Var%Mes,Acu%Total,Fator -OAno,Mes,Var%Mes,Acu%Total,Fator -RVar%Mes,Acu%Total,Fator
+	jq -r '.[]|"\(.p)\t\(.v)"' <<<"$data" |
+	while read mes ano v
+	do 	set -- $(bc <<<"scale=16;
+			tval = (1 + ($v /100) ) * $1;
+			tvalp= (tval -1) * 100;
+			tval; tvalp ")
+		printf "%s\t%d\t%.2f%%\t%'.2f%%\t%.6f\n" "$mes" "$ano" "$v" "$2" "$1"
+	done | column -et -NMes,Ano,Var%Mes,Acu%Total,Fator -OAno,Mes,Var%Mes,Acu%Total,Fator -RVar%Mes,Acu%Total,Fator
 }
+#inflação variação mensal #cod:63
 #calculadora: https://www3.bcb.gov.br/CALCIDADAO/publico/corrigirPorIndice.do?method=corrigirPorIndice
 
 
@@ -4223,33 +4249,32 @@ ipcab()
 #uso: %s [ANO]  #ANO>=1980 e calcula de jan/ANO a DEZ/ANO_ATUAL-1 
 ipcab2()
 {
-	local data year yearend val tval tvalp
+	local data year yearend
 	#print usage if user did not supply any argument
-	(($#)) || printf 'uso: ipcab2 ANO  #ANO >= 1980\n\n' >&2
-	if ((${#1} == 4 && ${1:-0} >= 1980))
-	then 	set -- "${1}01" #ano+janeiro
-	fi
-	if ((${#1} != 6 || ${1:-0} < 1980))
-	then 	set -- 199501  #199407 começo do plano real
-	fi
+	(($#)) || printf %s\\n\\n 'uso: ipcab2 ANO  #ANO >= 1980' >&2
+	((${#1} == 4 && ${1:-0} >= 1980)) && set -- "${1}01" #ano+janeiro
+	((${#1} != 6 || ${1:-0} < 1980)) && set -- 199501  #199407 começo do plano real
 	
 	#inflação acumulada por ano #cod:69
-	data=$(curl -sLb non-existing "https://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=69&p=${1}-203012&ng=1(1)&c=")
+	data=$(curl -sLb non-existing "https://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=69&p=${1}-203012&ng=1(1)&c=") || return
 
-	jq -er '.[0].var' <<<"$data" || return 1
+	jq -er '.[0].var' <<<"$data"
 	jq -r '.[]|"\(.p) \(.v)"' <<<"$data" | column -ets' ' -NMes,Ano,Acu%Ano -OAno,Mes,Acu%Ano
 	
-	#inflação acumulada a partir de um ano específicado pelo usuário
+	#inflação acumulada a partir de ano especifico
 	yearend=$(($( date +%Y ) - 1))
 	year="${1:0:4}"
+	set -- 1 1 1
 
 	printf '\nPeríodo %s/jan - %s/dez\n' "$year" "$yearend"
 	for ((year=year;year<=yearend;++year))
-	do 	val="$(jq -r ".[]|select(.p == \"dezembro ${year}\")|.v" <<<"$data")"
-		tval="$(bc <<<"scale=16; (1+ ($val /100) ) * ${tval:-1}")"
-		tvalp="$(bc <<<"scale=16; ($tval -1) * 100")"
-		printf "%s dez %s%% %'.2f%% %.6f\n" "$year" "$val" "$tvalp" "$tval"
-	done | column -ets' ' -NAno,Mes,Ac%Ano,Acu%Total,Fator -RAc%Ano,Acu%Total,Fator 
+	do 	set -- $(bc <<<"scale=16;
+			val = $(jq -r ".[]|select(.p == \"dezembro ${year}\")|.v" <<<"$data");
+			tval = (1 + (val /100) ) * $2;
+			tvalp = (tval - 1) * 100;
+			val ;tval ;tvalp")
+		printf "%d\tdez\t%.2f%%\t%'.2f%%\t%.6f\n" "$year" "$1" "$3" "$2"
+	done | column -et -NAno,Mes,Ac%Ano,Acu%Total,Fator -RAc%Ano,Acu%Total,Fator 
 }
 #https://www.ibge.gov.br/estatisticas/economicas/precos-e-custos/9256-indice-nacional-de-precos-ao-consumidor-amplo.html?t=series-historicas&utm_source=landing&utm_medium=explica&utm_campaign=inflacao#plano-real-mes
 
@@ -4257,7 +4282,7 @@ ipcab2()
 #american inflation
 ipca()
 {
-	if [[ -z "$*" ]]
+	if ((!$#))
 	then 	printf 'usage: ipca [series_id]\n' >&2
 		printf 'usage: ipca  .           #all series\n\n' >&2
 		set -- CUUR0000SA0

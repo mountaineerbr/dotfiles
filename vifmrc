@@ -310,6 +310,9 @@ command Brc !vim ~/.bashrc
 "Edit .xbindbeysrc
 command Xbrc !vim ~/.xbindkeysrc
 
+" add icons to files
+"source ~/.config/vifm/favicons.vifm
+" https://github.com/cirala/vifm_devicons 
 
 " ------------------------------------------------------------------------------
 
@@ -787,6 +790,7 @@ nnoremap yr :!echo -n %c:r | xsel --input --primary %i &&
             \ echo -n %c:r | xsel --clipboard --input %i<cr>:echo expand('%"c:r') "yanked"<cr>
 "https://wiki.vifm.info/index.php/How_to_copy_path_to_current_file/directory_to_system_clipboard
 
+
 " RENAMING Maps
 " Rename from first char
 "nnoremap I cw<c-a>
@@ -818,6 +822,11 @@ nmap ;Wq :wq
 
 
 " BINDDINGS WITH LEADER ,
+
+"open in firefox
+nnoremap ,f :!ff.sh %c %i<cr>
+nnoremap ,d :!vimdiff %c %C<cr>
+nnoremap ,v :!vimdiff %c %C<cr>
 
 " Execute command togglesort
 noremap ,t :togglesort<cr>

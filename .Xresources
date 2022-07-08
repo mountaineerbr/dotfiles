@@ -580,7 +580,7 @@ xterm*font: -xos4-terminus-medium-r-normal--18-180-72-72-c-100-iso10646-1
 !bitmap font sizes 
 
 !Unreadable (do not set to use xterm default font):
-!xterm*font1: -xos4-terminus-medium-r-normal--0-0-72-72-c-0-iso10646-1
+xterm*font1: -xos4-terminus-medium-r-normal--0-0-72-72-c-0-iso10646-1
 !tiny:
 xterm*font2: -xos4-terminus-medium-r-normal--12-120-72-72-c-60-iso10646-1
 !small:
@@ -595,8 +595,15 @@ xterm*font6: -xos4-terminus-medium-r-normal--32-320-72-72-c-160-iso10646-1
 !9x15bold 
 
 !use ttf fonts instead
-!XTerm*faceName: TerminessTTF Nerd Font Mono
-!XTerm*faceSize: 12
+!xterm*faceName: Terminus (TTF)
+!xterm*faceName:  TerminessTTF Nerd Font Mono:style=Medium:size=13
+!xterm*faceName: DejaVuSansMono Nerd Font Mono:style=Regular:size=12
+!xterm*faceName: FiraCode Nerd Font Mono:style=Regular:size=12
+!!xterm*faceName: RobotoMono Nerd Font Mono:style=Regular:size=12
+!xterm*faceSize: 13
+!!xterm*font: 7x13
+! start with TrueType fonts disabled
+! xterm*renderfont: false
 !good fonts:
 !Noto Sans Mono Condensed
 !Hack Nerd Font Mono
@@ -611,7 +618,6 @@ xterm*font6: -xos4-terminus-medium-r-normal--32-320-72-72-c-160-iso10646-1
 !xterm.vt100.fontWarnings: 2
 !0=never; 1=only if font is at Xresources (default); 2=always
 
-!slection
 !selected text will use CLIPBOARD
 !set to false uses PRIMARY by defaults
 !programmes may also have a CUTBUFFER (eg. vim)

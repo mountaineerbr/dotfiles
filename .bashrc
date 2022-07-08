@@ -283,7 +283,7 @@ repeat()
 semaphore()
 {
 	local jobs
-	while jobs=( $(jobs -p) ) ;((${#jobs[@]} > ${1:-4})) ;do sleep ${2:-1} ;done
+	while jobs=( $(jobs -p) ) ;((${#jobs[@]} > ${1:-4})) ;do sleep ${2:-0.2} ;done
 }
 
 # Subfunction needed by `repeat'.

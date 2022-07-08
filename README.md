@@ -18,10 +18,14 @@ full-fledged scripts and moved to __[scripts repo](https://github.com/mountainee
 
 Some configuration files from `/etc` (such as `issue`) and subdirectories under `~/.config` (such as `vifmrc`) are present but not hierarchically organised in this repo. 
 
----
+  
+  
 
 ![ScreenShot](git_screenshot1.png)
 Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](https://www.youtube.com/watch?v=Mu3BfD6wmPg "Chilled Cow by Kupla")
+
+  
+  
 
                    __  ___                  
      _______ ____ / /_/ _ |_    _____ ___ __
@@ -33,6 +37,4 @@ Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](htt
      /  ' \/ _ \/ // / _ \/ __/ _ `/ / _ \/ -_) -_) __/ _  / __/
     /_/_/_/\___/\_,_/_//_/\__/\_,_/_/_//_/\__/\__/_/ /____/_/   
                                                             
----
 
-***(ARCHIVAL REPOSITORY)***
