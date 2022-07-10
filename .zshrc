@@ -82,7 +82,7 @@ setopt G_L___OB_ST_A_R__SH____ORT
 # don't throw errors when file globs don't match anything and delete the pattern from the argument list 
 #setopt NULL_GLOB
 # only throw errors when no globs match anything
-#setopt CSH_NULL_GLOB
+setopt CSH_NULL_GLOB
 
 #With NO_NOMATCH set, any patterns which don't match are left alone
 setopt NO_NOMATCH
@@ -1174,6 +1174,11 @@ htmlentities()
 #So i think those are essentially the 'core' modules. You can probably
 #include zsh/langinfo and zsh/terminfo in most cases too.
 #dana
+
+#c-style
+#if ((n==2)) { 	print hello }
+#while ((range-- >0)) { print hello }
+#brackets are not even necessary to run a single command!
 
 
 #sources

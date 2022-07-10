@@ -271,10 +271,14 @@ p()
 #print all /bin files
 lsb()
 {
-	if (($#))
-	then 	ls /bin | grep "$@"
-	else 	ls /bin
-	fi
+	local dir ar
+	[[ $ZSH_VERSION ]] && ar=(${=PATH//:/ }) || ar=(${PATH//:/ })
+	for dir in ${ar[@]}
+	do 	if (($#))
+		then 	ls $dir | grep "$@"
+		else 	ls $dir
+		fi
+	done
 }
 
 
@@ -890,7 +894,7 @@ gres()
 #https://stackoverflow.com/questions/4327708/git-reset-hard-head-leaves-untracked-files-behind/4327720
 
 #remove last n commit
-#grmlast 2  # removes last 2 commits, otherwise removes last commit
+#use: grmlast 2  # removes last 2 commits, otherwise removes last commit
 grmlast()
 {
 	[[ -z "$1" ]] && set -- 'HEAD^'
@@ -3501,6 +3505,36 @@ snow() { clear;while :;do echo $LINES $COLUMNS $(($RANDOM%$COLUMNS));sleep ${2:-
 #{ LD_PRELOAD=/usr/lib/libGL.so optirun %command% ;}
 #{ LD_PRELOAD=/usr/lib32/libGL.so optirun %command% ;}
 #https://bbs.archlinux.org/viewtopic.php?id=233888
+
+##turn to lower case
+#lcase()
+#{
+#    word=$1
+#    while [ -n "$word" ]
+#    do
+#      temp=${word#?}
+#      case ${word%"$temp"} in
+#          A*) _LWR=a ;;        B*) _LWR=b ;;
+#          C*) _LWR=c ;;        D*) _LWR=d ;;
+#          E*) _LWR=e ;;        F*) _LWR=f ;;
+#          G*) _LWR=g ;;        H*) _LWR=h ;;
+#          I*) _LWR=i ;;        J*) _LWR=j ;;
+#          K*) _LWR=k ;;        L*) _LWR=l ;;
+#          M*) _LWR=m ;;        N*) _LWR=n ;;
+#          O*) _LWR=o ;;        P*) _LWR=p ;;
+#          Q*) _LWR=q ;;        R*) _LWR=r ;;
+#          S*) _LWR=s ;;        T*) _LWR=t ;;
+#          U*) _LWR=u ;;        V*) _LWR=v ;;
+#          W*) _LWR=w ;;        X*) _LWR=x ;;
+#          Y*) _LWR=y ;;        Z*) _LWR=z ;;
+#          *) _LWR=${1%${1#?}} ;;
+#      esac
+#      printf "%s" "$_LWR"
+#      word=$temp
+#    done
+#}
+##https://www.drdobbs.com/shell-corner-bash-dynamically-loadable-b/199102950?pgno=1
+
 
 #useful one-liners
 #commands
