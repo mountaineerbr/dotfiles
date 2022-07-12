@@ -770,7 +770,7 @@ grm()
 #git commit
 gcom()
 {
-	git commit -m "${1:-sync..}"
+	git commit -m "${*:-sync..}"
 }
 
 #git push
@@ -789,7 +789,7 @@ gdiff()
 #simple git sync
 gitup()
 {
-	git add -A && git commit -msync && git push
+	git add -A && git commit -m "${*:-sync}" && git push
 }
 
 #retrieve the remote git address of a repo?
@@ -887,7 +887,7 @@ thumblr()
 gres()
 {
 	git fetch --all &&
-	git reset --hard "${1:-origin/master}"
+	git reset --hard "${1:-origin/main}"
 	#git clean -f -d -x
 }
 #use a commit hash or 'HEAD^' to revert to last commit
@@ -923,14 +923,14 @@ grmob()
 	#commit the changes
 	git commit -am sync
 	#delete the branch
-	git branch -D master
-	#rename the current branch to master
-	git branch -m master
+	git branch -D main
+	#rename the current branch to main
+	git branch -m main
 	#finally, force update your repository
-	git push -f origin master
+	git push -f origin main
 
 	#push the current branch and set the remote as upstream
-	git push --set-upstream origin master
+	git push --set-upstream origin main
 }
 #https://stackoverflow.com/questions/13716658/how-to-delete-all-commit-history-in-github
 #also check 'bgf repo-cleaner' https://rtyley.github.io/bfg-repo-cleaner/
@@ -980,7 +980,7 @@ gd()
 
 	echo "$url" >&2
 }
-#"https://github.com/$1/$2/blob/master/${3}?raw=true"
+#"https://github.com/$1/$2/blob/main/${3}?raw=true"
 
 #check local hash sums of same-named local files
 #usage:  gk  [USER] [REPO] [SUBREPO/PATH/]FILE
@@ -1265,7 +1265,7 @@ z()
 #zshell mailing list
 zz()
 {
-	cat ~/arq/docs/zShellDocs/zshUsersMailingList/zshUserMailingListConcat.txt
+	bat -l eml --style plain ~/arq/docs/zShellDocs/zshUsersMailingList/zshUserMailingListConcat.txt
 }
 
 #zsh release notes
@@ -1273,6 +1273,12 @@ zzz()
 {
 	curl https://zsh.sourceforge.io/releases.html| htmlfilter
 }
+
+b()
+{
+	bat -l eml --style plain ~/arq/docs/bash_help_mailing_list.txt
+}
+
 
 xtitle () 
 { 
@@ -1781,10 +1787,7 @@ dic()
 alias d='datediff.sh -d'
 
 # Calculate the difference in whole days between two dates, ignoring timezone changes
-datedifference()
-{
-    echo $(( ($(date -u -d "$1" +%s) - $(date -u -d "$2" +%s)) / 86400)) days
-}
+#datedifference() { echo $(( ($(date -u -d "$1" +%s) - $(date -u -d "$2" +%s)) / 86400)) days ;}
 #https://matt.blissett.me.uk/linux/zsh/zshrc
 
 # convertsecs
@@ -1799,13 +1802,13 @@ datedifference()
 #   ENDTIME=$(date +"%s")
 #   TOTALTIME=$(($ENDTIME-$STARTTIME))
 # ------------------------------------------------------
-convertsecs()
-{
-  ((h=${1}/3600))
-  ((m=(${1}%3600)/60))
-  ((s=${1}%60))
-  printf "%02d:%02d:%02d\n" $h $m $s
-}
+#convertsecs()
+#{
+#  ((h=${1}/3600))
+#  ((m=(${1}%3600)/60))
+#  ((s=${1}%60))
+#  printf "%02d:%02d:%02d\n" $h $m $s
+#}
 #https://github.com/natelandau/shell-scripts/blob/master/lib/sharedFunctions.sh
 
 #units - list units from default file
@@ -1911,7 +1914,7 @@ wrap()
 #hew() { perl -le 'print unpack "H*","'"$1"'"' ;}
 #weh() { perl -le 'print pack "H*","'"$1"'"' ;}
 #pversion()    { perl -M"$1" -le "print $1->VERSION" ;} # i. e."pversion LWP -> 5.79"
-#getlinks ()   { perl -ne 'while ( m/"((www|ftp|http):\/\/.*?)"/gc ) { print $1, "\n"; }' "$*" ;}
+getlinks ()   { perl -ne 'while ( m/"((www|ftp|http|https):\/\/.*?)"/gc ) { print $1, "\n"; }' "$*" ;}
 #gethrefs ()   { perl -ne 'while ( m/href="([^"]*)"/gc ) { print $1, "\n"; }' "$*" ;}
 #getanames ()  { perl -ne 'while ( m/a name="([^"]*)"/gc ) { print $1, "\n"; }' "$*" ;}
 #getforms ()   { perl -ne 'while ( m:(\</?(input|form|select|option).*?\>):gic ) { print $1, "\n"; }' "$*" ;}
@@ -2663,7 +2666,7 @@ yts()
 
 #bcalc.sh
 #disable globbing
-alias c='noglob bcalc.sh -v4'
+alias c='noglob bcalc.sh -v'
 
 #bash calculator - bc
 #function c() { bc -l <<< "$*" ;}

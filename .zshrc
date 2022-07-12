@@ -1174,6 +1174,11 @@ htmlentities()
 #So i think those are essentially the 'core' modules. You can probably
 #include zsh/langinfo and zsh/terminfo in most cases too.
 #dana
+#
+#specifies that builtin strftime and parameter EPOCHSECONDS are to be
+#autoloaded from the module zsh/datetime, but that no other features
+#from zsh/datetime will be enabled without being specifically mentioned.
+zmodload -aF zsh/datetime b:strftime p:EPOCHSECONDS
 
 #c-style
 #if ((n==2)) { 	print hello }
