@@ -184,6 +184,9 @@ export MOZ_USE_OMTC=1
 #pvkrun  [demo]
 #OBS: `optirun' is the only which enables NVIDIA renderer for me
 
+#bcalc.sh extensios file for bc
+export BCEXTFILE="$HOME/bin/bcalc_ext.bc"
+
 #config for bitcoin.{blk,tx}.sh
 export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
 
