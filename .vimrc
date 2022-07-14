@@ -273,6 +273,7 @@ if &diff
   syntax off
   au VimEnter * RainbowParenthesesToggle
   set nohls
+
 endif
 "https://odd.blog/2016/11/24/howto-disable-syntax-highlighting-in-vimdiff/
 
@@ -913,7 +914,7 @@ map <F6> <C-e>:sleep 3800m<CR>j<F6>
 
 
 
-" INDEX OF LEADER 0
+" INDEX OF LEADER \ <defaults>
 "	\dust  Remove shell dust such as ${var} --> $var
 "	\c     Replace word under cursor (down)
 "	\C     Replace word under cursor (up)
@@ -1060,11 +1061,6 @@ nnoremap <BS> <C-W><C-H>
 "nmap « :vertical:resize +2 <CR>
 "nmap ß :vertical:resize -2 <CR>
 "
-
-
-" MAPLEADER 2 ( CUSTOM LEADER ) < ç >
-"
-"map ç <cleader2>
 
 
 " Vim colors do not work in Tmux
@@ -1217,6 +1213,20 @@ let g:netrw_winsize = 20
 filetype plugin on
 set omnifunc=syntaxcomplete#Complete
 autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
+
+
+"diffchar.vim https://github.com/rickhowe/diffchar.vim
+function DiffUnitToggle()
+	if g:DiffUnit == 'Word1'
+		let g:DiffUnit="Char"
+	else
+		let g:DiffUnit="Word1"  "defaults
+	endif
+endfunction
+nnoremap <Leader>u :call DiffUnitToggle()<cr>
+
+
+"addons: emmet-vim-git  vim-colorschemes  vim-diffchar  vim-eunuch  vim-markdown-git  vim-palenight-git  vim-pathogen  vim-rainbow-parentheses-git  vim-supertab  vim-surround  vim-tabular  vimpager
 
 
 " REFERENCES
