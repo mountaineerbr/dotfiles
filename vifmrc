@@ -183,7 +183,7 @@ set lsoptions=transposed
 "set milleroptions=lsize:1,csize:1,rsize:1,rpreview:dirs
 "two-column mode which is useful in combination with :view command:
 set milleroptions=lsize:1,csize:2
-" More options: ,rsize:1
+" More options: \rsize:1
 
 " Use increment searching (search while typing)
 set incsearch
@@ -701,15 +701,15 @@ set vifminfo=dhistory,savedirs,chistory,state,tui,shistory,
 "set viewcolumns=-{name}..,12{}.
 "set viewcolumns=-{name}.,12{}.
 "windo set viewcolumns=-{name}..,6{size},11{perms}
-nmap ,0 :set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
+nmap \0 :set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
 "set defaults
 windo    set viewcolumns=-{name}..,3{ext},7{size},13{mtime} <cr>
 
 "change mtime to perms
-nmap ,p  :set viewcolumns=-{name}..,3{ext},7{size},11{perms} <cr>
+nmap \p  :set viewcolumns=-{name}..,3{ext},7{size},11{perms} <cr>
 
 " detailed information about files
-nnoremap <silent> ,d :set viewcolumns=*{name}..,11{perms},7{uname},-7{gname},7{size}.,13{mtime}<cr>
+nnoremap <silent> \d :set viewcolumns=*{name}..,11{perms},7{uname},-7{gname},7{size}.,13{mtime}<cr>
 "https://q2a.vifm.info/464/filtering-columns-when-window-is-too-small
 
 
@@ -821,46 +821,41 @@ nmap :Wq :wq
 nmap ;Wq :wq
 
 
-" BINDDINGS WITH LEADER ,
+" BINDDINGS WITH LEADER \
 
 "open in firefox
-nnoremap ,f :!ff.sh %c %i<cr>
-nnoremap ,d :!vimdiff %c %C<cr>
-nnoremap ,v :!vimdiff %c %C<cr>
+nnoremap \f :!ff.sh %c %i<cr>
+nnoremap \v :!vimdiff %c %C<cr>
 
 " Execute command togglesort
-noremap ,t :togglesort<cr>
+noremap \t :togglesort<cr>
 
 "sync directory in panes
-noremap ,i :sync! <cr>
+noremap \i :sync! <cr>
 
 " Examples
 " Open console in current directory
-nnoremap ,x :!xterm &<cr>
+nnoremap \x :!xterm &<cr>
 " Open editor to edit vifmrc and apply settings after returning to vifm
-"nnoremap ,c :write | edit $MYVIFMRC | restart full<cr>
+"nnoremap \c :write | edit $MYVIFMRC | restart full<cr>
 " Open gvim to edit vifmrc
-" nnoremap ,C :!gvim --remote-tab-silent $MYVIFMRC &<cr>
+" nnoremap \C :!gvim --remote-tab-silent $MYVIFMRC &<cr>
 "https://wiki.vifm.info/index.php/Configuration_model#:restart_usage_example
 
-" Toggle wrap setting on ,w key
-nnoremap ,w :set wrap!<cr>
+" Toggle wrap setting on \w key
+nnoremap \w :set wrap!<cr>
 
 " Open with firefox
-nnoremap ,f :!firefox %c &<cr>
+nnoremap \f :!firefox %c &<cr>
 
 "toggle lsview
-noremap ,l :set lsview! <cr>
+noremap \l :set lsview! <cr>
 "toggle millerview
-noremap ,m :set millerview! 
+noremap \m :set millerview! 
 	\ |view
 	\ |set viewcolumns={name} <cr>
 "tree view
-noremap ,e :tree! <cr>
-
-
-" BINDDINGS WITH LEADER \
-
+noremap \e :tree! <cr>
 
 
 " FUNCTION (FN) KEYS BINDDINGS

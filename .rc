@@ -1529,26 +1529,14 @@ debian2()
 #ubuntu -- list all pkg names (without version)
 ubuntu()
 {
-	local v vv r
+	local v r
 	echo 'List of all packages' >&2
-	for v in impish hirsute focal bionic xenial trusty
-	do 	case "$v" in
-			devel  ) vv=development;;
-			precise) vv='12.04 LTS';;  #removed
-			trusty ) vv='14.04 LTS';;
-			xenial ) vv='16.04 LTS';;
-			bionic ) vv='18.04 LTS';;
-			cosmic ) vv='18.10';;
-			disco  ) vv='19.04';;  #removed from server
-			eoan   ) vv='19.10';;  #removed
-			focal  ) vv='20.04 LTS';;
-			groovy ) vv='20.10';;  #removed
-			hirsute) vv='21.04';;
-			impish ) vv='21.10';;
-		esac
-		for r in main multiverse restricted universe
-		do 	echo "$v $vv in $r" | tr a-z A-Z >&2
-			curl -Ls "http://archive.ubuntu.com/ubuntu/dists/${v}/${r}/source/Sources.gz" \
+	for v in 'jammy 22.04 LTS' 'impish 21.10' 'hirsute 21.04' \
+		'focal 20.04 LTS' 'bionic 18.04 LTS' 'xenial 16.04 LTS' \
+		'trusty 14.04' #devel
+	do 	for r in main multiverse restricted universe
+		do 	echo "$v in $r" | tr a-z A-Z >&2
+			curl -Ls "http://archive.ubuntu.com/ubuntu/dists/${v%% *}/${r}/source/Sources.gz" \
 				| gzip -dc | grep -F Package:
 		done
 	done
@@ -1617,7 +1605,7 @@ fedora()
 {
 	local ver index
 	echo 'List of (almost) all packages' >&2
-	for ver in 35
+	for ver in 36
 	do 	for index in {a..z} {0..9}
 		do 	curl --compressed -sL "http://fedora.c3sl.ufpr.br/linux/releases/$ver/Everything/aarch64/os/Packages/$index" \
 				| sed -e 's/</\t&/g; s/<[^>]*>//g' -e 's/^[\s\t]*//; s/\t\+/\t/g; s/&nbsp;//' | cat -s
@@ -1914,7 +1902,7 @@ wrap()
 #hew() { perl -le 'print unpack "H*","'"$1"'"' ;}
 #weh() { perl -le 'print pack "H*","'"$1"'"' ;}
 #pversion()    { perl -M"$1" -le "print $1->VERSION" ;} # i. e."pversion LWP -> 5.79"
-getlinks ()   { perl -ne 'while ( m/"((www|ftp|http|https):\/\/.*?)"/gc ) { print $1, "\n"; }' "$*" ;}
+#getlinks ()   { perl -ne 'while ( m/"((www|ftp|http|https):\/\/.*?)"/gc ) { print $1, "\n"; }' "$*" ;}
 #gethrefs ()   { perl -ne 'while ( m/href="([^"]*)"/gc ) { print $1, "\n"; }' "$*" ;}
 #getanames ()  { perl -ne 'while ( m/a name="([^"]*)"/gc ) { print $1, "\n"; }' "$*" ;}
 #getforms ()   { perl -ne 'while ( m:(\</?(input|form|select|option).*?\>):gic ) { print $1, "\n"; }' "$*" ;}
