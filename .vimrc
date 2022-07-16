@@ -1191,8 +1191,6 @@ let g:user_emmet_leader_key=','
 "https://github.com/preservim/vim-markdown/
 let g:vim_markdown_folding_disabled = 1
 
-
-
 "netrw
 "Note: toggle view type with 'i'
 "
@@ -1222,6 +1220,7 @@ function DiffUnitToggle()
 	else
 		let g:DiffUnit="Word1"  "defaults
 	endif
+	diffupdate
 endfunction
 nnoremap <Leader>u :call DiffUnitToggle()<cr>
 
