@@ -16,23 +16,24 @@
 #file to hold Tmux signal
 _TMUXSIG="${TMPD:-/tmp}/tmux.exit.$EUID"
 #start tmux
-if [[ -z "$TMUX$VIFMSET" && "$EUID" -gt 0 ]]
+if [[ -z $TMUX$VIFMSET && $EUID -gt 0 ]]
 then
 	command tmux
 	#is exit signal file present?
-	if [[ -e "$_TMUXSIG" ]]
+	if [[ -e $_TMUXSIG ]]
 	then
 		#execute a simple command
-		set - "$(<"$_TMUXSIG")"
+		set -- "$(<"$_TMUXSIG")"
 		command rm "$_TMUXSIG"
 		eval "$*"
+		set --
 	fi
 fi
 #exit tmux and terminal emulator, too
 qq()
 {
 	#create signal file if within Tmux
-	[[ "$TMUX" ]] && echo exit >"$_TMUXSIG"
+	[[ $TMUX ]] && echo exit >"$_TMUXSIG"
 	echo '[bye..]' >&2
 	exit
 }
@@ -227,7 +228,7 @@ setopt PUSHD_IGNORE_DUPS
 #history
 HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
 #do not add to history, however it stays in the interactive history
-HISTORY_IGNORE='(q|qq)'
+HISTORY_IGNORE='(q|qq|exit|bye)'
 #HISTORY_IGNORE="(ls|cd|pwd|exit|cd)"
 HISTSIZE=1000000
 SAVEHIST=100000

@@ -533,6 +533,18 @@ out()
 	echo '[nothing to do]' >&2
 	return 1
 }
+#OBS: ``$_TMUXSIG'' is defined at ~/.rc file!
+
+#exit termux and rerun last command
+a()
+{
+	if [[ $TMUX ]]
+	then 	fc -ln -- -1 >"$_TMUXSIG"
+		exit
+	else 	fc -s
+	fi
+}
+
 
 #startx
 #alias x=startx
@@ -612,6 +624,13 @@ vf()
 	echo -e "\aPWD: $PWD"
 }
 ((VIFMSET)) && echo -e \\aYou are within VIFM! >&2
+vff()
+{ 	#exit tmux and run vifm
+	if [[ $TMUX ]]
+	then 	echo vf >"$_TMUXSIG" ;exit
+	else vf
+	fi
+}
 
 #cd to last visited dir in Vifm
 vfcd()
@@ -1121,9 +1140,10 @@ alias ipmet=ipmet.sh
 alias open='exo-open'
 #alias open='xdg-open'
 
-#alias T='~/bin/ctemp.sh'
-alias ct='~/bin/ctemp.sh'
+#temperature converter
 alias ctemp='~/bin/ctemp.sh'
+alias ct=ctemp
+alias ct.sh=ctemp
 
 
 #alias b=binance.sh\ -3
@@ -1154,6 +1174,13 @@ alias usd='cmc usd brl ;cgk usd brl ;uol.sh|sed -n 8p\;17p'
 
 #print ssh command to connect to current machine
 alias shh='echo ssh $(whoami)@$(ip -4 n | awk "{print \$3;exit}" | ip -br -4 a s $(echo Device: >&2 ;cat /dev/stdin) | grep -Eo "[0-9.]{7,}")' 
+
+#list local ips
+iplist()
+{
+	nmap -sn 192.168.0.0/24
+}
+#https://superuser.com/questions/261818/how-can-i-list-all-ips-in-the-connected-network-through-terminal-preferably
 
 
 #make dir and change dir to it - GRML has one mkcd function
@@ -2192,7 +2219,7 @@ gsitemap()
 #{ optirun -b none nvidia-settings -c :8 ;}
 #{ optirun firefox ;}
 #{ primusrun /usr/lib/firefox/firefox ;}
-#primus_vk
+#primus_vk, pvkrun
 #'nvidia-smi' to check gpu load
 #TROUBLESHOOTING:
 #Cannot access secondary GPU
@@ -3994,11 +4021,10 @@ tmr()
 #space characters include: tab, newline, vertical tab, form feed, carriage return, and space.
 trim()
 {
-	local var="$*"
+	local var="${*:-$([[ -t 0 ]] || </dev/stdin)}"
 	var="${var#"${var%%[![:space:]]*}"}"  #rm leading ws
 	var="${var%"${var##*[![:space:]]}"}"  #rm trailing ws
-
-	#read -r foo <<<"$foo"  #from usenet
+	echo "${var:?empty}"
 }
 #compatible with all posix shells
 #https://web.archive.org/web/20121022051228/http://codesnippets.joyent.com/posts/show/1816
@@ -4007,6 +4033,7 @@ trim()
 #var="${var#*( )}" var="${var%*( )}"
 #printf %s "$var"
 #https://linuxhint.com/trim_string_bash/
+#read -r foo <<<"$foo"  #from usenet
 
 #tip: sed `//d' removes last expression
 
@@ -4137,7 +4164,7 @@ MSG=(
 'Conhece a ti mesmo.'
 'Coragem, paciência, determinação e alegria.'
 'Clareza e entendimento, depois jogar o jogo para meu bem.'
-'Engajamento políticoe transformador da história que vai fazer
+'Engajamento político e transformador da história vai fazer
 você usar os seus humores em seu próprio proveito.'
 'Preparar recursos para quando o momento de uma ansiedade chegar,
 estarmos preparados pois já enfrentamo-lá.'
@@ -4156,11 +4183,12 @@ estarmos preparados pois já enfrentamo-lá.'
 'Gues what. No one cares.'
 'Key word is "addiction", nothing wrong with any of these if the addiction is not there. -- @woonomic'
 'The difference between a smart person and a clever person is that a smart person knows how to get out of trouble that a clever person wouldnt have gotten into in the first place.'
+'Go and touch the  grass. -- Brodie Robertson'
 
 )
 if [[ $- = *i* ]] && [[ $TMUX ]]
 then
-	#[[ -e notes ]] && cat notes  #lolcat -F 0.05 notes
+	#[[ -e notes ]] && lolcat -F 0.05 notes
 	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}]}\e[0m\n"  #| cowthink -sn
 fi
 unset MSG
