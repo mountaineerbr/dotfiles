@@ -68,7 +68,7 @@ prompt_jobs='$([[ \j -gt 0 ]] && echo "(%\j)")'
 PROMPT_DIRTRIM=3
 #set ps1 string
 #PS1="${prompt_exit}${c0}\u${bwhite} \h:${bcyan}\w${endc} ${prompt_git}(\!${prompt_jobs})${prompt_ssl}\$ "
-PS1="${prompt_exit}${c0}\u${bwhite} \h:${bcyan}\w${endc} ${prompt_git}\${prompt_git:+ }${prompt_jobs}${prompt_ssl}\$ "
+PS1="${prompt_exit}${c0}\u ${bwhite}\h:${bcyan}\w${endc} ${prompt_git}\${prompt_git:+ }${prompt_jobs}${prompt_ssl}\$ "
 #keep environment clean
 unset end bwhite bcyan bgreen bpink bred yellow c0 prompt_ssl_max prompt_ssl prompt_git prompt_exit prompt_jobs
 
