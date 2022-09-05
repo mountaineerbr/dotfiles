@@ -9,8 +9,8 @@
 
 ## Dotfiles, run control and c files
 
-__Most shell functions and aliases are at__ [.rc file](.rc). That is sourced from
-both _.bashrc_ and _.zshrc_, which contain configs for each shell.
+__Most shell functions and aliases are at__ __[.rc file](.rc)__. That is sourced from
+both [.bashrc](.bashrc) and [.zshrc](.zshrc), which contain configs for each shell.
 
 The [.rc file](.rc) changes constantly and is also a testcamp for new code.
 When functions become too large and mature, they may be promoted to
