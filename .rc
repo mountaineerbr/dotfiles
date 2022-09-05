@@ -2229,20 +2229,16 @@ gsitemap()
 #requires the script 'ansiweather'
 wf() { 	ansiweather -l "${*:-${CITY:-londrina}}" ;}
 
-#google weather forecast
+#google 
 wf2()
 {
-	[[ -z "$*" ]] && set -- sao paulo
-	set -- $(sed 's/\s/%20/g' <<<"$*")
-
-	curl -sL --header "$UAG" "https://www.google.com/search?q=weather+$*" |
+	local location
+	location="${*:-sao paulo}" location="${location// /%20}"
+	curl -sL --header "$UAG" "https://www.google.com/search?q=weather+${location}" |
 		sed 's|<[^/]*>[^>]*>|&\n|g' |
-		grep -E -e \"wob_wc\" -e \"wob_loc\" -e \"wob_dts\" \
-		-e \"wob_dcp\" -e \"wob_dc\" -e id=\"wob_t\" -e \"wob_t\?tm\" \
-		-e \"wob_pp\" -e \"wob_hm\" -e \"wob_ws\"|
-		sed 's/<[^>]*>//g' | sed '2s/$/ °C/' | sed '3s/$/ °F/'
+		grep -E -e "\"wob_(wc|loc|dts|dcp|dc|pp|hm|ws)\"" -e id=\"wob_t\" -e \"wob_t\?tm\" |
+		sed -e 's/<[^>]*>//g' -e '1d' -e'2s/$/ °C/' -e '3s/$/ °F/'
 }
-#sed -nE 's/(.*)(id="wob_loc.{4000})(.*)/<\2/ p' | sed 's/>/&\n/g' | sed 's/<[^>]*>//g ; /^ *$/d ; /[<>]/d ; /&nbsp;/d'
 
 #weather forecast (previsão do tempo)
 #and moon fase forecast
