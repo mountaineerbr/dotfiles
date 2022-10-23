@@ -329,14 +329,20 @@ alias curl='curl --compressed'
 alias curlu='curl --compressed --insecure -Lb non-existing --header "$UAG"'
 
 #html filter
-#w3m
-alias hf='w3m -dump -T text/html'
-alias htmlfilter=hf
-#{ lynx -force_html -stdin -dump -nolist ;}
-#{ elinks -dump ;}
+htmlfilter()
+{
+	case "$1" in
+		w3m)    w3m -dump -T text/html ${@:2} ;;
+		elinks) elinks -force-html -dump -no-references ${@:2} ;;
+		links)  links -force-html -dump ${@:2} ;;
+		lynx)   lynx -force_html -dump -nolist $([[ -t 0 ]] || echo -stdin) ${@:2} ;;
+		sed)    sed '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }' ${@:2} ;;
+		*)      htmlfilter w3m "$@" ;;
+	esac
+}
+alias hf=htmlfilter
 alias hf2="sed 's/<[^>]*>//g'"
-alias hf3="sed '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }'"
-alias hf4="sed -Ee 's/<\/\?(script|style)[^>]*>/\n&\n/g' | sed -Ee '/^<(script|style)[^>]*>/,/^<\/(script|style)>/ d' -e '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }'"
+alias hf3="sed -Ee 's/<\/\?(script|style)[^>]*>/\n&\n/g' | sed -Ee '/^<(script|style)[^>]*>/,/^<\/(script|style)>/ d' -e '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }'"
 #https://www.thegeekstuff.com/2009/12/unix-sed-tutorial-6-examples-for-sed-branching-operation/
 
 #Remove the data between pattern ” ” in a whole file
@@ -2630,7 +2636,7 @@ YTDL_CMD=yt-dlp
 yth()
 {
 	echo "YOUTUBE-DL WRAPPERS
-	yt  [URL..]     -- download wrapper, restict filenames
+	yt  [URL..]     -- download wrapper, restrict filenames
 	yta [URL..]     -- bestaudio only
 	ytb [URL..]     -- bestaudio+bestvideo
 	ytc [URL..]     -- medium quality (18) or worstaudio
@@ -3625,6 +3631,17 @@ SUM2()
 #{ awk '{s1+=$1;s2+=$2;s3+=$3;s4+=$4;s5+=$5}{print;}END{print "----------\n"s1,s2,s3,s4,s5}' ;}
 #https://www.vivaolinux.com.br/topico/Algoritmos-e-resolucao-de-problemas/somar-linhas-em-bash
 
+#change K, M, G Bytes (approximately)
+kbto()
+{
+	sed -E -e 's/[Bb][Yy][Tt][Ee][Ss]?/B/g' \
+		-e 's/[Bb][Ii][Tt][Ss]?/B/g' \
+		-e 's/[Kk]i?[Bb]?/*1000/g' \
+		-e 's/[Mm]i?[Bb]?/*1000000/g' \
+		-e 's/[Gg]i?[Bb]?/*1000000000/g' \
+		| bc "$@"
+}
+
 #print first 3 lines
 #{ head -n+3 ;}
 #{ head -3 ;}
@@ -4201,6 +4218,7 @@ estarmos preparados pois já enfrentamo-lá.'
 'Key word is "addiction", nothing wrong with any of these if the addiction is not there. -- @woonomic'
 'The difference between a smart person and a clever person is that a smart person knows how to get out of trouble that a clever person wouldnt have gotten into in the first place.'
 'Go and touch the  grass. -- Brodie Robertson'
+'Essas substâncias você deve evitar.. Usar pouco, não abusar de jeito nenhum -- Drauzio Varela'
 
 )
 if [[ $- = *i* ]] && [[ $TMUX ]]
