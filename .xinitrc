@@ -66,6 +66,11 @@ picom -b
 #load key binding
 xbindkeys
 
+#start conky service
+systemctl --user start conky.service &
+
+#oneko -tora & oneko -tomoyo &
+
 #start xfce4
 exec startxfce4
 #if you want to run Xfce4 from .xinitrc, only use »startxfce4 --with-ck-
