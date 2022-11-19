@@ -425,7 +425,6 @@ unt()
 #start virtualbox from command line
 bsd13()
 {
-	~/bin/vbox_wall.sh & disown
 	VBoxManage startvm "bsd13" --type headless
 }
 bsd13halt()
@@ -3258,30 +3257,13 @@ plot4()
 #http://www.physics.smu.edu/fattarus/GnuplotTutorial.html
 #https://www.datafix.com.au/BASHing/2019-06-21.html
 
-#percentage rate between two values
-#one value per line
-percentagef()
-{
-	#subshell
-	local line last perline rate scl n
-	scl="${1:-4}"  #scale
-	while read line
-	do
-		[[ "$line" = *[a-zA-Z]* || -z "${line// }" ]] && continue
-		[[ -z "$last" ]] && last="$line"
-		#((perline = line - last))
-		((++n))
-		if [[ $ZSH_VERSION ]]
-		then 	typeset -F $scl rate line last
-			((rate = ( ( line / last ) - 1) * 100))
-		else 	rate=$(bc -l <<<"scale=$scl; ( ( $line / $last ) - 1) * 100")
-		fi
-		printf '%.*f%%\n' $scl $rate
-		#printf '%d\t%s\t+%.*f\t%.*f%%\n' $n "$line" $scl $perline $scl $rate
-		last="$line"
-	done  #| column -ets$'\t' -NN,LINE,INC,INC%
-	#cols: N,LINE,INC,INC%%
+#Get the list of functions in a script
+get_functions() {
+    # Usage: get_functions
+    IFS=$'\n' read -d "" -ra functions < <(declare -F)
+    printf '%s\n' "${functions[@]//declare -f }"
 }
+#https://github.com/dylanaraps/pure-bash-bible
 
 #world population
 #usage: wpop [location|world]
@@ -4219,6 +4201,7 @@ estarmos preparados pois já enfrentamo-lá.'
 'The difference between a smart person and a clever person is that a smart person knows how to get out of trouble that a clever person wouldnt have gotten into in the first place.'
 'Go and touch the  grass. -- Brodie Robertson'
 'Essas substâncias você deve evitar.. Usar pouco, não abusar de jeito nenhum -- Drauzio Varela'
+'É difícil lutar contra você mesmo pois descobre a sua própria força -- Anime'
 
 )
 if [[ $- = *i* ]] && [[ $TMUX ]]
