@@ -212,6 +212,9 @@ alias bigger='echo "setfont iso02-12x22" ;setfont iso02-12x2'
 alias fontlist='fc-list | col | sort | less'
 #https://wiki.netbsd.org/tutorials/how_to_use_ttf_fonts_in_xterm/
 
+#check which fonts have got some (unicode) characters:
+#{ fc-list :charset=A4B0,A4B1 }
+
 #alias cp="cp -i" # confirm before overwriting something
 alias df='df -h'  # human-readable sizes
 #alias free='free -m' # show sizes in MB
@@ -1821,7 +1824,13 @@ dic()
 #ISO 8601: strftime({"%Y-%m-%dT%H:%M:%SZ"}, var.time);
 
 #date ranges script
-alias d='datediff.sh -d'
+alias d=datediff.sh
+#d()
+#{ 	#debug
+#	[[ $1 = -* ]] && { 	local opt=$1 ;shift ;}
+#	~/bin/datediff.sh -dDD $opt $(date -Iseconds -d "${1:-now}") $(date -Iseconds -d "${2:-now}")
+#
+#}
 
 # Calculate the difference in whole days between two dates, ignoring timezone changes
 #datedifference() { echo $(( ($(date -u -d "$1" +%s) - $(date -u -d "$2" +%s)) / 86400)) days ;}
@@ -3209,6 +3218,13 @@ alias espeakngbr='espeakng -v pt-br'
 #make a wav file with text input:
 #{ espeak --stdout -f text.txt > text.wav ;}
 #open with *mplayer or vlc
+
+#mauna loa CO2
+alias maunaloa='curl https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_annmean_mlo.txt'
+
+#University of Alabama in Huntsville Data
+alias uah='curl https://www.nsstc.uah.edu/data/msu/v6.0/tlt/uahncdc_lt_6.0.txt'
+
 
 ####################
  #####markets######
