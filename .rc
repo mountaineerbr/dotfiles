@@ -1,7 +1,7 @@
 #
 # ~/.rc
 # shell functions
-# 2022  by mountaineerbr
+# 2023  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 #                        __       _                  ___
 #  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
@@ -16,9 +16,8 @@
 # Set colorful PS1 only on colorful terminals.
 # dircolors --print-database uses its own built-in database
 # instead of using /etc/DIR_COLORS.  Try to use the external file
-# first to take advantage of user additions.
-# We run dircolors directly due to its changes in file syntax and
-# terminal name patching.
+# first to take advantage of user additions.  We run dircolors directly
+# due to its changes in file syntax and terminal name patching.
 use_color=false
 if [[ $BASH_VERSION ]] && type -P dircolors >/dev/null || whence -p dircolors >/dev/null
 then
@@ -347,6 +346,13 @@ alias hf=htmlfilter
 alias hf2="sed 's/<[^>]*>//g'"
 alias hf3="sed -Ee 's/<\/\?(script|style)[^>]*>/\n&\n/g' | sed -Ee '/^<(script|style)[^>]*>/,/^<\/(script|style)>/ d' -e '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }'"
 #https://www.thegeekstuff.com/2009/12/unix-sed-tutorial-6-examples-for-sed-branching-operation/
+
+#filter html from clipboard
+chf()
+{
+	xclip -o -sel clip | htmlfilter
+	#{ xclip -o -sel c }
+}
 
 #Remove the data between pattern ” ” in a whole file
 #{ sed ':loop ;$!{ N ;/\n$/!b loop } ;s/\"[^\"]*\"//g' ;}
@@ -3026,6 +3032,16 @@ alias btct='tail -f /media/primary/blockchain/debug.log'
 btchist()
 {
 	curl https://nastyfans.org/exchangerate.csv | tr , \\t  | column -et -NDATE,PRICE
+}
+
+halving()
+{
+	local hgt days_left
+	hgt=$(curl -s https://blockchain.info/q/getblockcount) || return
+	days_left=$(( ( (840000-hgt)*(10*60))/(24*60*60) ))
+	
+	printf 'bitcoin halving\nheight   : %6d\ndays left: %6d\n' $hgt $days_left
+	date -R -d${days_left}days
 }
 
 #cryptocurrency greps
