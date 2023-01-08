@@ -204,7 +204,7 @@ shopt -s checkwinsize
 #add current dir to stack (top of stack is nought)
 #alias p.='pushd .'
 #check dirs stack
-alias d='dirs -v'
+#alias d='dirs -v'
 
 #hack the cd command to remember where you have been
 #function cd

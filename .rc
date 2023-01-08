@@ -351,7 +351,6 @@ alias hf3="sed -Ee 's/<\/\?(script|style)[^>]*>/\n&\n/g' | sed -Ee '/^<(script|s
 chf()
 {
 	xclip -o -sel clip | htmlfilter
-	#{ xclip -o -sel c }
 }
 
 #Remove the data between pattern ” ” in a whole file
@@ -1406,6 +1405,12 @@ alias pacdate='expac --timefmt="%F %T" "%l %n" | sort -n'
 #list all pkgs from a repo
 #{ LANG=C pacman -Sl multilib | grep installed | cut -d ' ' -f 2 ;}
 
+#pacman sync messages
+pacmsg()
+{
+	sed -n 's/.*SCRIPTLET] //p' /var/log/pacman.log
+}
+
 #Listing changed config files
 #If you want to backup your system configuration files you could copy all
 #files in /etc/, but usually you are only interested in the files that you
@@ -2426,10 +2431,12 @@ passkeys()
 #current wifi connection
 passkey()
 {
-	local ssid=$( iw dev | awk '/ssid/ {print $2}' )
+	local ssid=$(iw dev | awk '/Interface/ {print $2}')
 	[[ -z "$ssid" ]] && return 1
 
 	su root -c "awk '/^(id|psk)=/' /etc/NetworkManager/system-connections/${ssid}.nmconnection"
+
+	nmcli device wifi show-password
 }
 #https://www.vivaolinux.com.br/topico/Iniciantes-no-Linux/Existe-algum-comando-para-exibir-a-senha-do-wifi-que-estou-conectado-no-momento/
 

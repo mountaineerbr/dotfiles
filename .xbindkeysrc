@@ -201,6 +201,19 @@
  alt + Mod2+Mod4 + b:1
 
 
+#mouse razer deathadder v2 mini
+"xte 'keydown Super_L'"
+ b:9
+"xte 'keyup Super_L'"
+ Mod2+Mod4 + b:9
+#
+#"xte 'keydown Super_L' ;sleep 2 ;xte 'keyup Super_L'"
+# b:9 + release
+#
+#How do I PROPERLY map a keyboard key to a mouse button?
+#https://superuser.com/questions/883782/how-do-i-properly-map-a-keyboard-key-to-a-mouse-button
+#https://unix.stackexchange.com/questions/189116/reprogram-mouse-buttons
+
 #x11 keymaps
 #http://xahlee.info/linux/linux_show_keycode_keysym.html
 
