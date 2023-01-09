@@ -1958,6 +1958,15 @@ tza()
 #    https://api.imgur.com/3/upload | sed 's/.*http/http/; s/".*/\n/; s,\\/,/,g'
 #}
 
+vipe.sh()
+{
+	local tmpf=$(mktemp)
+	cat > "$tmpf"
+	${VISUAL:-vim} "$tmpf" </dev/tty >/dev/tty
+	cat "$tmpf"
+	/usr/bin/rm "$tmpf"
+}
+
 # unfmt - convert paragraphs into long lines
 # 20jul2014  +chris+  zsh function
 # 15dec2014  +chris+  simplify
@@ -2688,18 +2697,13 @@ alias a2='aria2c'
 #command:
 YTDL_CMD=yt-dlp
 
-#help
-yth()
-{
-	echo "YOUTUBE-DL WRAPPERS
-	yt  [URL..]     -- download wrapper, restrict filenames
-	yta [URL..]     -- bestaudio only
-	ytb [URL..]     -- bestaudio+bestvideo
-	ytc [URL..]     -- medium quality (18) or worstaudio
-	yth [URL..]     -- this help page
-	ytm [URL..]     -- bestaudio and convert to mp3
-	yts [KEY_WORDS] -- search for keyword and play *audio* with mpv"
-}
+#YOUTUBE-DL WRAPPERS
+#	yt  [URL..]     -- download wrapper, restrict filenames
+#	yta [URL..]     -- bestaudio only
+#	ytb [URL..]     -- bestaudio+bestvideo
+#	ytc [URL..]     -- medium quality (18) or worstaudio
+#	ytm [URL..]     -- bestaudio and convert to mp3
+#	yts [KEY_WORDS] -- search for keyword and play *audio* with mpv
 
 #simple download
 #usage: yt [urls..]

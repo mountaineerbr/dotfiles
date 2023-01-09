@@ -202,7 +202,7 @@
 
 
 #mouse razer deathadder v2 mini
-"xte 'keydown Super_L'"
+"xte 'keydown Super_L' ;notify-send 'SUPER on'"
  b:9
 "xte 'keyup Super_L'"
  Mod2+Mod4 + b:9
@@ -213,6 +213,11 @@
 #How do I PROPERLY map a keyboard key to a mouse button?
 #https://superuser.com/questions/883782/how-do-i-properly-map-a-keyboard-key-to-a-mouse-button
 #https://unix.stackexchange.com/questions/189116/reprogram-mouse-buttons
+
+#swap b:8 (back) by refresh
+"xdotool key XF86Refresh"
+ b:8
+#https://wiki.linuxquestions.org/wiki/XF86_keyboard_symbols
 
 #x11 keymaps
 #http://xahlee.info/linux/linux_show_keycode_keysym.html
