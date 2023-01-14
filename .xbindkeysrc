@@ -120,13 +120,13 @@
 
 
 #raise vol ('b:4' is mouse scroll up)
-#"amixer sset -q 'Master' 2%+"
-#  Mod2+Mod4 + b:4
+"amixer sset -q 'Master' 2%+"
+  Mod2+Mod4 + b:4
 "amixer sset -q 'Master' 2%+"
  Mod2+Mod4 + Up
 #volume Decrease ('b:5' is mouse scroll down)
-#"amixer sset -q 'Master' 2%-"
-#  Mod2+Mod4 + b:5
+"amixer sset -q 'Master' 2%-"
+  Mod2+Mod4 + b:5
 "amixer sset -q 'Master' 2%-"
  Mod2+Mod4 + Down
 
@@ -202,9 +202,9 @@
 
 
 #mouse razer deathadder v2 mini
-"xte 'keydown Super_L' ;notify-send 'SUPER on'"
+"xte 'keydown Super_L' ;notify-send -u low -t 200 'SUPER on'"
  b:9
-"xte 'keyup Super_L'"
+"xte 'keyup Super_L'   ;notify-send -u low -t 200 'SUPER off'"
  Mod2+Mod4 + b:9
 #
 #"xte 'keydown Super_L' ;sleep 2 ;xte 'keyup Super_L'"
