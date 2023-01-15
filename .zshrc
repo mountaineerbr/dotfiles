@@ -28,6 +28,11 @@ then
 		eval "$*"
 		set --
 	fi
+#set DBUS for Tmux
+elif [[ $TMUX ]] && [[ -z $DBUS_SESSION_BUS_ADDRESS ]]
+then
+	export $(xargs --null --max-args=1 < /proc/$(pidof xfce4-session)/environ | grep DBUS_SESSION_BUS_ADDRESS)
+	#https://askubuntu.com/questions/772631/how-to-connect-screen-tmux-byobu-to-dbus
 fi
 #exit tmux and terminal emulator, too
 qq()

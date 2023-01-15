@@ -552,7 +552,7 @@ out()
 #OBS: ``$_TMUXSIG'' is defined at ~/.rc file!
 
 #exit termux and rerun last command
-a()
+ter()
 {
 	if [[ $TMUX ]]
 	then 	fc -ln -- -1 >"$_TMUXSIG"
