@@ -202,7 +202,7 @@
 
 
 #mouse razer deathadder v2 mini
-"xte 'keydown Super_L' ;notify-send -u low -t 200 'SUPER on'"
+"xte 'keydown Super_L' ;notify-send -u low -t 400 'SUPER on'"
  b:9
 "xte 'keyup Super_L'   ;notify-send -u low -t 200 'SUPER off'"
  Mod2+Mod4 + b:9
@@ -213,6 +213,11 @@
 #How do I PROPERLY map a keyboard key to a mouse button?
 #https://superuser.com/questions/883782/how-do-i-properly-map-a-keyboard-key-to-a-mouse-button
 #https://unix.stackexchange.com/questions/189116/reprogram-mouse-buttons
+
+#Simulate Double Click
+#"if ls ~/.xbk_double_caps; then [YOUR COMMAND]; else touch ~/.xbk_double_caps; sleep .5; rm ~/.xbindkeys_doubleclick; fi"
+# Caps_Lock
+#https://askubuntu.com/questions/471622/map-double-click-to-key-combination
 
 #swap b:8 (back) by refresh
 "xdotool key XF86Refresh"

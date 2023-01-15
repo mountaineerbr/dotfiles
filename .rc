@@ -1958,7 +1958,7 @@ tza()
 #    https://api.imgur.com/3/upload | sed 's/.*http/http/; s/".*/\n/; s,\\/,/,g'
 #}
 
-vipe.sh()
+vipef()
 {
 	local tmpf=$(mktemp)
 	cat > "$tmpf"
@@ -2332,7 +2332,7 @@ gps2()
 #usage: moon YYYY-MM-DD [NUMBER_OF_PHASES<=99]
 moon()
 {
-	curl "https://aa.usno.navy.mil/api/moon/phases/date?date=${1:-$(date -u -Idate)}&nump=${2:-6}" |
+	curl "https://aa.usno.navy.mil/api/moon/phases/date?date=$(date -u -Idate -d"${1:-now}")&nump=${2:-6}" |
 		jq -r '.phasedata[]|"\(.year)-\(.month)-\(.day)\t\(.time)\t\(.phase)"'
 }
 #https://aa.usno.navy.mil/data/MoonPhases
@@ -2348,11 +2348,11 @@ moonbrt()
 	read year month day <<<"${*//[\/.-]/ }"
 	tmpfile="${TMPDIR:-/tmp}/UsNavyMoon${year}.html"
 	
-	[[ -f $tmpfile ]] || curl --compressed --header "$UAG" "https://aa.usno.navy.mil/calculated/moon/fraction?year=${year}&task=00&tz=0.00&tz_sign=-1&tz_label=false&submit=Get+Data" > "$tmpfile" || rm -v "$tmpfile"
+	[[ -f $tmpfile ]] || curl --compressed --header "$UAG" "https://aa.usno.navy.mil/calculated/moon/fraction?year=${year}&task=00&tz=0.00&tz_sign=-1&tz_label=false&submit=Get+Data" -o "$tmpfile" || rm -v "$tmpfile"
 	
 	set -- $(sed -n '/<table/,/<\/table/p' "$tmpfile" | sed 's/<[^>]*>/ /g')
 
-	echo ${@[9+13+1+((${day}-1)*13)+${month}${BASH_VERSION:+-1}]}
+	echo ${@:9+13+1+((${day}-1)*13)+${month}:1}
 }
 #https://aa.usno.navy.mil/data/MoonFraction
 
