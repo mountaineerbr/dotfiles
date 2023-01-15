@@ -384,6 +384,7 @@ tablef()
 sedlinks()
 {
 	sed 's|<[Aa] |\n&|g' | sed -nE "/<[Aa] / s|.*href=['\"]([^'\"]+)['\"].*|\1| p"
+	#perl -ne "while ( m/href=['\"]([^'\"]*)['\"]/gc ) { print \$1, \"\n\"; }"
 }
 #https://stackoverflow.com/questions/1881237/easiest-way-to-extract-the-urls-from-an-html-page-using-sed-or-awk-only
 
@@ -1539,22 +1540,22 @@ alias ala='~/bin/ala.sh'
 #usage: amail | less
 amail()
 {
-	local months list m
-	select list in arch-{general,announce,commits,events,magazine,women,mirrors,security} aur-{dev,general,requests} pacman-{contrib,dev}
-	do 	select m in $(curl -L https://lists.archlinux.org/pipermail/$list/ | sed -n '/<td><A/ p' | sed -En 's/.*"([^"]*)".*/\1/ p')
-		do 	curl -L https://lists.archlinux.org/pipermail/$list/$m |
-			if [[ "$m" = *.gz ]]
-			then 	gzip -c -d
-			else 	cat
-			fi
+	local urlroot=https://lists.archlinux.org/archives/list
+	select list in arch-{general,dev,events,proaudio,mirrors,mirrors-announce,announce} aur-{general,requests} pacman-dev
+	do 	select m in $(curl "$urlroot/arch-general@lists.archlinux.org/" |
+			sed -n '/^<ul/,/^<\/ul/p' |
+			sed -nE "/<[Aa] / s/.*href=['\"]([^'\"]+)['\"].*/\1/ ;s/^.*linux\.org\///p")
+		do 	m=${m%/}  m=${m/\//-}
+			curl -L "$urlroot/${list}@lists.archlinux.org/export/${list}@lists.archlinux.org-${m}.mbox.gz?start=${m}-01&end=$(date -Idate -d"${m}-01 + 1month")" |
+			gzip -c -d
 			echo "MONTH: $m" >&2
 			break 2
 		done
 	done
 }
-#get the raw mailbox (210+ MB!!)
-#usage: allmail [LIST]
-allmail()
+#get the raw mailbox
+#usage: allmail_old [LIST]
+allmail_old()
 {
 	local list
 	list="${1:-arch-general}"
