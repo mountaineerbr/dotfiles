@@ -466,13 +466,14 @@ cssb()
 #dump page with chromium/chrome
 cdump()
 {
-	google-chrome-stable --headless --dump-dom "${@:?webpage address required}"
+	google-chrome-stable --disable-gpu --headless --dump-dom --user-agent="$UAG" "${@:?address required}"
 }
 cdump2()
 {
-	chromium --headless --dump-dom "${@:?webpage address required}"
+	chromium --disable-gpu --headless --dump-dom --user-agent="$UAG" "${@:?address required}"
 }
 #https://developers.google.com/web/updates/2017/04/headless-chrome
+#https://intoli.com/blog/making-chrome-headless-undetectable/
 
 #headless chrome and chromium flags
 #chromium --screenshot
@@ -1537,7 +1538,7 @@ alias ala='~/bin/ala.sh'
 
 
 #arch linux mail
-#usage: amail | less
+#usage: amail | less #bat -l mbx
 amail()
 {
 	local urlroot=https://lists.archlinux.org/archives/list
