@@ -4386,7 +4386,7 @@ tesouro()
 	jq '.response.TrsrBondMkt' <<<"$data"
 	jq -r '.response.TrsrBdTradgList[].TrsrBd |
 		"\(.nm)\t\(.FinIndxs| if .nm == "PREFIXADO" then "" else .nm end)+\(if .anulInvstmtRate == 0 then empty else .anulInvstmtRate end)%\t\(.minInvstmtAmt)\t\(.untrInvstmtVal)\t\(.mtrtyDt|.[:10])"' <<<"$data" |
-		sort | column -et -NTÍTULO,RENT/ANO,INVEST/MIN,PREÇO,VENCIMENTO -RRENT/ANO,INVEST/MIN,PREÇO
+		sort | column -et -s$'\t'  -NTÍTULO,RENT/ANO,INVEST/MIN,PREÇO,VENCIMENTO -RRENT/ANO,INVEST/MIN,PREÇO
 	echo "<https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm>"
 
 }
@@ -4406,7 +4406,7 @@ ipcab()
 	((${#1} != 6 || ${1:-0} < 198001)) && set -- 199501  #199407 começo do plano real
 
 
-	data=$(curl --compressed -s "https://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=63&p=${1}-203701&ng=1(1)&c=")
+	data=$(curl --compressed -s "http://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=63&p=${1}-203701&ng=1(1)&c=")
 	set -- 1
 
 	#inflação variação mensal #cod:63
@@ -4436,7 +4436,7 @@ ipcab2()
 	((${#1} != 6 || ${1:-0} < 1980)) && set -- 199501  #199407 começo do plano real
 	
 	#inflação acumulada por ano #cod:69
-	data=$(curl -sLb non-existing "https://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=69&p=${1}-203012&ng=1(1)&c=") || return
+	data=$(curl -sLb non-existing "http://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=69&p=${1}-203012&ng=1(1)&c=") || return
 
 	jq -er '.[0].var' <<<"$data"
 	jq -r '.[]|"\(.p) \(.v)"' <<<"$data" | column -ets' ' -NMes,Ano,Acu%Ano -OAno,Mes,Acu%Ano
