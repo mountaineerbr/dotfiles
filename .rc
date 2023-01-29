@@ -2519,27 +2519,6 @@ alias autoclicker='xdotool click --repeat 100 --delay 18 1'
 # the terminal rickroll
 #alias rick='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh  #| bash'
 
-#chuck norris jokes
-#usage: joke 2      #two random jokes
-#usage: joke id 15  #specific joke
-#usage: joke id     #all jokes
-joke()
-{
-	local NAME LASTN NAMEF
-	#NAME=John; LASTN=Doe; NAMEF="?firstName=${NAME}&lastName=${LASTN}"
-
-	if [[ "$*" = *id* ]]
-	then 	set -- ${@//id/} ;curl -s "http://api.icndb.com/jokes/$*$NAMEF"
-	else 	curl -s "http://api.icndb.com/jokes/random/$1$NAMEF"
-	fi | jq -r '..|"[\(.id?)]\t\(.joke?)"' | sed -e 's/&quot;/\"/g' -e '/null/d'
-}
-#multiple jokes: http://api.icndb.com/jokes/random/5
-#specific joke: http://api.icndb.com/jokes/15
-#change name: http://api.icndb.com/jokes/random?firstName=John&lastName=Doe
-#http://www.icndb.com/api/
-
-#https://medium.com/cameron-nokes/working-with-json-in-bash-using-jq-13d76d307c4
-
 #cheat sheets pkgs:
 #tldr
 #cht.sh
