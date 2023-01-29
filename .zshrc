@@ -364,7 +364,7 @@ c0=red
 c1=cyan
 #shell sublevels
 #OBS: SHLVL config depends on on your specific windowing system!
-[[ $TMUX ]] && prompt_ssl_max=2 || prompt_ssl_max=4
+[[ $TMUX ]] && prompt_ssl_max=3 || prompt_ssl_max=2
 
 #PS1="%F{red}%B%(?..%? )%b%F{%(!.${c0}.${c1})}%n%F{white}@%m %40<...<%B%~%b%<< \${vcs_info_msg_0_}%f(%!%(1j.%%%j.))%F{yellow}%(${prompt_ssl_max}L.+.)%f%# "
 PS1="%F{red}%B%(?..%? )%b%F{%(!.${c0}.${c1})}%n%F{white}@%m %40<...<%B%~%b%<< \${vcs_info_msg_0_}%f%(1j.(%%%j).)%F{yellow}%(${prompt_ssl_max}L.+.)%f%# "

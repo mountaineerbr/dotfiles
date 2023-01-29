@@ -260,11 +260,8 @@ alias ll='ls++ --potsf'
 #alias l='ls -l'
 #alias ll='ls -l'
 #alias ls='ls -F'
-alias pl="printf '%s\n'"
-p()
-{
-	printf '%s\n' "$*"
-}
+pl() { 	printf '%s\n' "$@" ;}
+p() { 	printf '%s\n' "$*" ;}
 
 #alias j='jobs -l'
 #alias pu=pushd
@@ -421,16 +418,6 @@ w3mu()
 }
 #w3m -m nntp://news.aioe.org/comp.os.linux.networking
 
-#usenet extract tar and zip files
-unt()
-{
-	local f
-	for f in ./utzoo-wiseman-usenet-archive/*.tgz
-	do 	tar xzOf "$f"
-	done
-	printf '%s\n' ./*/*.zip | xargs -- gunzip -c
-}
-
 #start virtualbox from command line
 bsd13()
 {
@@ -449,18 +436,15 @@ bsd13halt()
 
 #parse sitemap.xml
 #{ sed 's|<loc>\(.*\)<\/loc>$|\1|g' ;}
-sitemap()
-{
-	sed -n 's|.*<loc>\(.*\)<\/loc>.*|\1|g p'
-}
+#sitemap() { sed -n 's|.*<loc>\(.*\)<\/loc>.*|\1|g p' ;}
 
 #beautify css
-cssb()
-{
-	local opt
-	[[ -t 0 ]] && opt=-f || opt=-s
-	"$HOME/node_modules/.bin/cssbeautify-cli" "$opt" "$1"
-}
+#cssb()
+#{
+#	local opt
+#	[[ -t 0 ]] && opt=-f || opt=-s
+#	"$HOME/node_modules/.bin/cssbeautify-cli" "$opt" "$1"
+#}
 #https://prefetch.net/blog/2017/12/02/formatting-css-from-the-linux-command-line/
 
 #dump page with chromium/chrome
@@ -567,17 +551,17 @@ ter()
 #startx
 #alias x=startx
 
-#kill detached screen sessions
-sdk()
-{
-	screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
-}
+##kill detached screen sessions
+#sdk()
+#{
+#	screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
+#}
 
-#list screen processes
-sls()
-{
-	screen -list | grep -Eo "[0-9]{4,}" | xargs -n 1 pstree -p
-}
+##list screen processes
+#sls()
+#{
+#	screen -list | grep -Eo "[0-9]{4,}" | xargs -n 1 pstree -p
+#}
 #https://askubuntu.com/questions/302662/reattaching-to-an-existing-screen-session
 
 #tmux
@@ -644,13 +628,6 @@ vf()
 	echo -e "\aPWD: $PWD"
 }
 ((VIFMSET)) && echo -e \\aYou are within VIFM! >&2
-vff()
-{ 	#exit tmux and run vifm
-	if [[ $TMUX ]]
-	then 	echo vf >"$_TMUXSIG" ;exit
-	else vf
-	fi
-}
 
 #cd to last visited dir in Vifm
 vfcd()
@@ -849,40 +826,6 @@ gaddr()
 	git remote -v
 }
 #https://stackoverflow.com/questions/8816107/how-can-i-retrieve-the-remote-git-address-of-a-repo
-
-
-#my website
-#update contents and sync to github
-WWW()
-{
-	cd "$HOME/www/bionota.github.io" || return
-	"$HOME/www/bionota.github.io/portal.sh" "$@" && gitup
-}
-
-#creat blog entry
-bloga() { ~/www/bionota.github.io/bin/blog.sh -a "$@" ;}
-
-#process audio for podcast (personal website)
-#fblog()
-#{
-#	local buffer out
-#	buffer=a.mp3
-#	out=o.flv
-#
-#	#check file extension
-#	[[ "${1##*.}" = m4a ]] || return
-#
-#	ffmpeg -i "$1" -c:a libmp3lame -b:a 64k "$buffer" &&
-#	ffmpeg -i "$buffer" -filter_complex \
-#	"[0:a]avectorscope=s=320x258,pad=636:360[vs]; \
-#	 [0:a]showspectrum=mode=separate:color=intensity:scale=cbrt:s=320x259[ss]; \
-#	 [0:a]showwaves=s=640x101:mode=line[sw]; \
-#	 [vs][ss]overlay=w[bg]; \
-#	 [bg][sw]overlay=0:H-h,drawtext=fontfile=/usr/share/fonts/TTF/Vera.ttf:fontcolor=white:x=10:y=10:text='Podcast '[out]" \
-#	-map "[out]" -map 0:a -c:v libx264 -preset fast -crf 19 -c:a copy "$out"
-#
-#	printf '%s\n' '' files: "$buffer" "$out"
-#}
 
 #Resize the image if it is larger than the specified dimensions.
 #This will automatically preserve the aspect ratio of the image too.
@@ -1083,12 +1026,6 @@ if ! declare -f qq &>/dev/null
 then 	qq() { q ;}
 fi
 
-#start conkies
-conkies()
-{
-	systemctl --user ${1:-start} conky.service
-}
-
 #slurm internet monitor
 slurm()
 {
@@ -1150,12 +1087,9 @@ alias cdb='cd ~/bak'
 alias cdc='cd ~/arq/concursos'
 alias cdd='cd ~/arq/docs'
 alias cdD='cd ~/Documents'
-alias cde='cd ~/www/bionota.github.io/'
 alias cdm='cd ~/bin/markets'
 alias cdM='cd /media ;[[ "$(/bin/ls)" ]] || cd /run/media'
 alias cdmedia=cdM
-#alias cdq='cd ~/www/mountaineerbr.github.io/'
-#alias cdQ='cd ~/www/mountaineerbr.github.io/blog'
 alias cds='cd ~/bin'
 alias cdt='cd ${TMPDIR:-/tmp}'
 alias cdT='cd ~/tmp'
@@ -1165,7 +1099,7 @@ alias cdW='cd ~/www'
 alias du='du -h'
 
 alias winecd='cd /home/jsn/.wine/drive_c/users/jsn'
-alias battle='WINEPREFIX="/home/jsn/.wine" wine "/home/jsn/.wine/drive_c/Program Files (x86)/Battle.net/Battle.net Launcher.exe"'
+#alias battle='WINEPREFIX="/home/jsn/.wine" wine "/home/jsn/.wine/drive_c/Program Files (x86)/Battle.net/Battle.net Launcher.exe"'
 
 alias ipmet=ipmet.sh
 
@@ -1554,14 +1488,6 @@ amail()
 		done
 	done
 }
-#get the raw mailbox
-#usage: allmail_old [LIST]
-allmail_old()
-{
-	local list
-	list="${1:-arch-general}"
-	curl -L https://lists.archlinux.org/pipermail/${list}.mbox/${list}.mbox
-}
 
 
 #debian -- list of all packages
@@ -1692,16 +1618,6 @@ fedora()
 #test shell performance
 #{ strace -cf bash -c 'for i in $(seq 1 1000); do bash -c ":"; done' ;}
 
-#check available options
-#options not used explicitly in a pkg manual
-#usage: freeopt 'grep'  #beware grep option -NUM exists!
-freeopt()
-{
-	sort <(man "$1" |& grep -oE -e '-[0-9],\s?' | tr -d ', -') <(printf '%s\n' {0..9}) | uniq -u
-	sort <(man "$1" |& grep -oE -e '-[a-z],?\s' | tr -d ', -') <(printf '%s\n' {a..z}) | uniq -u
-	sort <(man "$1" |& grep -oE -e '-[A-Z],?\s' | tr -d ', -') <(printf '%s\n' {A..Z}) | uniq -u
-}
-
 cloudflare()
 {
 	python "$HOME/bin/more/CloudFlair/cloudflair.py" "$1"
@@ -1739,12 +1655,6 @@ hy()
 #from the internet
 hy2()
 {
-	curl -s "http://www.syllablecount.com/syllables/$1" \
-		| sed 's/<[^>]*>//g' | sed -n '/^\s*Divide/ s/^.*:\s//p'
-}
-
-hy3()
-{
 	w3m "https://www.howmanysyllables.com/words/$1" \
 		| sed -n '/^\s*Divide/ s/^.*:\s*//p'
 }
@@ -1755,7 +1665,7 @@ hy3()
 #it merely tries to provide some of them, without providing any wrong ones.
 #so the set of breaks from hyphenate.py will be a subset of the full set
 #of break points.
-hy4()
+hy3()
 {
 	python2 ~/bin/more/hyphenate.py "$1"
 }
@@ -1770,21 +1680,6 @@ th()
 	sed -n "/^${1:-.*}|/,/^[a-z.]/ p" /usr/share/mythes/th_en_US_v2.dat \
 		| sed -Ee 's/^([a-z.].*)\|([0-9]+)/\1  \[\2\]/' -e 's/^\(([^\)]+)\)\|(.*)/>>\1 -- \2/ ; s/\|/, /g' \
 		| sed \$d
-}
-
-#online sources
-th2()
-{
-	w3m "https://www.lexico.com/synonym/$1" \
-		| sed -En '/^(Home)/,/^\[/p' \
-		| sed -E '/^Home/,/^(See|No exact)/d' \
-		| sed -E '/^Word of the day/,$d' \
-		| sed '$d; s/^\s*//' | cat -s | sed \$d
-}
-th3()
-{
-	w3m "https://www.thesaurus.com/browse/$1" \
-		| sed -n "/^\[/,/^Roget's/p" | tac
 }
 
 #dicionário de sinônimos
@@ -1833,12 +1728,14 @@ dic()
 # for random phrases, check
 # https://swanrad.ch/g.html
 
-#convert between human and unix time formats
-#cdate()
-#{
-#	#TZ="America/Los_Angeles"  #set defaults
-#	date -d"$*" +%s 2>/dev/null || date -Iseconds -d@"$*"
-#}
+#try to convert to ISO date
+ciso()
+{
+	(($#)) || [[ -t 0 ]] || set -- "$(</dev/stdin)"
+	busybox date -I -D '%d/%b/%Y' -d "$@" ||
+	busybox date -I -D '%d/%m/%Y' -d "$@" ||
+	date -I -d "$@"
+} 2>/dev/null
 
 #Serialization, time formats
 #RFC 5322: strftime({"%a, %d %b %Y %T %z"}, var.time);
@@ -2036,23 +1933,6 @@ cep()
 }
 #https://data.mendeley.com/datasets/g97jb8fp57/1
 #http://cep.la/baixar
-
-#informações por número de cep
-cep2()
-{
-	curl -sL "https://api.postmon.com.br/v1/cep/${1}" | jq
-}
-#https://postmon.com.br/
-cep3()
-{
-	curl -sL "https://viacep.com.br/ws/${1}/json/" | jq
-}
-#https://viacep.com.br/
-cep4()
-{
-	curl -sL "http://apps.widenet.com.br/busca-cep/api/cep/${1}.json" | jq
-}
-#https://widenet.com.br/busca-cep/api-de-consulta/
 
 #indent a compact json (one-liner)
 #echo '{"test1": 1, "test2": "win"}' | python -m json.tool
@@ -2434,15 +2314,16 @@ ipgeo()
 #wifi pass key list (passwords)
 #requires root access
 #all conections
-passkeys()
+psks()
 {
 	su root -c "awk '/^(id|psk)=/' /etc/NetworkManager/system-connections/*"
 }
 
 #current wifi connection
-passkey()
+psk()
 {
-	local ssid=$(iw dev | awk '/Interface/ {print $2}')
+	local interface=$(iw dev | awk '/Interface/ {print $2}')
+	local ssid=$(iw dev $interface link | sed -n '/SSID:/ s/^.*SSID: //p')
 	[[ -z "$ssid" ]] && return 1
 
 	su root -c "awk '/^(id|psk)=/' /etc/NetworkManager/system-connections/${ssid}.nmconnection"
@@ -2523,6 +2404,10 @@ alias atown='ssh torus@ascii.town'
 #https://ascii.town/
 alias nethack-online='ssh nethack@nethack.alt.org ; clear'
 alias tron-online='ssh sshtron.zachlatta.com ; clear'
+
+#play tron
+#use wasd to move
+tron() { 	ssh sshtron.zachlatta.com ;}
 
 #get colour information
 #color hex, name, rgb, hsl or hs
@@ -2630,13 +2515,6 @@ alias autoclicker='xdotool click --repeat 100 --delay 18 1'
 
 #click and enter
 #{ xdotool click 1 key KP_Enter ;}
-
-#play tron
-#use wasd to move
-tron()
-{
-	ssh sshtron.zachlatta.com
-}
 
 # the terminal rickroll
 #alias rick='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh  #| bash'
@@ -3302,6 +3180,7 @@ alias myc='~/bin/markets/myc.sh -3'
 alias uol='~/bin/markets/uol.sh'
 alias cointop='/bin/cointop --cache-dir ~/.cache'
 alias ctop=cointop
+alias chat=chatgpt.sh
 #mop - stocks the hacker way
 mop()
 {
@@ -3382,24 +3261,12 @@ localidade()
 {
 	local args data
 	args=$( tr A-Z a-z <<< "$*" )
-	data=$(curl --compressed 'https://servicodados.ibge.gov.br/api/v1/localidades/distritos')
+	data=$(curl --compressed 'http://servicodados.ibge.gov.br/api/v1/localidades/distritos')
 
 	jq -er '.. | select( .nome? | ascii_downcase == "'$args'")' <<<"$data" \
 		|| jq -r . <<<"$data"
 }
 #https://servicodados.ibge.gov.br/api/docs/localidades
-
-#população brasil - ibge
-#data is disorganised, uses multiple document formats across historic data
-#no uniformity in filenames
-#ftp://ftp.ibge.gov.br/Estimativas_de_Populacao/
-bpop2()
-{
-	local title="estimativa_TCU_2019_20200427.pdf"
-	local tmpfile="/tmp/$title"
-	[[ -e "$tmpfile" ]] || curl -L -H"$UAG" -o "$tmpfile" "ftp://ftp.ibge.gov.br/Estimativas_de_Populacao/Estimativas_2019/$title"
-	pdftotext -layout "$tmpfile" -
-}
 
 #ibge - frequência de nomes
 #uso: nomefreq [adriano]
@@ -3407,12 +3274,12 @@ nomef()
 {
 	local json
 	if [[ -z "$1" ]]
-	then 	json=$( curl -s 'https://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking' )
+	then 	json=$( curl -s 'http://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking' )
 		jq -r '.[]|"Localidade: \(.localidade)"' <<<"$json"
 		jq -r '.[]|.res[]|"\(.nome)\t\(.frequencia)\t\(.ranking)"' <<<"$json" \
 			| column -et -NNOME,FREQ,RNK
 	else 	set -- "$( tr A-Z a-z <<< "$1" )"
-		json=$(curl -s "https://servicodados.ibge.gov.br/api/v2/censos/nomes/$1")
+		json=$(curl -s "http://servicodados.ibge.gov.br/api/v2/censos/nomes/$1")
 		jq -r '.[]|"Local: \(.localidade)","Nome_: \(.nome)"' <<<"$json"
 		jq -r '.[].res[]|"\(.periodo)\t\(.frequencia)"' <<<"$json" \
 			| tr -d '][' | tr ',' '-' | column -et -NPERIODO,FREQ
@@ -4144,10 +4011,10 @@ trim()
 #{ python -m SimpleHTTPServer 8000 ;}
 #Python 3
 #{ python3 -m http.server 8000 --directory /tmp/ ;}
-hserv()  { python3 -m http.server ${1:-8000} ;}  #local network: --bind 0.0.0.0
+hserv()  { 	python3 -m http.server ${1:-8000} ;}  #local network: --bind 0.0.0.0
 #https://stackoverflow.com/questions/4139170/bind-httserver-to-local-ipport-so-that-others-in-lan-can-see-it
-hserv2() { php -S localhost:${1:-8000} ;}
-checkports() { sudo ss -tulpn | sed -nE '/LISTEN/ s/.*:([0-9]+)\s*.*/\1/ p' ;}
+hserv2() { 	php -S localhost:${1:-8000} ;}
+checkports() { 	sudo ss -tulpn | sed -nE '/LISTEN/ s/.*:([0-9]+)\s*.*/\1/ p' ;}
 
 #Perl - Insert lines after a match is found in a file
 #{ perl -pi -e '/module some_1/ and $_.="APPLY DELAY xx \nAPPLY LOADS  ld\n"' ;}
@@ -4308,14 +4175,14 @@ ibgepop()
 	local localidade
 	localidade="$1"
 	[[ $localidade = *[a-zA-Z]* ]] && localidade=$(ibgepop_helperf "$1")
-	curl --header "$UAG" --compressed -L https://servicodados.ibge.gov.br/api/v1/projecoes/populacao/$localidade | jq .
+	curl --header "$UAG" --compressed -L http://servicodados.ibge.gov.br/api/v1/projecoes/populacao/$localidade | jq .
 }
 ibgepop_helperf()
 {
 	local string
 	typeset -l string
 	string="$1"
-	curl --header "$UAG" --compressed -L https://servicodados.ibge.gov.br/api/v1/localidades/estados |
+	curl --header "$UAG" --compressed -L http://servicodados.ibge.gov.br/api/v1/localidades/estados |
 	tr '[:upper:]' '[:lower:]' |
 	jq ".[] | (select(.sigla==\"${string}\") // select(.nome==\"${string}\")) | .id"
 }
@@ -4375,8 +4242,6 @@ blist()
 
 
 #tesouro direto -- precos e taxas dos titulos
-#requer o pacote 'xmlstarlet'
-#'wget -qO-' ou 'curl -sL'
 tesouro()
 {
 	local url data
@@ -4585,32 +4450,6 @@ metals()
 #Specialty/Minor and Bulk Metals prices are derived from various sources including but not limited to International Monetary Fund,
 #The World Bank, German Geoscience Institutes, Energy Information Administration and others. 
 #http://www.infomine.com/chartsdata/infominechartsdatareadme.pdf
-
-
-#google finance hack
-gfin()
-{
-	printf 'Google Finance\n'
-	{
-	#get rates by 'mids'; max 100 mids per request
-	curl -s 'https://www.google.com/async/finance_wholepage_price_updates?ei=99InXuDmDNHY5OUPv-CguA0&yv=3&async=mids:%2Fg%2F11c319bxp1%7C%2Fg%2F11c6qr7_zl%7C%2Fg%2F11cjk7msnp%7C%2Fg%2F11f_p2h7tk%7C%2Fg%2F11fqt81yyy%7C%2Fg%2F11h06gmwhk%7C%2Fg%2F11h5q0hb4g%7C%2Fg%2F12fh0nz9c%7C%2Fg%2F12fh0nzb0%7C%2Fg%2F12fh0nzb3%7C%2Fg%2F12fh0p2yj%7C%2Fg%2F12fh0p2ys%7C%2Fg%2F12fh0p2zf%7C%2Fg%2F12fh0p73t%7C%2Fg%2F12fh0p75f%7C%2Fg%2F12fh0p75n%7C%2Fg%2F12fh0pcbj%7C%2Fg%2F12fh0ph_m%7C%2Fg%2F12fh0ph_n%7C%2Fg%2F12fh0ph_w%7C%2Fg%2F12fh0pj0n%7C%2Fg%2F12fh0pj11%7C%2Fg%2F12fh0pmvf%7C%2Fg%2F12fh0q03j%7C%2Fg%2F12fh0q03k%7C%2Fg%2F12fh0q40l%7C%2Fg%2F12fh0q40p%7C%2Fg%2F12fh0q417%7C%2Fg%2F12fh0q41w%7C%2Fg%2F12fh0q889%7C%2Fg%2F12fh0q89p%7C%2Fg%2F12fh0qdmr%7C%2Fg%2F12fh0qdp7%7C%2Fg%2F12fh0qdq2%7C%2Fg%2F12fh0qdq7%7C%2Fg%2F12hdlm_nd%7C%2Fg%2F12hdlm_nx%7C%2Fg%2F12hdlm_pq%7C%2Fg%2F12hdlr38s%7C%2Fg%2F12hdlrw86%7C%2Fg%2F12hdlsn8t%7C%2Fg%2F12hdlsn8x%7C%2Fg%2F12hdltfqt%7C%2Fg%2F12hdltfr0%7C%2Fg%2F12hdltfrc%7C%2Fg%2F12hdltfsh%7C%2Fg%2F1dtsbwq8%7C%2Fg%2F1hg1hklbg%7C%2Fg%2F1q4t94b6p%7C%2Fg%2F1q52g9wfq%7C%2Fg%2F1q52gbb7v%7C%2Fg%2F1q6b4f1pf%7C%2Fg%2F1yg5879fd%7C%2Fg%2F1yghbvnlq%7C%2Fg%2F1ylhlbf1j%7C%2Fm%2F016j14%7C%2Fm%2F016yss%7C%2Fm%2F02853rl%7C%2Fm%2F02hl6w%7C%2Fm%2F02xl7xj%7C%2Fm%2F034673%7C%2Fm%2F046k_p%7C%2Fm%2F04j8v0t%7C%2Fm%2F04t5sp%7C%2Fm%2F04ww1p%7C%2Fm%2F04xjcr%7C%2Fm%2F04xk2h%7C%2Fm%2F04zvfw%7C%2Fm%2F07zkq3x%7C%2Fm%2F07zkrds%7C%2Fm%2F07zk_ym%7C%2Fm%2F07zk_zc%7C%2Fm%2F07zkzv8%7C%2Fm%2F07zl90k%7C%2Fm%2F07zllzd%7C%2Fm%2F07zln7n%7C%2Fm%2F07zln_9%7C%2Fm%2F07zlw9w%7C%2Fm%2F07zm1ts%7C%2Fm%2F07zm2vb%7C%2Fm%2F07zm7zs%7C%2Fm%2F07zmbvf,currencies:,_fmt:json' | sed 1d
-	curl -s 'https://www.google.com/async/finance_wholepage_price_updates?ei=ywprXZHwMcCy5OUPqeK3qAw&yv=3&async=mids:%2Fm%2F0877z%7C%2Fm%2F09fld6%7C%2Fm%2F0b18t%7C%2Fm%2F0ckbkv_%7C%2Fm%2F0ckbnyv%7C%2Fm%2F0ckcq21%7C%2Fm%2F0ckcrh7%7C%2Fm%2F0ckcxmp%7C%2Fm%2F0ckd7nm%7C%2Fm%2F0ckd8tr%7C%2Fm%2F0ckdqsq%7C%2Fm%2F0ckf36v%7C%2Fm%2F0ckf8kv%7C%2Fm%2F0ckgsgx%7C%2Fm%2F0ckh859%7C%2Fm%2F0ckhqlx%7C%2Fm%2F0ck_hz6%7C%2Fm%2F0ckj0b3%7C%2Fm%2F0ckj76w%7C%2Fm%2F0ckjvmb%7C%2Fm%2F0ckk41t%7C%2Fm%2F0ckk6tq%7C%2Fm%2F0ckl1vg%7C%2Fm%2F0ckl258%7C%2Fm%2F0ckp030%7C%2Fm%2F0ckplt3%7C%2Fm%2F0ckpv1f%7C%2Fm%2F0ckpwbx%7C%2Fm%2F0ckq0pv%7C%2Fm%2F0ckq1xd%7C%2Fm%2F0ckq1yk%7C%2Fm%2F0ckqp37%7C%2Fm%2F0ckr0kx%7C%2Fm%2F0ckrjm4%7C%2Fm%2F0cks31m%7C%2Fm%2F0cks_60%7C%2Fm%2F0cksgss%7C%2Fm%2F0ckspft%7C%2Fm%2F0cksrc4%7C%2Fm%2F0cksx47%7C%2Fm%2F0ckt6ld%7C%2Fm%2F0cktgpy%7C%2Fm%2F0ckwf21%7C%2Fm%2F0ckxj89%7C%2Fm%2F0ckxkz6%7C%2Fm%2F0ckxpc8%7C%2Fm%2F0ckxrhc%7C%2Fm%2F0ckxvl0%7C%2Fm%2F0ckxvm7%7C%2Fm%2F0cky1hw%7C%2Fm%2F0ckynjl%7C%2Fm%2F0ckyv15%7C%2Fm%2F0ckzfjy%7C%2Fm%2F0cl015q%7C%2Fm%2F0cl0x5j%7C%2Fm%2F0cl19mp%7C%2Fm%2F0cl1_nd%7C%2Fm%2F0cl20h_%7C%2Fm%2F0cl20hl%7C%2Fm%2F0cl26k8%7C%2Fm%2F0cl3bt3%7C%2Fm%2F0cl3pfz%7C%2Fm%2F0clbbbp%7C%2Fm%2F0cqyw%7C%2Fm%2F0rz9htl,currencies:%2Fm%2F02l6h%2B%2Fm%2F09nqf%7C%2Fm%2F09nqf%2B%2Fm%2F088n7%7C%2Fm%2F01nv4h%2B%2Fm%2F09nqf%7C%2Fm%2F09nqf%2B%2Fm%2F0ptk_%7C%2Fm%2F09nqf%2B%2Fm%2F02nb4kq%7C%2Fm%2F09nqf%2B%2Fm%2F0hn4_%7C%2Fm%2F0kz1h%2B%2Fm%2F09nqf,_fmt:json' | sed 1d
-	} | 	jq -r '.PriceUpdate.entities[]|
-			( .financial_entity // .currency_entity |
-				"\((.common_entity_data|"\(.symbol//.name)$\(.name)$\(.change)$\(.value_change)$\(if .change == "POSITIVE" then "+" else "-" end)\(.percent_change)$\(.last_value)$\(.last_updated_time)"))$\(.last_close_price//null|.value//"")$\(.exchange//"")"
-			)' |
-		sed 's/\s\/\s/\//g' | sort -u -k1 -t'$' |
-		column -et -s'$' -NSYMBOL,NAME,DIRECTION,CHANGE,CHANGE%,VALUE,UPDATE,LASTCLOSE,EXCHANGE -TNAME,UPDATE -HDIRECTION,EXCHANGE -OSYMBOL,VALUE,NAME,DIRECTION,CHANGE,CHANGE%,LASTCLOSE,UPDATE,EXCHANGE
-
-}
-#quotes are not sourced from all markets and may be delayed by up to 20 minutes.
-#information is provided 'as is' and solely for informational purposes, not for
-#trading purposes or advice.>>
-#get a personalised list by visiting <https://www.google.com/finance>,
-#expand watchlists and set up your symbols. then, open the 'developer tools' 
-#of your browser, go to the 'network' tab, reload the page and check for the 
-#'finance_wholepage_price_updates' link and get your 'mids'
-
 
 #yahoo finance hack -- long ticker
 yfin()
