@@ -271,7 +271,7 @@ p() { 	printf '%s\n' "$*" ;}
 lsb()
 {
 	local dir ar
-	[[ $ZSH_VERSION ]] && ar=(${=PATH//:/ }) || ar=(${PATH//:/ })
+	ar=(${path[@]:-${PATH//:/ }})
 	for dir in ${ar[@]}
 	do 	if (($#))
 		then 	ls $dir | grep "$@"
@@ -1022,7 +1022,7 @@ alias ezit=q
 #bash cannot map ';q' but zsh can
 
 #for compatibility between my shell configs
-if ! declare -f qq &>/dev/null
+if ! declare -f qq  >/dev/null 2>&1
 then 	qq() { q ;}
 fi
 
@@ -2816,7 +2816,8 @@ B58=( {1..9} {A..H} {J..N} {P..Z} {a..k} {m..z} )
 #convert "decimal number" to Base58 in Bash
 toBase58()
 {
-    local a=( {1..9} {A..H} {J..N} {P..Z} {a..k} {m..z} )
+    local a
+    a=( {1..9} {A..H} {J..N} {P..Z} {a..k} {m..z} )
     # TODO: check that $1 is a valid number
     local nb=$1 b58= fiftyeight=${#a[@]}
     while ((nb)); do
@@ -3160,6 +3161,11 @@ alias uol='~/bin/markets/uol.sh'
 alias cointop='/bin/cointop --cache-dir ~/.cache'
 alias ctop=cointop
 alias chat=chatgpt.sh
+chati()
+{
+	chatgpt.sh -i "$@" &&
+	open "$HOME/Downloads/chatgpt0.png"
+}
 #mop - stocks the hacker way
 mop()
 {
@@ -3662,7 +3668,7 @@ bintext()
 #{ gzip -dc ;}
 
 #ultra compress
-7zultra()
+zultra()
 {
 	 7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "${1}.7z" "${@:?file required}"
 
@@ -4135,7 +4141,7 @@ estarmos preparados pois já enfrentamo-lá.'
 if [[ $- = *i* ]] && [[ $TMUX ]]
 then
 	#[[ -e notes ]] && lolcat -F 0.05 notes
-	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}]}\e[0m\n"  #| cowthink -sn
+	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}${KSH_VERSION+0}]}\e[0m\n"  #| cowthink -sn
 fi
 unset MSG
 #{ fortune | cowsay ;}
@@ -4454,11 +4460,11 @@ yfin()
 	then 	printf '%s\n' "$YJSON"
 		return
 	#check for error response
-	elif jq -e '.quoteResponse.error' <<< "$YJSON" &>/dev/null
+	elif jq -e '.quoteResponse.error' <<< "$YJSON"  >/dev/null 2>&1
 	then 	jq -r '.quoteResponse.error' <<< "$YJSON"
 		return 1
 	#empty response?
-	elif ! jq -e '.quoteResponse.result[]' <<<"$YJSON" &>/dev/null
+	elif ! jq -e '.quoteResponse.result[]' <<<"$YJSON"  >/dev/null 2>&1
 	then 	return 1
 	fi
 
