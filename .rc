@@ -4583,7 +4583,7 @@ yfin2()
 		printf '%s\n' "$YJSON"
 		return
 	#check for error response
-	elif jq -er '.chart.error' <<< "$YJSON" &>/dev/null
+	elif jq -er '.chart.error' <<< "$YJSON" >/dev/null 2>&1
 	then
 		jq -r '.chart.error.description' <<< "$YJSON"
 		return 1
