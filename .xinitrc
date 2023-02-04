@@ -67,7 +67,7 @@ picom -b
 xbindkeys
 
 #start conky service
-systemctl --user start conky.service &
+##systemctl --user start conky.service &
 
 #oneko -tora & oneko -tomoyo &
 
