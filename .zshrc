@@ -31,6 +31,7 @@ then
 #set DBUS for Tmux
 elif [[ $TMUX ]] && [[ -z $DBUS_SESSION_BUS_ADDRESS ]]
 then
+	pidof -q xfce4-session &&
 	export $(xargs --null --max-args=1 < /proc/$(pidof xfce4-session)/environ | grep DBUS_SESSION_BUS_ADDRESS)
 	#https://askubuntu.com/questions/772631/how-to-connect-screen-tmux-byobu-to-dbus
 fi
@@ -423,6 +424,12 @@ bindkey -M menuselect 'h' vi-backward-char        # left
 bindkey -M menuselect 'k' vi-up-line-or-history   # up
 bindkey -M menuselect 'l' vi-forward-char         # right
 bindkey -M menuselect 'j' vi-down-line-or-history # bottom
+
+#Open editor <C-X C-E>
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
+#https://unix.stackexchange.com/questions/6620/how-to-edit-command-line-in-full-screen-editor-in-zsh
 
 
 #interval in seconds between checks for login/logout activity

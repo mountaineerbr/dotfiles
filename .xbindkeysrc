@@ -200,6 +200,10 @@
 "xzoom"
  alt + Mod2+Mod4 + b:1
 
+#html filter from clipboard
+"uxterm -e 'xclip -o -sel clip | w3m -dump -T text/html | less'"
+ Mod2+Mod4 + h
+
 
 #mouse razer deathadder v2 mini
 "xte 'keydown Super_L' ;notify-send -u low -t 400 'SUPER on'"
