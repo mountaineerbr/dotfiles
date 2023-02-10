@@ -1,4 +1,5 @@
 # dotfiles
+Shell, terminal multiplexer and other software configuration files
 
     :::::::-.      ...   ::::::::::::.-:::::'::: :::    .,:::::: .::::::. 
      ;;,   `';, .;;;;;;;.;;;;;;;;'''';;;'''' ;;; ;;;    ;;;;'''';;;`    ` 
@@ -6,6 +7,7 @@
       $$,    $$$$$,     $$$   $$     `$$$"`` $$$ $$'     $$""""   '''    $
       888_,o8P'"888,_ _,88P   88,     888    888o88oo,.__888oo,__88b    dP
       MMMMP"`    "YMMMMMP"    MMM     "MM,   MMM""""YUMMM""""YUMMM"YMmMY" 
+
 
 ## Dotfiles, run control and c files
 
