@@ -426,8 +426,8 @@ bsd13()
 bsd13halt()
 {
 	ssh -t jack@bsd 'doas shutdown -h now' || return
+	echo "Actions: \`resume' or \`pause' or \`*poweroff'" >&2
 	sleep 30
-	echo actions: \`resume\' or \`pause' or \*\`poweroff\'
 	VBoxManage controlvm "bsd13" ${1:-poweroff} --type headless
 	#resume or pause or poweroff
 }
@@ -3161,11 +3161,7 @@ alias uol='~/bin/markets/uol.sh'
 alias cointop='/bin/cointop --cache-dir ~/.cache'
 alias ctop=cointop
 alias chat=chatgpt.sh
-chati()
-{
-	chatgpt.sh -i "$@" &&
-	open "$HOME/Downloads/chatgpt0.png"
-}
+
 #mop - stocks the hacker way
 mop()
 {
@@ -3673,6 +3669,10 @@ zultra()
 	 7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "${1}.7z" "${@:?file required}"
 
 }
+
+#exif
+#identify -verbose <file> | grep Orientation
+#exiftran -i9 %f #change orientation in exif only
 
 #unix hacks
 #<http://www.iwar.org.uk/hackers/resources/digital%20rebels/articles/unixtips.txt>
