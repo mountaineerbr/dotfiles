@@ -24,9 +24,9 @@
 #Server = http://br.mirror.archlinux-br.org/$repo/os/$arch
 #Server = https://archive.archlinux.org/repos/last/$repo/os/$arch
 
-Server = https://archive.archlinux.org/repos/2022/07/01/$repo/os/$arch
-Server = http://archlinux.arkena.net/archive/repos/2022/07/01/$repo/os/$arch
-Server = https://archive.archlinux.org/repos/2022/07/02/$repo/os/$arch
+Server = https://archive.archlinux.org/repos/2023/02/01/$repo/os/$arch
+#Server = http://archlinux.arkena.net/archive/repos/2023/02/01/$repo/os/$arch
+Server = https://archive.archlinux.org/repos/2023/02/02/$repo/os/$arch
 #
 #Server = https://archive.archlinux.org/repos/2022/06/01/$repo/os/$arch
 #Server = http://archlinux.arkena.net/archive/repos/2022/06/01/$repo/os/$arch
@@ -35,6 +35,14 @@ Server = https://archive.archlinux.org/repos/2022/07/02/$repo/os/$arch
 #Archive servers#
 #https://{europe,asia,america}.archive.pkgbuild.com
 
+#Always the best mirrors?
+#Server = https://mirror.rackspace.com/archlinux/$repo/os/$arch 
+#Server = https://cloudflaremirrors.com/archlinux/$repo/os/$arch
+#Server = https://mirror.facebook.net/archlinux/$repo/os/$arch
+#https://bbs.archlinux.org/viewtopic.php?id=65318&p=279
+
+#FB mirror
+#Server = https://mirror.facebook.net/archlinux/$repo/os/$arch/
 
 ## Prefered mirrors
 #Server = http://linorg.usp.br/archlinux/$repo/os/$arch
@@ -45,6 +53,13 @@ Server = https://archive.archlinux.org/repos/2022/07/02/$repo/os/$arch
 #Server = http://www.caco.ic.unicamp.br/archlinux/$repo/os/$arch
 #Server = https://arch.mirrors.theom.nz/$repo/os/$arch
 #Server = http://mirrors.kernel.org/archlinux/$repo/os/$arch
+
+##Arch Linux
+##To add Cloudflare Mirrors to the list of Arch Linux all you have to do as add this following line to /etc/pacman.d/mirrorlist
+#Server = https://cloudflaremirrors.com/archlinux/$repo/os/$arch
+##We have taken the liberty of going to mirror list to download a list of latest mirrors. And we will be serving your repos from these mirrors, which based on your location seems closest to you, unless we have it in cache in which case we will serve it from there.
+##https://cloudflaremirrors.com/
+
 
 ## Brazil
 #Server = http://br.mirror.archlinux-br.org/$repo/os/$arch
