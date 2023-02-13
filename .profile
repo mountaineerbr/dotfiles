@@ -92,6 +92,9 @@ export SUDO_EDITOR="$VISUAL"
 export PAGER=less
 
 #less config
+#export LESSOPEN="|lesspipe.sh %s"  #just install pkg `lesspipe'
+#export LESS=' -R'
+#
 #LESS='-i -e -M -P%t?f%f :stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
 
 #bat pages
@@ -99,6 +102,8 @@ export BAT_STYLE="numbers"
 
 #timezone config (unix system can automatically set locale time)
 #export TZ=America/Sao_Paulo
+#export TZ=/etc/localtime  #dont TZ=:/etc/localtime
+#https://bbs.archlinux.org/viewtopic.php?id=65318&p=279
 
 #mail
 #export MAIL="/var/mail/$USER"
@@ -110,6 +115,9 @@ export EMAIL=jamilbio20@gmail.com
 
 #fim, fbi improved file viewer
 #export FBFONT=/usr/share/kbd/consolefonts/ter-216n.psf.gz
+
+#`ls -l` date format
+export TIME_STYLE="full-iso"
 
 export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_SELECT=4
@@ -193,6 +201,9 @@ export BCEXTFILE="$HOME/bin/bcalc_ext.bc"
 #config for bitcoin.{blk,tx}.sh
 export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
 
+#chatgpt.sh conf
+export CHATGPTRC="$HOME/Downloads/chatgpt.conf"
+
 #cgk.sh
 #expiration of cache files in seconds
 #set to 0 or unset to disable expiration
@@ -262,3 +273,4 @@ fi
 #export LC_TIME=$LANG
 #export PAPERSIZE=a4
 ##export LANGUAGE=$LANG
+
