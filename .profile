@@ -117,7 +117,7 @@ export EMAIL=jamilbio20@gmail.com
 #export FBFONT=/usr/share/kbd/consolefonts/ter-216n.psf.gz
 
 #`ls -l` date format
-export TIME_STYLE="full-iso"
+export TIME_STYLE=long-iso
 
 export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_SELECT=4
