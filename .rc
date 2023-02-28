@@ -534,7 +534,6 @@ out()
 	if ps aux | grep \[x\]fce4-session | grep -q "^$(whoami)"
 	then 	if [[ -n "$TMUX" ]]
 		then 	echo 'xfce4-session-logout --logout --fast' >"$_TMUXSIG"
-			echo '[quit tmux and logout]' >&2
 			exit
 		else 	xfce4-session-logout --logout --fast
 		fi
@@ -726,16 +725,12 @@ rr()
 #xbindkeys rebind keys
 kk()
 {
-	if [[ -n $TMUX ]]
-	then 	echo 'kk(): avoid starting xbindkeys in tmux' >&2
-		sleep 1
-		exit 1
-	else 	killall -15 xbindkeys
-		sleep 1
-		xbindkeys  #-f ~/.xbindkeysrc
-		sleep 1
-		xbindkeys --show
-	fi
+	#OBS: avoid starting xbindkeys in TMUX
+	killall -15 xbindkeys
+	sleep 1
+	xbindkeys  #-f ~/.xbindkeysrc
+	sleep 1
+	xbindkeys --show
 }
 
 #edit c files
@@ -3039,29 +3034,22 @@ ht()
 #disable one of each sibling ht
 dht()
 {
-	if [[ -n "$TMUX" ]]
-	then 	echo 'err: command cannot be run under tmux' >&2
-		return 1
-	else 	local i
-		for i in 2 3
-		do 	echo "Disabling logical HT core $i"
-			echo 0 > /sys/devices/system/cpu/cpu${i}/online
-		done
-	fi
+	#OBS: command may not run under TMUX!
+	local i
+	for i in 2 3
+	do 	echo "Disabling logical HT core $i"
+		echo 0 > /sys/devices/system/cpu/cpu${i}/online
+	done
 }
 
 #enable hyperthreading
 eht()
 {
-	if [[ -n "$TMUX" ]]
-	then 	echo 'err: command cannot be run under tmux' >&2
-		return 1
-	else 	local i
-		for i in 2 3
-		do 	echo "Enabling logical HT core $i"
-			echo 1 > /sys/devices/system/cpu/cpu${i}/online
-		done
-	fi
+	local i
+	for i in 2 3
+	do 	echo "Enabling logical HT core $i"
+		echo 1 > /sys/devices/system/cpu/cpu${i}/online
+	done
 }
 
 #toggle 'caps lock' to 'esc'
