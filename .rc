@@ -19,7 +19,7 @@
 # first to take advantage of user additions.  We run dircolors directly
 # due to its changes in file syntax and terminal name patching.
 use_color=false
-if [[ $BASH_VERSION ]] && type -P dircolors >/dev/null || whence -p dircolors >/dev/null
+if [[ -n $BASH_VERSION ]] && type -P dircolors >/dev/null || whence -p dircolors >/dev/null
 then
 	# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
 	LS_COLORS=
@@ -410,6 +410,14 @@ jqpath2()
 #also see `gron' package to flatten json
 #https://www.datafix.com.au/BASHing/2022-03-23.html
 
+jsonminif()
+{
+	#jq -c . <<<"$*"
+	set -- ${*//[$'\t\n\r\v\f']} ;set -- ${*//\": \"/\":\"}
+	set -- ${*//, \"/,\"} ;set -- ${*//\" ,\"/\",\"}
+	printf '%s\n' "$*"
+}
+
 #browse usenet
 #from w3m man page
 w3mu()
@@ -482,7 +490,7 @@ alias nbrc='vim ~/.newsboat/urls'
 #shell history
 h()
 {
-	[[ "$ZSH_VERSION" ]] && set -- "${1:-0}"
+	[[ -n "$ZSH_VERSION" ]] && set -- "${1:-0}"
 	history "$@"
 }
 
@@ -524,7 +532,7 @@ sdr()
 out()
 {
 	if ps aux | grep \[x\]fce4-session | grep -q "^$(whoami)"
-	then 	if [[ "$TMUX" ]]
+	then 	if [[ -n "$TMUX" ]]
 		then 	echo 'xfce4-session-logout --logout --fast' >"$_TMUXSIG"
 			echo '[quit tmux and logout]' >&2
 			exit
@@ -540,7 +548,7 @@ out()
 #exit termux and rerun last command
 ter()
 {
-	if [[ $TMUX ]]
+	if [[ -n $TMUX ]]
 	then 	fc -ln -- -1 >"$_TMUXSIG"
 		exit
 	else 	fc -s
@@ -718,7 +726,7 @@ rr()
 #xbindkeys rebind keys
 kk()
 {
-	if [[ $TMUX ]]
+	if [[ -n $TMUX ]]
 	then 	echo 'kk(): avoid starting xbindkeys in tmux' >&2
 		sleep 1
 		exit 1
@@ -743,11 +751,11 @@ alias pkglist='vim ~/arq/docs/archInstallPkgSuggestion.txt'
 #edit and source
 sbrc()
 {
-	[[ "$BASH_VERSION" ]] && exec bash
+	[[ -n "$BASH_VERSION" ]] && exec bash
 }
 szrc()
 {
-	[[ "$ZSH_VERSION" ]] && exec zsh
+	[[ -n "$ZSH_VERSION" ]] && exec zsh
 }
 #src()
 #{
@@ -892,7 +900,7 @@ gres()
 grmlast()
 {
 	[[ -z "$1" ]] && set -- 'HEAD^'
-	[[ "$1" ]] && [[ "${#1}" -le 2 ]] && set -- "HEAD~$1"
+	[[ -n "$1" ]] && [[ "${#1}" -le 2 ]] && set -- "HEAD~$1"
 
 	git reset --hard "$1" && git push origin -f
 }
@@ -985,8 +993,8 @@ gk()
 	(( $# )) || return 1
 
 	#set shell options
-	[[ "$ZSH_VERSION" ]]  && setopt nullglob dotglob globstarshort
-	[[ "$BASH_VERSION" ]] && shopt -s nullglob dotglob globstar
+	[[ -n "$ZSH_VERSION" ]]  && setopt nullglob dotglob globstarshort
+	[[ -n "$BASH_VERSION" ]] && shopt -s nullglob dotglob globstar
 
 	#get filename from user input
 	file="${3:-${2:-$1}}"  file="${file%/}"  file=${file##*/}
@@ -1088,7 +1096,7 @@ alias cdc='cd ~/arq/concursos'
 alias cdd='cd ~/arq/docs'
 alias cdD='cd ~/Documents'
 alias cdm='cd ~/bin/markets'
-alias cdM='cd /media ;[[ "$(/bin/ls)" ]] || cd /run/media'
+alias cdM='cd /media ;[[ -n "$(/bin/ls)" ]] || cd /run/media'
 alias cdmedia=cdM
 alias cds='cd ~/bin'
 alias cdt='cd ${TMPDIR:-/tmp}'
@@ -1159,6 +1167,7 @@ tmpd()
 	builtin cd "$( mktemp -d "${TMPDIR:-/tmp}/$( date +%s )${1}.XXXXXX" )" || return
 	echo "$PWD"
 }
+alias tmpdd="TMPDIR=$HOME/tmp tmpd"
 
 #view mounted drives
 mnt()
@@ -1375,7 +1384,7 @@ alias unseen="perl -ne 'print unless \$seen{\$_}++'"
 #pkg file lists
 pls()
 {
-	[[ "$1" ]] || return
+	[[ -n "$1" ]] || return
 	printf '%s\n' /var/lib/pacman/local/"$1"*
 
 	tac /var/lib/pacman/local/"$1"[0-9-]*/files \
@@ -2802,7 +2811,7 @@ d2h()
 ## print hex value of a number
 #hex() {
 #    emulate -L zsh
-#    if [[ "$1" ]]; then
+#    if [[ -n "$1" ]]; then
 #        printf "%x\n" $1
 #    else
 #        printf '%s\n' 'Usage: hex <number-to-convert>'
@@ -3030,7 +3039,7 @@ ht()
 #disable one of each sibling ht
 dht()
 {
-	if [[ "$TMUX" ]]
+	if [[ -n "$TMUX" ]]
 	then 	echo 'err: command cannot be run under tmux' >&2
 		return 1
 	else 	local i
@@ -3044,7 +3053,7 @@ dht()
 #enable hyperthreading
 eht()
 {
-	if [[ "$TMUX" ]]
+	if [[ -n "$TMUX" ]]
 	then 	echo 'err: command cannot be run under tmux' >&2
 		return 1
 	else 	local i
@@ -3210,7 +3219,7 @@ get_functions() {
 #usage: wpop [italy|uk|us|saudi-arabia|world]
 wpop()
 {
-	[[ "$1" ]] && local country="$1-population/"
+	[[ -n "$1" ]] && local country="$1-population/"
 
 	if [[ "$1" = world ]] || [[ "$1" = all ]]
 	then 	curl -s 'https://www.worldometers.info/geography/countries-of-the-world/' |
@@ -4105,6 +4114,7 @@ alias m=mail
 #https://forum.xfce.org/viewtopic.php?id=13109
 
 #welcome message
+# obs: be aware this will cause scp and ssh to throw errors!
 MSG=(
 'A free spirit. Travelers have the mentality to adapt.'
 'Direção mais importante que velocidade.'
@@ -4140,9 +4150,10 @@ estarmos preparados pois já enfrentamo-lá.'
 'Go and touch the  grass. -- Brodie Robertson'
 'Essas substâncias você deve evitar.. Usar pouco, não abusar de jeito nenhum -- Drauzio Varela'
 'É difícil lutar contra você mesmo pois descobre a sua própria força -- Anime'
+'Saturation = exaggeration, Issac Asimov'
 
 )
-if [[ $- = *i* ]] && [[ $TMUX ]]
+if [[ $- = *i* ]] && [[ -n $TMUX ]]
 then
 	#[[ -e notes ]] && lolcat -F 0.05 notes
 	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}${KSH_VERSION+0}]}\e[0m\n"  #| cowthink -sn
@@ -4198,7 +4209,7 @@ loss()
 	fi
 
 	#use zshell maths or bash bc?
-	if [[ $ZSH_VERSION ]]
+	if [[ -n $ZSH_VERSION ]]
 	then 	float u ;g=$(( ( (1 / (1 - (u / 100) ) ) - 1) * 100))
 	else 	g=$( bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100" )
 	fi
@@ -4215,7 +4226,7 @@ loss()
 blist()
 {
 	local i
-	if [[ "$*" ]]
+	if [[ -n "$*" ]]
 	then 	set -- $( tr '[:lower:]' '[:upper:]' <<< "$*" )
 	else 	printf 'uso: blist [LETRA|NUM]\n\n' >&2 ;set -- {A..Z} {0..9}
 	fi
@@ -4255,7 +4266,7 @@ ipcab()
 	local data mes ano v
 	(($#)) || printf %s\\n\\n 'uso: ipcab  ANO/MES  # >= 1980/01' >&2
 	
-	set -- "${@//[\/.-]}" ;[[ "$2" ]] && set -- "$1$2"
+	set -- "${@//[\/.-]}" ;[[ -n "$2" ]] && set -- "$1$2"
 	((${#1} == 4 && ${1:-0} >= 1980)) && set -- "${1}01" #ano+janeiro
 	((${#1} != 6 || ${1:-0} < 198001)) && set -- 199501  #199407 começo do plano real
 
@@ -4460,7 +4471,7 @@ yfin()
 	YJSON="$( curl -sL "https://query1.finance.yahoo.com/v7/finance/quote?symbols=${SYMBOL:-TSLA}&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance" )"
 
 	#print json?
-	if [[ "$PJSON" ]]
+	if [[ -n "$PJSON" ]]
 	then 	printf '%s\n' "$YJSON"
 		return
 	#check for error response
@@ -4582,7 +4593,7 @@ yfin2()
 	YJSON="$( curl -s "https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOL}?region=US&lang=en-US&includePrePost=true&interval=${2:-1d}&range=${3:-1d}&corsDomain=finance.yahoo.com&.tsrc=finance" --compressed )"
 
 	#print json?
-	if [[ "$PJSON" ]]
+	if [[ -n "$PJSON" ]]
 	then
 		printf '%s\n' "$YJSON"
 		return

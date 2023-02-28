@@ -29,7 +29,7 @@ then
 		set --
 	fi
 #set DBUS for Tmux
-elif [[ $TMUX ]] && [[ -z $DBUS_SESSION_BUS_ADDRESS ]]
+elif [[ -n $TMUX ]] && [[ -z $DBUS_SESSION_BUS_ADDRESS ]]
 then
 	pidof -q xfce4-session &&
 	export $(xargs --null --max-args=1 < /proc/$(pidof xfce4-session)/environ | grep DBUS_SESSION_BUS_ADDRESS)
@@ -39,7 +39,7 @@ fi
 qq()
 {
 	#create signal file if within Tmux
-	[[ $TMUX ]] && echo exit >"$_TMUXSIG"
+	[[ -n $TMUX ]] && echo exit >"$_TMUXSIG"
 	echo '[bye..]' >&2
 	exit
 }
@@ -267,42 +267,42 @@ key[Control-Left]="${terminfo[kLFT5]}"
 key[Control-Right]="${terminfo[kRIT5]}"
 
 # setup key accordingly
-[[ $key[Home]      ]] && {
+[[ -n $key[Home]      ]] && {
 	bindkey -M emacs - $key[Home]    beginning-of-line
 	bindkey -M viins - $key[Home]    vi-beginning-of-line
 	bindkey -M vicmd - $key[Home]    vi-beginning-of-line
 }
-[[ $key[End]       ]] && {
+[[ -n $key[End]       ]] && {
 	bindkey -M emacs - $key[End]     end-of-line
 	bindkey -M viins - $key[End]     vi-end-of-line
 	bindkey -M vicmd - $key[End]     vi-end-of-line
 }
-[[ $key[Insert]    ]] && {
+[[ -n $key[Insert]    ]] && {
 	bindkey -M emacs - $key[Insert]  overwrite-mode
 	bindkey -M viins - $key[Insert]  overwrite-mode
 	bindkey -M vicmd - $key[Insert]  vi-insert
 }
-[[ $key[Delete]    ]] && {
+[[ -n $key[Delete]    ]] && {
 	bindkey -M emacs - $key[Delete]  delete-char
 	bindkey -M viins - $key[Delete]  vi-delete-char
 	bindkey -M vicmd - $key[Delete]  vi-delete-char
 }
-[[ $key[Left]      ]] && {
+[[ -n $key[Left]      ]] && {
 	bindkey -M emacs - $key[Left]    backward-char
 	bindkey -M viins - $key[Left]    vi-backward-char
 	bindkey -M vicmd - $key[Left]    vi-backward-char
 }
-[[ $key[Right]     ]] && {
+[[ -n $key[Right]     ]] && {
 	bindkey -M emacs - $key[Right]   forward-char
 	bindkey -M viins - $key[Right]   vi-forward-char
 	bindkey -M vicmd - $key[Right]   vi-forward-char
 }
-#[[ $key[Up]        ]] && bindkey - $key[Up]         up-line-or-history
-#[[ $key[Down]      ]] && bindkey - $key[Down]       down-line-or-history
-[[ $key[PageUp]    ]] && bindkey - $key[PageUp]     up-line-or-history
-[[ $key[PageDown]  ]] && bindkey - $key[PageDown]   down-line-or-history
-#[[ $key[Backspace] ]] && bindkey - $key[Backspace]  backward-delete-char
-#[[ $key[Shift-Tab] ]] && bindkey - $key[Shift-Tab]  reverse-menu-complete
+#[[ -n $key[Up]        ]] && bindkey - $key[Up]         up-line-or-history
+#[[ -n $key[Down]      ]] && bindkey - $key[Down]       down-line-or-history
+[[ -n $key[PageUp]    ]] && bindkey - $key[PageUp]     up-line-or-history
+[[ -n $key[PageDown]  ]] && bindkey - $key[PageDown]   down-line-or-history
+#[[ -n $key[Backspace] ]] && bindkey - $key[Backspace]  backward-delete-char
+#[[ -n $key[Shift-Tab] ]] && bindkey - $key[Shift-Tab]  reverse-menu-complete
 
 # Finally, make sure the terminal is in application mode when zle is
 # active. Only then are the values from $terminfo valid.
@@ -365,7 +365,7 @@ c0=red
 c1=cyan
 #shell sublevels
 #OBS: SHLVL config depends on on your specific windowing system!
-[[ $TMUX ]] && prompt_ssl_max=3 || prompt_ssl_max=2
+[[ -n $TMUX ]] && prompt_ssl_max=3 || prompt_ssl_max=2
 
 #PS1="%F{red}%B%(?..%? )%b%F{%(!.${c0}.${c1})}%n%F{white}@%m %40<...<%B%~%b%<< \${vcs_info_msg_0_}%f(%!%(1j.%%%j.))%F{yellow}%(${prompt_ssl_max}L.+.)%f%# "
 PS1="%F{red}%B%(?..%? )%b%F{%(!.${c0}.${c1})}%n%F{white}@%m %40<...<%B%~%b%<< \${vcs_info_msg_0_}%f%(1j.(%%%j).)%F{yellow}%(${prompt_ssl_max}L.+.)%f%# "
@@ -805,7 +805,7 @@ zstyle ':completion:*:urls' local 'www' '/var/www/' 'public_html'
 [[ -r /etc/hosts ]] \
 && : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
 
-if [[ $HOST ]]
+if [[ -n $HOST ]]
 then
   localname=$HOST
 elif command -v hostname ; then

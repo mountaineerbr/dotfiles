@@ -53,7 +53,7 @@ c0="$bgreen"
 #check subshell level (needs run only once)
 #OBS: SHLVL config depends on on your specific windowing system!
 prompt_ssl_max=2
-[[ $TMUX ]] && prompt_ssl_max=2 || prompt_ssl_max=4
+[[ -n $TMUX ]] && prompt_ssl_max=2 || prompt_ssl_max=4
 prompt_ssl=$( ((SHLVL >= prompt_ssl_max)) && echo "${yellow}+${endc}" )
 #basic git integration (prints branch name)
 prompt_git="\$( branch=\$(git rev-parse --abbrev-ref HEAD 2>/dev/null) && echo \"[${yellow}\${branch}${endc}] \" )"

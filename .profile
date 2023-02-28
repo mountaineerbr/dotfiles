@@ -45,12 +45,11 @@
 
 #if running bash
 #source from .bashrc if it exists
-[[ "$BASH_VERSION" ]] &&
+[[ -n $BASH_VERSION ]] &&
 	[[ -e "$HOME/.bashrc" ]] && . "$HOME/.bashrc"
 
 #set custom $PATH
 for d in  \
-	"/opt" \
 	"$GOPATH/bin" \
 	"$HOME/.local/bin" \
 	"$HOME/bin/more" \
