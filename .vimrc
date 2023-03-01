@@ -192,7 +192,7 @@ set rulerformat=%l,%c%V%=%P
 " From: https://codeyarns.com/2010/11/28/vim-ruler-and-default-ruler-format/
 
 " Line numbering
-set number
+"set number
 "
 " Set how many spaces will be preallocated to show line numbers
 set numberwidth=5
@@ -994,6 +994,10 @@ nnoremap <leader>whs mz:%s/\s\+$//<cr>:let @/=''<cr>`z
 "from cursor to end of file
 nnoremap <Leader>dust :,$s/${\([^@*\[\]}%#^/,:]\+\)}\\|${\([*@0-9]\+\)}/$\1\2/gc
 
+" Select the font for the hardcopy
+set printfont=Courier:h8
+command! -range=% HardcopyPdf <line1>,<line2> hardcopy > %.ps | !ps2pdf %.ps && rm %.ps && echo 'Created: %.pdf'
+"https://askubuntu.com/questions/705973/how-can-i-print-from-vim-to-pdf
 
 
 " MAPLEADER 1 ( CUSTOM LEADER ) < = >
