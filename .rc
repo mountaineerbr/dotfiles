@@ -410,14 +410,6 @@ jqpath2()
 #also see `gron' package to flatten json
 #https://www.datafix.com.au/BASHing/2022-03-23.html
 
-jsonminif()
-{
-	#jq -c . <<<"$*"
-	set -- ${*//[$'\t\n\r\v\f']} ;set -- ${*//\": \"/\":\"}
-	set -- ${*//, \"/,\"} ;set -- ${*//\" ,\"/\",\"}
-	printf '%s\n' "$*"
-}
-
 #browse usenet
 #from w3m man page
 w3mu()
@@ -4073,13 +4065,11 @@ mail()
 { 	local text size subj
 	if [[ $1 = *\@* ]]         #e-mail address
 	then 	local EMAIL="$1" ;set -- "${@:2}"
-	#elif [[ ${@:$#} = *\@* ]]
-	#then 	local EMAIL="${@:$#}" ;set -- "${@:1:$# -1}"
 	fi
 	[[ $1 != \-\a ]] && [[ -e ${@:$#} ]] && set -- "${@:$#}" "${@:1:$# -1}" 
         if [[ $1 = \-\a || $(file --mime "$1") = *charset=binary* ]]  #opt -a or binary
-	then 	[[ -e $1 ]] && set -- -a "$@" ;set -- "$@" --
-		size=$(wc -c <"$2")  subj="${@:2}"
+	then 	[[ -e $1 ]] && set -- -a "$@"
+		size=$(wc -c <"$2")  subj="${3:-$2}" ;set -- "${@:1:2}" --
 	else 	[[ -t 0 ]] || subj="$*"
 		if [[ -f $1 ]]     #ascii file
 		then 	text=$(<"$1")  subj="${@:2} ${1##*/}"

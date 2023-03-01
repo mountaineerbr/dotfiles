@@ -201,7 +201,7 @@ export BCEXTFILE="$HOME/bin/bcalc_ext.bc"
 export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
 
 #chatgpt.sh conf
-#export CHATGPTRC="$HOME/Downloads/chatgpt.conf"
+#export CHATGPTRC="$HOME/.chatgpt.conf"
 
 #cgk.sh
 #expiration of cache files in seconds
