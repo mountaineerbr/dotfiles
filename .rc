@@ -8,7 +8,7 @@
 # /  ' \/ _ \/ // / _ \/ __/ _ `/ / _ \/ -_) -_) __/ _  / __/
 #/_/_/_/\___/\_,_/_//_/\__/\_,_/_/_//_/\__/\__/_/ /____/_/
 
-# this file is sourced by ~/.bashrc and ~/.zshrc
+# this file is sourced by ~/.bashrc, ~/.kshrc, and ~/.zshrc
 
 #sources
 [[ -e ~/.apikeys ]] && . ~/.apikeys
@@ -19,7 +19,8 @@
 # first to take advantage of user additions.  We run dircolors directly
 # due to its changes in file syntax and terminal name patching.
 use_color=false
-if [[ -n $BASH_VERSION ]] && type -P dircolors >/dev/null || whence -p dircolors >/dev/null
+if { 	[[ -n $BASH_VERSION ]] && type -P dircolors >/dev/null ;} ||
+	whence -p dircolors >/dev/null
 then
 	# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
 	LS_COLORS=
@@ -48,27 +49,82 @@ else
 	esac
 fi
 
-#if ${use_color} ; then
-#	if [[ ${EUID} == 0 ]] ; then
-#		PS1+='\[\033[01;31m\]\h\[\033[01;34m\] \w \$\[\033[00m\] '
-#	else
-#		PS1+='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
-#	fi
-#	#BSD#@export CLICOLOR=1
-#	#GNU#@alias ls='ls --color=auto'
-#	alias grep='grep --colour=auto'
-#	alias egrep='grep -E --colour=auto'
-#	alias fgrep='grep -F --colour=auto'
-#else
-#	# show root@ when we don't have colors
-#	PS1+='\u@\h \w \$ '
-#fi
+if ${use_color} ; then
+	#if [[ ${EUID} == 0 ]] ; then
+	#	PS1+='\[\033[01;31m\]\h\[\033[01;34m\] \w \$\[\033[00m\] '
+	#else
+	#	PS1+='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
+	#fi
+	##BSD#@export CLICOLOR=1
+	##GNU#@alias ls='ls --color=auto'
+	#alias grep='grep --colour=auto'
+	#alias egrep='grep -E --colour=auto'
+	#alias fgrep='grep -F --colour=auto'
+
+	# Color definitions (taken from Color Bash Prompt HowTo).
+	# Some colors might look different of some terminals.
+	# For example, I see 'Bold Red' as 'orange' on my screen,
+	# hence the 'Green' 'BRed' 'Red' sequence I often use in my prompt.
+	
+	# Normal Colors    # Bold              # Background
+	Black='\e[0;30m'   BBlack='\e[1;30m'   On_Black='\e[40m'
+	Red='\e[0;31m'     BRed='\e[1;31m'     On_Red='\e[41m'
+	Green='\e[0;32m'   BGreen='\e[1;32m'   On_Green='\e[42m'
+	Yellow='\e[0;33m'  BYellow='\e[1;33m'  On_Yellow='\e[43m'
+	Blue='\e[0;34m'    BBlue='\e[1;34m'    On_Blue='\e[44m'
+	Purple='\e[0;35m'  BPurple='\e[1;35m'  On_Purple='\e[45m'
+	Cyan='\e[0;36m'    BCyan='\e[1;36m'    On_Cyan='\e[46m'
+	White='\e[0;37m'   BWhite='\e[1;37m'   On_White='\e[47m'
+	
+	Alert=$BWhite$On_Red  # Bold White on red background
+	NC='\e[m'  # Color Reset
+	#\\e[0;0;0m \\e[m' #\e \E \033
+	#http://tldp.org/LDP/abs/html/sample-bashrc.html
+	
+	#coloured man pages
+	man()
+	{
+		if [[ "$TERM" = linux ]]
+		then 	env \
+				LESS_TERMCAP_mb=$(printf "\e[34m") \
+				LESS_TERMCAP_md=$(printf "\e[1;31m") \
+				LESS_TERMCAP_me=$(printf "\e[0m") \
+				LESS_TERMCAP_se=$(printf "\e[0m") \
+				LESS_TERMCAP_so=$(printf "\e[44;93m") \
+				LESS_TERMCAP_ue=$(printf "\e[0m") \
+				LESS_TERMCAP_us=$(printf "\e[32m") \
+						/usr/bin/man "$@"
+		else 	env \
+				LESS_TERMCAP_mb=$(printf "\e[1;34m") \
+				LESS_TERMCAP_md=$(printf "\e[38;5;9m") \
+				LESS_TERMCAP_me=$(printf "\e[0m") \
+				LESS_TERMCAP_se=$(printf "\e[0m") \
+				LESS_TERMCAP_so=$(printf "\e[44;93m") \
+				LESS_TERMCAP_ue=$(printf "\e[0m") \
+				LESS_TERMCAP_us=$(printf "\e[38;5;10m") \
+						/usr/bin/man "$@"
+		fi
+	}
+	#https://boredzo.org/blog/archives/2016-08-15/colorized-man-pages-understood-and-customized
+	#https://misc.flogisoft.com/bash/tip_colors_and_formatting#colors2
+	#https://bbs.archlinux.org/viewtopic.php?id=181414
+	# GRML-zshrc (alternative)
+	#export LESS_TERMCAP_mb=$'\E[01;31m'
+	#export LESS_TERMCAP_md=$'\E[01;31m'
+	#export LESS_TERMCAP_me=$'\E[0m'
+	#export LESS_TERMCAP_se=$'\E[0m'
+	#export LESS_TERMCAP_so=$'\E[01;44;33m'
+	#export LESS_TERMCAP_ue=$'\E[0m'
+	#export LESS_TERMCAP_us=$'\E[01;32m'
+else
+	# show root@ when we don't have colors
+	PS1='\u@\h \w \$ '
+fi
 
 # Try to keep environment pollution down, EPA loves us.
 unset use_color
 #https://gitweb.gentoo.org/repo/gentoo.git/tree/app-shells/bash/files/bashrc
 #https://github.com/magnuskiro/configs/blob/ddb877dbd344fd9000bdcd47fc4b3d44e188b8ba/color.bashrc
-
 
 #colour packages
 #colorize-git, ccat, rainbow, lolcat, ls++
@@ -76,67 +132,11 @@ unset use_color
 #<https://misc.flogisoft.com/bash/tip_colors_and_formatting>
 #<https://www.reddit.com/r/linux/comments/94nh4w/what_is_your_ps1/>
 
-#coloured man pages
-man()
-{
-	if [[ "$TERM" = linux ]]
-	then 	env \
-			LESS_TERMCAP_mb=$(printf "\e[34m") \
-			LESS_TERMCAP_md=$(printf "\e[1;31m") \
-			LESS_TERMCAP_me=$(printf "\e[0m") \
-			LESS_TERMCAP_se=$(printf "\e[0m") \
-			LESS_TERMCAP_so=$(printf "\e[44;93m") \
-			LESS_TERMCAP_ue=$(printf "\e[0m") \
-			LESS_TERMCAP_us=$(printf "\e[32m") \
-					/usr/bin/man "$@"
-	else 	env \
-			LESS_TERMCAP_mb=$(printf "\e[1;34m") \
-			LESS_TERMCAP_md=$(printf "\e[38;5;9m") \
-			LESS_TERMCAP_me=$(printf "\e[0m") \
-			LESS_TERMCAP_se=$(printf "\e[0m") \
-			LESS_TERMCAP_so=$(printf "\e[44;93m") \
-			LESS_TERMCAP_ue=$(printf "\e[0m") \
-			LESS_TERMCAP_us=$(printf "\e[38;5;10m") \
-					/usr/bin/man "$@"
-	fi
-}
-#https://boredzo.org/blog/archives/2016-08-15/colorized-man-pages-understood-and-customized
-#https://misc.flogisoft.com/bash/tip_colors_and_formatting#colors2
-#https://bbs.archlinux.org/viewtopic.php?id=181414
-# GRML-zshrc (alternative)
-#export LESS_TERMCAP_mb=$'\E[01;31m'
-#export LESS_TERMCAP_md=$'\E[01;31m'
-#export LESS_TERMCAP_me=$'\E[0m'
-#export LESS_TERMCAP_se=$'\E[0m'
-#export LESS_TERMCAP_so=$'\E[01;44;33m'
-#export LESS_TERMCAP_ue=$'\E[0m'
-#export LESS_TERMCAP_us=$'\E[01;32m'
-
 #the xhost program is used to add and delete host names or user names to
 #the list allowed to make connections to the X server. In the case of hosts,
 #this provides a rudimentary form of privacy control and security.
 xhost +local:root >/dev/null 2>&1
 #also check ~/.Xauthority
-
-# Color definitions (taken from Color Bash Prompt HowTo).
-# Some colors might look different of some terminals.
-# For example, I see 'Bold Red' as 'orange' on my screen,
-# hence the 'Green' 'BRed' 'Red' sequence I often use in my prompt.
-
-# Normal Colors    # Bold              # Background
-Black='\e[0;30m'   BBlack='\e[1;30m'   On_Black='\e[40m'
-Red='\e[0;31m'     BRed='\e[1;31m'     On_Red='\e[41m'
-Green='\e[0;32m'   BGreen='\e[1;32m'   On_Green='\e[42m'
-Yellow='\e[0;33m'  BYellow='\e[1;33m'  On_Yellow='\e[43m'
-Blue='\e[0;34m'    BBlue='\e[1;34m'    On_Blue='\e[44m'
-Purple='\e[0;35m'  BPurple='\e[1;35m'  On_Purple='\e[45m'
-Cyan='\e[0;36m'    BCyan='\e[1;36m'    On_Cyan='\e[46m'
-White='\e[0;37m'   BWhite='\e[1;37m'   On_White='\e[47m'
-
-Alert=$BWhite$On_Red 	# Bold White on red background
-NC='\e[m' ENDC=$NC 	# Color Reset
-#\\e[0;0;0m \\e[m' #\e \E \033
-#http://tldp.org/LDP/abs/html/sample-bashrc.html
 
 #ex - archive extractor
 #usage: ex <file>
@@ -166,43 +166,6 @@ extract()
 	fi
 }
 #also check 'unp' script
-
-# Make your directories and files access rights sane.
-sanitize()
-{
-	chmod -R u=rwX,g=rX,o= "$@"
-}
-
-#(un)archive and gpg file/dir
-gar()
-{
-	#decrypt (sigle file)
-	if [[ "$1" = *.tar.gpg* ]]
-	then 	gpg -d -- "$1" | tar xk
-	#encrypt (multiple files)
-	else 	tar c --format pax -- "$@" | gpg -ci -o "${1%/}".tar.gpg
-	fi
-}
-
-#cli password dialog: gpg --pinentry-mode loopback
-#preferably, use gnu/gnutar or pax/posix formats
-#(pax format causes extended headers to be extracted as files by a few implementations)
-#https://www.baeldung.com/linux/encrypting-decrypting-directory
-#https://www.gnu.org/software/tar/manual/html_node/Standard.html
-#https://www.gnu.org/software/tar/manual/html_node/gnu.html#SEC145
-#https://mgorny.pl/articles/portability-of-tar-features.html
-#https://serverfault.com/questions/250511/which-tar-file-format-should-i-use
-#also see: `gpgtar' (mainly written due the problems of porting a shell
-#script making use of tar (gpg-zip) to Windows; may be slower than
-#standard tar on Linux platforms)
-#https://lists.gnupg.org/pipermail/gnupg-users/
-
-#forget gpg session passwords
-gpgrel()
-{
-	gpg-connect-agent reloadagent /bye
-}
-#https://askubuntu.com/questions/349238/how-can-i-clear-my-cached-gpg-password
 
 #bigger font for terminal
 alias bigger='echo "setfont iso02-12x22" ;setfont iso02-12x2'
@@ -310,6 +273,42 @@ pscom()
 	#ps -p $pid -o comm=
 }
 #https://superuser.com/questions/632979/if-i-know-the-pid-number-of-a-process-how-can-i-get-its-name
+
+# Make your directories and files access rights sane.
+sanitize()
+{
+	chmod -R u=rwX,g=rX,o= "$@"
+}
+
+#(un)archive and gpg file/dir
+gar()
+{
+	#decrypt (sigle file)
+	if [[ "$1" = *.tar.gpg* ]]
+	then 	gpg -d -- "$1" | tar xk
+	#encrypt (multiple files)
+	else 	tar c --format pax -- "$@" | gpg -ci -o "${1%/}".tar.gpg
+	fi
+}
+#cli password dialog: gpg --pinentry-mode loopback
+#preferably, use gnu/gnutar or pax/posix formats
+#(pax format causes extended headers to be extracted as files by a few implementations)
+#https://www.baeldung.com/linux/encrypting-decrypting-directory
+#https://www.gnu.org/software/tar/manual/html_node/Standard.html
+#https://www.gnu.org/software/tar/manual/html_node/gnu.html#SEC145
+#https://mgorny.pl/articles/portability-of-tar-features.html
+#https://serverfault.com/questions/250511/which-tar-file-format-should-i-use
+#also see: `gpgtar' (mainly written due the problems of porting a shell
+#script making use of tar (gpg-zip) to Windows; may be slower than
+#standard tar on Linux platforms)
+#https://lists.gnupg.org/pipermail/gnupg-users/
+
+#forget gpg session passwords
+gpgrel()
+{
+	gpg-connect-agent reloadagent /bye
+}
+#https://askubuntu.com/questions/349238/how-can-i-clear-my-cached-gpg-password
 
 #silver searcher
 alias ag='/usr/bin/ag --nofollow --hidden --smart-case'
@@ -536,7 +535,7 @@ out()
 }
 #OBS: ``$_TMUXSIG'' is defined at ~/.rc file!
 
-#exit termux and rerun last command
+#exit tmux and rerun last command
 ter()
 {
 	if [[ -n $TMUX ]]
@@ -956,7 +955,7 @@ gd()
 	(( ${#@} - 2 )) || set -- "${3:-$defuser}" "$1" "$2"
 	set -- ${@%/} ;set -- ${@#/}
 	url="https://raw.githubusercontent.com/$1/$2/master/$3"
-	url="https://gitlab.com/$1/$2/-/raw/main/$3"
+	#url="https://gitlab.com/$1/$2/-/raw/main/$3"
 
 	#download and print file
 	if [[ -t 1 ]]
@@ -2903,12 +2902,11 @@ btchist()
 
 halving()
 {
-	local hgt days_left
+	local hgt
 	hgt=$(curl -s https://blockchain.info/q/getblockcount) || return
-	days_left=$(( ( (840000-hgt)*(10*60))/(24*60*60) ))
 	
-	printf 'bitcoin halving\nheight   : %6d\ndays left: %6d\n' $hgt $days_left
-	date -R -d${days_left}days
+	printf 'bitcoin halving\ndays left: %6d\nheight   : %6d/840000\n' $(( ( (840000-hgt)*(10*60))/(24*60*60) )) "$hgt"
+	date -R -d$(( (840000-hgt)*(10*60) ))seconds
 }
 
 #cryptocurrency greps
@@ -3150,6 +3148,15 @@ alias uol='~/bin/markets/uol.sh'
 alias cointop='/bin/cointop --cache-dir ~/.cache'
 alias ctop=cointop
 alias chat=chatgpt.sh
+upchat()
+{
+	local dir
+	for dir in ~/www/{lab,hub}-{scripts,shellChatGPT}
+	do 	cd $dir
+		cp -f ~/bin/chatgpt.sh ./ &&
+		gitup "$@" || break
+	done
+}
 
 #mop - stocks the hacker way
 mop()
@@ -4129,6 +4136,7 @@ estarmos preparados pois já enfrentamo-lá.'
 'Essas substâncias você deve evitar.. Usar pouco, não abusar de jeito nenhum -- Drauzio Varela'
 'É difícil lutar contra você mesmo pois descobre a sua própria força -- Anime'
 'Saturation = exaggeration, Issac Asimov'
+'Se você quer ser feliz por um momento, beba. Se você quer ser feliz por um ano, case. Se você quer ser feliz para sempre, plante um jardim. - Ditado chinês.'
 
 )
 if [[ $- = *i* ]] && [[ -n $TMUX ]]
