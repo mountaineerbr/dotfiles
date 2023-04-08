@@ -425,7 +425,7 @@ bsd13()
 bsd13halt()
 {
 	ssh -t jack@bsd 'doas shutdown -h now' || return
-	echo "Actions: \`resume' or \`pause' or \`*poweroff'" >&2
+	echo "VBox: \`resume' or \`pause' or \`*poweroff'" >&2
 	sleep 30
 	VBoxManage controlvm "bsd13" ${1:-poweroff} --type headless
 	#resume or pause or poweroff
@@ -935,7 +935,7 @@ grmob()
 #{ git -C DIR rev-parse --is-inside-work-tree ;}
 
 #download a single file from github repos
-#usage:  gd [USER] [REPO] [SUBREPO/PATH/]FILE
+#usage:  gd [LAB|HUB] [USER] [REPO[/BRANCH]] [SUBREPO/PATH/]FILE
 #usage:  gd  grml  grml-etc-core  etc/zsh/zshrc
 #one positional parameter is read as FILE or a subrepo path to a FILE;
 #two args are read as REPO and FILE;
@@ -943,19 +943,33 @@ grmob()
 #must set def git user and repo
 gd()
 {
-	local defuser defrepo url
+	local defuser defrepo hub branch url
 	defuser=mountaineerbr
 	defrepo=dotfiles
 
 	#print usage
-	[[ -z "$1" || -n "$4" ]] && return 1
+	case "$1" in
+		[Gg][Ii][Tt][Hh][Uu][Bb]|[Hh][Uu][Bb])
+			echo "GitHub" >&2; shift; ((++hub));;
+		[Gg][Ii][Tt][Ll][Aa][Bb]|[Ll][Aa][Bb])
+			echo "GitLab" >&2; shift;;
+	esac
+	if [[ -z "$1" || -n "$4" ]]
+	then 	echo "Usage: gd [LAB|HUB] [USER] [REPO[/BRANCH]] [SUBREPO/PATH/]FILE" >&2
+		return 1
+	fi
 
 	#set positional parameters (default user, repo etc if empty..)
 	(( ${#@} - 1 )) || set -- "${3:-$defuser}" "${2:-$defrepo}" "$1"
 	(( ${#@} - 2 )) || set -- "${3:-$defuser}" "$1" "$2"
+	if [[ $2 = */* ]]
+	then 	branch="${2##*/}"
+		set -- "${@:1:1}" "${2%%/*}" "${@:3}"
+	fi
+	branch="${branch:-main}"
 	set -- ${@%/} ;set -- ${@#/}
-	url="https://raw.githubusercontent.com/$1/$2/master/$3"
-	#url="https://gitlab.com/$1/$2/-/raw/main/$3"
+	((hub)) && url="https://raw.githubusercontent.com/$1/$2/$branch/$3" \
+		|| url="https://gitlab.com/$1/$2/-/raw/$branch/$3"
 
 	#download and print file
 	if [[ -t 1 ]]
@@ -965,7 +979,6 @@ gd()
 		curl -L\# "$url" | tee /dev/stderr
 		echo -e '\a\ngd.func: copy sent to stderr' >&2
 	fi
-
 	echo "$url" >&2
 }
 #"https://github.com/$1/$2/blob/main/${3}?raw=true"
@@ -1241,7 +1254,7 @@ setxv()
 #z-shell original user guide by Paul Falstad
 z()
 {
-	man ~/arq/docs/zShellDocs/zshGuide/plainTxt/zShellGuideAll.man
+	less ~/arq/docs/zShellDocs/zshGuide/plainTxt/zShellGuideAll.man
 }
 #also check the mailing list!
 #https://www.zsh.org/mla/users/
@@ -1472,14 +1485,14 @@ amail()
 {
 	local urlroot=https://lists.archlinux.org/archives/list
 	select list in arch-{general,dev,events,proaudio,mirrors,mirrors-announce,announce} aur-{general,requests} pacman-dev
-	do 	select m in $(curl "$urlroot/arch-general@lists.archlinux.org/" |
+	do 	for m in $(curl "$urlroot/arch-general@lists.archlinux.org/" |
 			sed -n '/^<ul/,/^<\/ul/p' |
 			sed -nE "/<[Aa] / s/.*href=['\"]([^'\"]+)['\"].*/\1/ ;s/^.*linux\.org\///p")
 		do 	m=${m%/}  m=${m/\//-}
 			curl -L "$urlroot/${list}@lists.archlinux.org/export/${list}@lists.archlinux.org-${m}.mbox.gz?start=${m}-01&end=$(date -Idate -d"${m}-01 + 1month")" |
 			gzip -c -d
 			echo "MONTH: $m" >&2
-			break 2
+			#break 2
 		done
 	done
 }
@@ -1737,7 +1750,7 @@ ciso()
 #ISO 8601: strftime({"%Y-%m-%dT%H:%M:%SZ"}, var.time);
 
 #date ranges script
-alias d=datediff.sh
+alias d="$HOME/bin/datediff.sh"
 #d()
 #{ 	#debug
 #	[[ $1 = -* ]] && { 	local opt=$1 ;shift ;}
@@ -4106,7 +4119,7 @@ MSG=(
 'Focar nas coisas boas para enfrentar as ruins.'
 'Make It Simple And Easy!'
 'Practice gratitude. There is always things to be grateful for. Dwell on that.'
-'Dont dwell on what got you down.'
+"Don't dwell on what got you down."
 'Keep quitting until you quit!'
 'Pode+Acredita=Consegue'
 'Cultivate the habit of picking yourself up. You will naturally start doing it.'
@@ -4122,9 +4135,9 @@ estarmos preparados pois já enfrentamo-lá.'
 'The pain of Discipline or the pain of Regret'
 'Motivation -> Discipline -> Habit' #https://www.youtube.com/watch?v=FMzk6e4Nokg
 'Live below your means and save everything, simple life'
-'Dont you see your father?'
+"Don't you see your father?"
 'If it is to be, it is up to me!!! -- Rusty78609'
-'Dont let the perfect be the enemy of the good -- Voltaire'
+"Don't let the perfect be the enemy of the good -- Voltaire"
 '<https://www.reddit.com/r/getdisciplined/comments/rod44e/plan_day_29_no_videogames_and_no_porn_slowly/>'
 'Turn on, tune in, drop out - Timothy Leary'
 'Si te cansas aprende a descansar, no a renunciar.'
@@ -4137,6 +4150,7 @@ estarmos preparados pois já enfrentamo-lá.'
 'É difícil lutar contra você mesmo pois descobre a sua própria força -- Anime'
 'Saturation = exaggeration, Issac Asimov'
 'Se você quer ser feliz por um momento, beba. Se você quer ser feliz por um ano, case. Se você quer ser feliz para sempre, plante um jardim. - Ditado chinês.'
+'To teach is to learn. -- Solano Aquino'
 
 )
 if [[ $- = *i* ]] && [[ -n $TMUX ]]

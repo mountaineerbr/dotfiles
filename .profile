@@ -77,7 +77,7 @@ CDPATH="${CDPATH%:}"
 export GOPATH="$HOME/go"
 
 #full-screen text editor
-export VISUAL=vim
+export VISUAL="${VISUAL:-vim}"
 #stream editor
 export EDITOR="$VISUAL"
 #sudoers editor
