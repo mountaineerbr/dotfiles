@@ -19,6 +19,10 @@ let g:is_bash = 1
 "when one redraws with ctrl-l, try setting the "sh_minlines" internal variable
 "to a larger number. The default value is 200.
 let sh_minlines = 1000
+":syntax sync minlines=10000
+":set redrawtime=10000
+"syntax sync fromstart
+"https://github.com/vim/vim/issues/2790
 
 " Allow backspacing over everything in insert mode.
 "set backspace=indent,eol,start

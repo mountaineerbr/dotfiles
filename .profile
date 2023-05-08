@@ -208,6 +208,19 @@ export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
 #set to 0 or unset to disable expiration
 #export CGKEXPIRATION=259200  #(3 days)
 
+#wf.sh -- norway institute of meteorology
+export WFAV="
+apucarana:-23.5525327:-51.4610764:840
+arapongas:-23.4152862:-51.4293961:816
+astorga:-23.2350184:-51.6647074:675
+belo horizonte:-19.9227318:-43.9450948:852
+cascavel:-24.9554996:-53.4560544:781
+foz do igua[cç][uú]:-25.5401479:-54.5858139:164
+general carneiro:-26.422982:-51.3146691:983
+gramado:-29.3924265:-50.912571:850
+guaratuba:-25.8806192:-48.5750905:0 
+"
+
 
 #is it linux tty?
 if [[ "$TERM" = linux ]]

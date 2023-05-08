@@ -601,6 +601,12 @@ autoload insert-unicode-char
 zle -N insert-unicode-char
 bindkey - '^XU' insert-unicode-char
 
+#The following binds insert-composed-char to F5 on my keyboard:
+autoload -Uz insert-composed-char
+zle -N insert-composed-char
+bindkey '\e[15~' insert-composed-char
+#https://zsh.sourceforge.io/FAQ/zshfaq05.html
+
 # add a command line to the shells history without executing it
 function commit-to-history () {
     print -rs ${(z)BUFFER}

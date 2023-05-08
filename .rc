@@ -1478,6 +1478,13 @@ alias yw='yay -Pw'
 #arch linux archieve explorer script
 alias ala='~/bin/ala.sh'
 
+#get a PKGBUILD
+pkgb()
+{
+	curl -f\# "https://raw.githubusercontent.com/archlinux/svntogit-packages/master/${1}/trunk/PKGBUILD" \
+	|| curl -f\# "https://raw.githubusercontent.com/archlinux/svntogit-community/master/${1}/trunk/PKGBUILD" \
+	|| aur.sh -p "${1}"
+}
 
 #arch linux mail
 #usage: amail | less #bat -l mbx
@@ -2915,11 +2922,13 @@ btchist()
 
 halving()
 {
-	local hgt
+	local hgt secs
 	hgt=$(curl -s https://blockchain.info/q/getblockcount) || return
 	
-	printf 'bitcoin halving\ndays left: %6d\nheight   : %6d/840000\n' $(( ( (840000-hgt)*(10*60))/(24*60*60) )) "$hgt"
-	date -R -d$(( (840000-hgt)*(10*60) ))seconds
+	printf 'Bitcoin Halving\nDays left: %6d\nHeight   : %6d/840000\n' $(( ( (840000-hgt)*(10*60))/(24*60*60) )) "$hgt"
+	secs=$(( (840000-hgt)*(10*60) ))
+	datediff.sh -vvv ${secs}seconds 2>/dev/null
+	date -R -d"${secs}seconds"
 }
 
 #cryptocurrency greps
@@ -3112,9 +3121,6 @@ alias et='vim ~/bin/test.sh'
 #run test script
 alias t='~/bin/test.sh'
 
-#script aliases
-alias anta='~/bin/anta.sh'
-
 #imgur
 alias imgur=imgur.sh
 
@@ -3165,9 +3171,14 @@ upchat()
 {
 	local dir
 	for dir in ~/www/{lab,hub}-{scripts,shellChatGPT}
-	do 	cd $dir
-		cp -f ~/bin/chatgpt.sh ./ &&
-		gitup "$@" || break
+	do
+		cd $dir || return  ;pwd
+		{ 	[[ -d man ]] && cd man &&
+			./md2man.sh chatgpt.sh.1.md
+			cd $dir
+		}
+		cp -f ~/bin/chatgpt.sh $dir/ &&
+		gitup "$@"
 	done
 }
 
@@ -3325,6 +3336,9 @@ mandelbrot3()
 #or everything on the line, regardless of cursor position:
 #{ echo -e "\033[2K" ;}
 #https://unix.stackexchange.com/questions/26576/how-to-delete-line-with-echo
+#{ tput cuu1 && tput dl1 ;}
+#{ printf '\e[A\e[K' ;} # to move the cursor up one line and erase the line
+#https://stackoverflow.com/questions/5861428/bash-script-erase-previous-line
 
 #regex to search for non-ascii values
 #ASCII is in range of 0 to 127
@@ -4121,7 +4135,7 @@ MSG=(
 'Practice gratitude. There is always things to be grateful for. Dwell on that.'
 "Don't dwell on what got you down."
 'Keep quitting until you quit!'
-'Pode+Acredita=Consegue'
+'Pode + Acredita = Consegue'
 'Cultivate the habit of picking yourself up. You will naturally start doing it.'
 'Conhece a ti mesmo.'
 'Coragem, paciência, determinação e alegria.'
@@ -4129,7 +4143,7 @@ MSG=(
 'Engajamento político e transformador da história vai fazer
 você usar os seus humores em seu próprio proveito.'
 'Preparar recursos para quando o momento de uma ansiedade chegar,
-estarmos preparados pois já enfrentamo-lá.'
+estarmos preparados pois já a enfrentamos.'
 'If you are going too fast, slow it down.'
 'Are you in the GAP or the GAIN?' #-- Benjamin P. Hardy & Dan Sullivan, www.fastcompany.com/90687442
 'The pain of Discipline or the pain of Regret'
@@ -4147,10 +4161,13 @@ estarmos preparados pois já enfrentamo-lá.'
 'The difference between a smart person and a clever person is that a smart person knows how to get out of trouble that a clever person wouldnt have gotten into in the first place.'
 'Go and touch the  grass. -- Brodie Robertson'
 'Essas substâncias você deve evitar.. Usar pouco, não abusar de jeito nenhum -- Drauzio Varela'
-'É difícil lutar contra você mesmo pois descobre a sua própria força -- Anime'
+'É difícil lutar contra você mesmo quando descobre a sua própria força -- Haikais'
 'Saturation = exaggeration, Issac Asimov'
 'Se você quer ser feliz por um momento, beba. Se você quer ser feliz por um ano, case. Se você quer ser feliz para sempre, plante um jardim. - Ditado chinês.'
 'To teach is to learn. -- Solano Aquino'
+"Concentrate on what you have, not on what you don't have. -- ReWild University"
+"What made the change was The Decision. -- Gabriel Madureira"
+'do the good things you did at 19. -- me'
 
 )
 if [[ $- = *i* ]] && [[ -n $TMUX ]]
