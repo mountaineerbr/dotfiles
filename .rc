@@ -2276,7 +2276,13 @@ _gps()
 	fi
 	((${#g[@]:?}==2)) && printf '%s\t%s\n' "${g[@]}"
 }
-_gps_fmt() { 	sed -n 1p | tee /dev/stderr | sed 's/\t[^\t]*$//' ;}
+_gps_fmt()
+{
+	local var
+	var=$(sed -n 1p)
+	printf '%s\n' "$var" >&2
+	sed 's/\t[^\t]*$//' <<<"$var"
+}
 
 #get coordinates from opencage
 gps2()
