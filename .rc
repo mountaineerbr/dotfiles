@@ -2238,11 +2238,10 @@ dist()
 	
 	from=$(__gps "${1:?from: not set}") || return
 	to=$(__gps "${2:?to: not set}") || return
-	from="${from%$'\t'*}" to="${to%$'\t'*}"
 	
 	#coordinates: {longitude},{latitude};
-	from="${from##*$'\t'},${from%%$'\t'*}"
-	to="${to##*$'\t'},${to%%$'\t'*}"
+	from="${from##*[$IFS]},${from%%[$IFS]*}"
+	to="${to##*[$IFS]},${to%%[$IFS]*}"
 
 	#distance (metres)
 	#http://project-osrm.org/docs/v5.5.1/api/
@@ -2265,7 +2264,7 @@ dist()
 }
 __gps()
 {
-	grep -Pom2 '(-?\d+([.]\d+)?)' <<<"$*" || gps "$@"
+	grep -Pom2 '(-?\d+([.]\d+)?)' <<<"$*" || gps "$@" | cut -f1,2
 }
 
 
