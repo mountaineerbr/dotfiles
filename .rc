@@ -2236,8 +2236,8 @@ dist()
 	  -bike|-foot|-car)  by="${1##-}"; shift;;
 	esac
 	
-	from=$(__gps "${1:?from: not set}") || return
-	to=$(__gps "${2:?to: not set}") || return
+	from=$(_gps "${1:?from: not set}") || return
+	to=$(_gps "${2:?to: not set}") || return
 	
 	#coordinates: {longitude},{latitude};
 	from="${from##*[$IFS]},${from%%[$IFS]*}"
@@ -2262,18 +2262,28 @@ dist()
 		end; .durations[] |map(if . != 0 then . else empty end)|.[]|seconds_to_time_string"
 	#jq -r '[.durations[] |map(if . != 0 then . else empty end)|.[] ]|join(" / ")+" secs"'
 }
-__gps()
+_gps()
 {
-	grep -Pom2 '(-?\d+([.]\d+)?)' <<<"$*" || gps "$@" | cut -f1,2
+	local g
+	if g=($(grep -Eo '[+-]?[0-9]+[.][0-9]*' <<<"$*"))
+	   ! ((${#g[@]}==2))
+	then
+		if g=($(gps "$@" | _gps_fmt))
+		   ! ((${#g[@]}==2))
+		then
+			g=($(gps2 "$@" | _gps_fmt))
+		fi
+	fi
+	((${#g[@]:?}==2)) && printf '%s\t%s\n' "${g[@]}"
 }
+_gps_fmt() { 	sed -n 1p | tee /dev/stderr | sed 's/\t[^\t]*$//' ;}
 
-
-#get coordinates
+#get coordinates from opencage
 gps2()
 {
 	[[ -n "${*:?location required}" ]] || return
 	curl -sL "https://api.opencagedata.com/geocode/v1/json?q=$(sed 's/\s/%20/g' <<< "${*}")&key=${OPENCAGEKEY}&no_annotations=1&language=en" |
-		jq -r '.results[0]|.formatted,(.geometry|"\(.lat) \(.lng)")'
+		jq -r '.results[]|"\(.geometry.lat)\t\(.geometry.lng)\t\(.formatted)"'
 }
 
 #only big cities - api without many locations available
@@ -2281,7 +2291,7 @@ gps3()
 {
 	[[ -n "${*:?location required}" ]] || return
 	curl -Ls "https://www.metaweather.com/api/location/search/?query=$(sed 's/\s/%20/g' <<<"$*")" |
-	jq '.[]'
+	jq .
 }
 
 #phase of moon (US Navy API)
