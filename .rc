@@ -2208,21 +2208,80 @@ wf3()
 #<curl wttr.in/:bash.function>
 
 
-#latitude and longitude
+#get gps coordenates
+#usage: gpsf [location|coordinates]
 gps()
 {
-	[[ -z "$1" ]] && set -- sao paulo
-	local key=54f6cb1814a4426484b8f28c0b6adbb6
-	local query=$(sed 's/\s/%20/g' <<< "$*")
-	curl -sL "https://api.opencagedata.com/geocode/v1/json?q=${query}&key=$key&no_annotations=1&language=en" |
-		jq -r '.results[0]|.formatted,(.geometry|"\(.lat) \(.lng)")'
+	[[ -n ${*:?location: not set} ]] || return
+	curl -sL -H "$UAG" "https://nominatim.openstreetmap.org/search?q=$(sed 's/\s/%20/g' <<< "$*")&format=json" |
+	jq -r ".[]|.lat+\"\t\"+.lon+\"\t\"+.display_name"
 }
-#not many locations, only big cities
+
+#by gps coordinates
+gspc()
+{
+	curl -sL -H "$UAG" "https://nominatim.openstreetmap.org/reverse?lat=${1:?lat: not set}&lon=${2:?lon: not set}&format=json&addressdetails=0" |
+	jq .
+}
+#https://nominatim.org/release-docs/develop/api/Lookup/
+
+#get the distance (metres)
+#usage: distf -[car|bike|foot] [from_location] [to_location]
+dist()
+{
+	local by from to
+	
+	case "$1" in
+	  -bike|-foot|-car)  by="${1##-}"; shift;;
+	esac
+	
+	from=$(__gps "${1:?from: not set}") || return
+	to=$(__gps "${2:?to: not set}") || return
+	
+	
+	curl -sL -H "$UAG" "https://routing.openstreetmap.de/routed-${by:-car}/route/v1/driving/${from/[$IFS]/,};${to/[$IFS]/,}?overview=false&alternatives=true&steps=false" |
+	jq -r '.waypoints[]|(.distance|tostring)+" m"'
+
+
+	#duration of the fastest route (lon,lat)
+	from="${from##*[$IFS]},${from%%[$IFS]*}"
+	to="${to##*[$IFS]},${to%%[$IFS]*}"
+
+	curl -sL -H "$UAG" "http://router.project-osrm.org/table/v1/driving/${from};${to}" |
+	jq -r "def pad(x): tostring | (length | if . >= x then \"\" else \"0\" * (x - .) end) as \$padding | \"\(\$padding)\(.)\";
+		def seconds_to_time_string:
+		def nonzero: floor | if . > 0 then . else empty end;
+		if . == 0 then \"00\"
+		else
+		[(./60/60         | nonzero),
+		 (./60       % 60 | pad(2)),
+		 (.          % 60 | pad(2))]
+		| join(\":\")
+		end;
+		.durations[] |map(if . != 0 then . else empty end)|.[]|seconds_to_time_string"
+	#jq -r '[.durations[] |map(if . != 0 then . else empty end)|.[] ]|join(" / ")+" secs"'
+}
+__gps()
+{
+	grep -Pom2 '(-?\d+([.]\d+)?)' <<<"$*" || gps "$@"
+}
+#http://project-osrm.org/docs/v5.5.1/api/
+
+
+#get coordinates
 gps2()
 {
-	[[ -z "$1" ]] && set -- são paulo
-	local query=$(sed 's/\s/%20/g' <<<"$*")
-	curl -Ls "https://www.metaweather.com/api/location/search/?query=$query" | jq '.[]'
+	[[ -n "${*:?location required}" ]] || return
+	curl -sL "https://api.opencagedata.com/geocode/v1/json?q=$(sed 's/\s/%20/g' <<< "${*}")&key=${OPENCAGEKEY}&no_annotations=1&language=en" |
+		jq -r '.results[0]|.formatted,(.geometry|"\(.lat) \(.lng)")'
+}
+
+#only big cities - api without many locations available
+gps3()
+{
+	[[ -n "${*:?location required}" ]] || return
+	curl -Ls "https://www.metaweather.com/api/location/search/?query=$(sed 's/\s/%20/g' <<<"$*")" |
+	jq '.[]'
 }
 
 #phase of moon (US Navy API)
@@ -3157,7 +3216,7 @@ alias uah='curl https://www.nsstc.uah.edu/data/msu/v6.0/tlt/uahncdc_lt_6.0.txt'
 ####################
  #####markets######
 ####################
-alias binfo='~/bin/markets/binfo.sh'
+alias binfo='~/bin/binfo.sh'
 alias bitstamp='~/bin/markets/bitstamp.sh'
 alias binance='~/bin/markets/binance.sh'
 alias cgk='~/bin/markets/cgk.sh -3'
@@ -4168,6 +4227,7 @@ estarmos preparados pois já a enfrentamos.'
 "Concentrate on what you have, not on what you don't have. -- ReWild University"
 "What made the change was The Decision. -- Gabriel Madureira"
 'do the good things you did at 19. -- me'
+'It’s not what you do but who you are. -- book'
 
 )
 if [[ $- = *i* ]] && [[ -n $TMUX ]]
