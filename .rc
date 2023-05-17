@@ -2281,7 +2281,7 @@ _gps_fmt()
 	local var
 	var=$(sed -n 1p)
 	printf '%s\n' "$var" >&2
-	sed 's/\t[^\t]*$//' <<<"$var"
+	printf '%s\n' "${var%$'\t'*}" 
 }
 
 #get coordinates from opencage
