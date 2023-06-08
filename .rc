@@ -660,6 +660,7 @@ alias e=vim
 #open last vim file
 #register nought "'0" jumps back to where you exited last
 alias vimlast='vim -c "normal '"'"'0"'
+alias vlast=vimlast
 
 #cd to vim backup
 alias vbak='cd ~/.vim/bak'
@@ -922,6 +923,13 @@ grmob()
 }
 #https://stackoverflow.com/questions/13716658/how-to-delete-all-commit-history-in-github
 #also check 'bgf repo-cleaner' https://rtyley.github.io/bfg-repo-cleaner/
+
+#git grep
+ggrep()
+{
+	git rev-list --all | xargs git grep "$@"
+}
+#https://stackoverflow.com/questions/2928584/how-to-grep-search-committed-code-in-the-git-history
 
 #compare files
 #{ git diff --no-index dir1/ dir2/ ;}
@@ -1481,9 +1489,7 @@ alias ala='~/bin/ala.sh'
 #get a PKGBUILD
 pkgb()
 {
-	curl -f\# "https://raw.githubusercontent.com/archlinux/svntogit-packages/master/${1}/trunk/PKGBUILD" \
-	|| curl -f\# "https://raw.githubusercontent.com/archlinux/svntogit-community/master/${1}/trunk/PKGBUILD" \
-	|| aur.sh -p "${1}"
+	curl -f\# "https://gitlab.archlinux.org/archlinux/packaging/packages/${1}/-/raw/main/PKGBUILD"
 }
 
 #arch linux mail
@@ -2598,6 +2604,23 @@ toimage()
 #-font -misc-fixed-*-*-*-*-*-*-*-*-*-*-*-*
 #https://www.ostechnix.com/save-linux-command-output-image-file/
 
+#creater extra cursor for my touchpad
+xpointer()
+{
+	if [[ $* = rm ]]
+	then 	#xinput reattach 16 "Virtual core pointer" &&
+		xinput remove-master "Virtual core pointer"
+	else 	
+		xinput list | grep -q "Auxiliary pointer" \
+		|| xinput create-master Auxiliary
+		xinput reattach 16 "Auxiliary pointer" \
+		&& xinput reattach 26 "Auxiliary keyboard" \
+		&& xinput reattach 28 "Auxiliary keyboard" \
+		&& xinput reattach 29 "Auxiliary keyboard"
+	fi
+}
+#https://wiki.archlinux.org/title/Multi-pointer_X
+
 #autoclicker
 alias autoclicker='xdotool click --repeat 100 --delay 18 1'
 #which means: click a hundred times, every 18 milliseconds, using left mouse button (1 at the end)
@@ -3256,6 +3279,22 @@ upchat()
 		gitup "$@"
 	done
 }
+upchataur()
+{
+	local com
+	cd $HOME/www/hub-shellChatGPT || return
+	com=${1:-$(git rev-parse main )}
+	
+	cd /home/jsn/bin/openai/ || return
+	./pkgbuild.sh $com || return
+
+	cd /home/jsn/tmp/build/chatgpt/ || return
+	
+	cp ./.SRCINFO $HOME/www/aur-chatgpt.sh/ &&
+	cp ./PKGBUILD $HOME/www/aur-chatgpt.sh/ &&
+	cd $HOME/www/aur-chatgpt.sh/ &&
+	pwd
+}
 
 #mop - stocks the hacker way
 mop()
@@ -3299,6 +3338,11 @@ get_functions() {
     printf '%s\n' "${functions[@]//declare -f }"
 }
 #https://github.com/dylanaraps/pure-bash-bible
+
+#red display
+alias goclear='xcalib -clear'
+alias gored='xcalib -green .1 0 1 -blue .1 0 1 -red 0.5 1 40 -alter'
+#https://blog.ynfonatic.de/2023/02/10/x-org-x11-set-your-monitor-to-monochrome-red-on-black.html
 
 #world population
 #usage: wpop [location|world]
