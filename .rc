@@ -1024,7 +1024,7 @@ gk()
 #quit like vim
 q()
 {
-	echo '[bye..]'
+	[[ ! -t 1 ]] || echo '[bye..]' >&2
 	exit
 }
 
@@ -1038,7 +1038,7 @@ alias ezit=q
 
 #for compatibility between my shell configs
 if ! declare -f qq  >/dev/null 2>&1
-then 	qq() { q ;}
+then 	qq() { 	q ;}
 fi
 
 #slurm internet monitor
@@ -1113,8 +1113,8 @@ alias cdW='cd ~/www'
 
 alias du='du -h'
 
-alias winecd='cd /home/jsn/.wine/drive_c/users/jsn'
-#alias battle='WINEPREFIX="/home/jsn/.wine" wine "/home/jsn/.wine/drive_c/Program Files (x86)/Battle.net/Battle.net Launcher.exe"'
+alias winecd='cd $HOME/.wine/drive_c/users/jsn'
+#alias battle='WINEPREFIX="$HOME/.wine" wine "$HOME/.wine/drive_c/Program Files (x86)/Battle.net/Battle.net Launcher.exe"'
 
 alias ipmet=ipmet.sh
 
@@ -1489,7 +1489,16 @@ alias ala='~/bin/ala.sh'
 #get a PKGBUILD
 pkgb()
 {
-	curl -f\# "https://gitlab.archlinux.org/archlinux/packaging/packages/${1}/-/raw/main/PKGBUILD"
+	aur.sh -p "$@" || _pkgb "$@"
+}
+_pkgb()
+{
+	local page
+	if page=$(curl -f\# "https://gitlab.archlinux.org/archlinux/packaging/packages/${1}/-/raw/main/PKGBUILD")
+		[[ $page = *\<html\>* ]]
+	then 	page=$(curl -f\# "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${1}") || return
+	fi
+	printf '%s\n' "$page"
 }
 
 #arch linux mail
@@ -3285,10 +3294,10 @@ upchataur()
 	cd $HOME/www/hub-shellChatGPT || return
 	com=${1:-$(git rev-parse main )}
 	
-	cd /home/jsn/bin/openai/ || return
+	cd "$HOME"/bin/openai/ || return
 	./pkgbuild.sh $com || return
 
-	cd /home/jsn/tmp/build/chatgpt/ || return
+	cd "$HOME"/tmp/build/chatgpt/ || return
 	
 	cp ./.SRCINFO $HOME/www/aur-chatgpt.sh/ &&
 	cp ./PKGBUILD $HOME/www/aur-chatgpt.sh/ &&
@@ -3586,7 +3595,7 @@ snow() { clear;while :;do echo $LINES $COLUMNS $(($RANDOM%$COLUMNS));sleep ${2:-
 #  Meta+S, Meta+V, Meta+W, Meta+X, and Meta
 
 #monero mining with nvidia
-#alias xxx='cd /home/jsn/*Minerador && sudo cpupower \
+#alias xxx='cd $HOME/*Minerador && sudo cpupower \
 #frequency-set -g performance && sudo sysct\
 #l -w vm.nr_hugepages=128 && xfce4-terminal \
 #-e "optirun -b none nvidia-settings -c :8"\
@@ -4290,7 +4299,7 @@ estarmos preparados pois já a enfrentamos.'
 'It’s not what you do but who you are. -- book'
 
 )
-if [[ $- = *i* ]] && [[ -n $TMUX ]]
+if [[ $- = *i* ]] && [[ -t 1 ]] && [[ -n $TMUX ]]
 then
 	#[[ -e notes ]] && lolcat -F 0.05 notes
 	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}${KSH_VERSION+0}]}\e[0m\n"  #| cowthink -sn
