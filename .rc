@@ -190,18 +190,6 @@ alias cp='cp --interactive'
 #moving
 alias mv='mv --interactive'
 
-#beware of removing important files accidentally!
-rml()
-{
-	local REPLY
-	printf '%s\n' ${11+...} "PWD: $PWD" "Press Enter to confirm removal" >&2
-	ls "${@:1:10}" || return
-	read
-	/usr/bin/rm -I "$@"
-}
-
-alias Z=zathura
-
 #grep cmds
 #colorise grep (useful for retrieving logs)
 alias ls='ls --color=auto'
@@ -304,10 +292,7 @@ gar()
 #https://lists.gnupg.org/pipermail/gnupg-users/
 
 #forget gpg session passwords
-gpgrel()
-{
-	gpg-connect-agent reloadagent /bye
-}
+#{ gpg-connect-agent reloadagent /bye ;}
 #https://askubuntu.com/questions/349238/how-can-i-clear-my-cached-gpg-password
 
 #silver searcher
@@ -353,7 +338,7 @@ chf()
 #{ sed ':loop ;$!{ N ;/\n$/!b loop } ;s/\"[^\"]*\"//g' ;}
 
 #If a line ends with a backslash append the next line to it.
-alias unbackslash="sed ':loop ;/\\$/N ;s/\\\n */ / ;t loop'"
+#alias unbackslash="sed ':loop ;/\\$/N ;s/\\\n */ / ;t loop'"
 
 #Commify a numeric strings
 alias commify="sed ':loop ;s/\(.*[0-9]\)\([0-9]\{3\}\)/\1,\2/; t loop'"
@@ -371,12 +356,6 @@ alias commify="sed ':loop ;s/\(.*[0-9]\)\([0-9]\{3\}\)/\1,\2/; t loop'"
 #https://www.linuxquestions.org/questions/programming-9/remove-css-comments-with-sed-776853/
 
 #website links
-#get tables
-tablef()
-{
-	sed -n '/<table*/,/<\/table>/p'
-}
-
 sedlinks()
 {
 	sed 's|<[Aa] |\n&|g' | sed -nE "/<[Aa] / s|.*href=['\"]([^'\"]+)['\"].*|\1| p"
@@ -438,12 +417,8 @@ bsd13halt()
 #sitemap() { sed -n 's|.*<loc>\(.*\)<\/loc>.*|\1|g p' ;}
 
 #beautify css
-#cssb()
-#{
-#	local opt
-#	[[ -t 0 ]] && opt=-f || opt=-s
-#	"$HOME/node_modules/.bin/cssbeautify-cli" "$opt" "$1"
-#}
+#{ 	[[ -t 0 ]] && opt=-f || opt=-s
+#	"$HOME/node_modules/.bin/cssbeautify-cli" "$opt" "$1" ;}
 #https://prefetch.net/blog/2017/12/02/formatting-css-from-the-linux-command-line/
 
 #dump page with chromium/chrome
@@ -459,15 +434,11 @@ cdump2()
 #https://intoli.com/blog/making-chrome-headless-undetectable/
 
 #headless chrome and chromium flags
-#chromium --screenshot
-#chromium --print-to-pdf, --print-to-pdf=output_file_name.pdf
-#trigger the javascript console (read-eval-print-loop): --repl
 #list of chromium command line switches:
 #https://peter.sh/experiments/chromium-command-line-switches/
 #http://www.chromium.org/developers/how-tos/run-chromium-with-flags
 
 #headless firefox flags
-#firefox --screeenshot [filename] --window-size=x,y
 #https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options
 #also see: wkhtmltopdf
 
@@ -489,7 +460,7 @@ h()
 gconf()
 {
 	sudo vim /etc/default/grub
-	echo "don't forget to update GRUB!" >&2
+	echo "Don't forget to update GRUB!" >&2
 }
 #grub update hook
 alias upgrub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
@@ -536,30 +507,21 @@ out()
 #OBS: ``$_TMUXSIG'' is defined at ~/.rc file!
 
 #exit tmux and rerun last command
-ter()
-{
-	if [[ -n $TMUX ]]
-	then 	fc -ln -- -1 >"$_TMUXSIG"
-		exit
-	else 	fc -s
-	fi
-}
-
+#{
+#	if [[ -n $TMUX ]]
+#	then 	fc -ln -- -1 >"$_TMUXSIG"
+#		exit
+#	else 	fc -s
+#	fi ;}
 
 #startx
 #alias x=startx
 
 ##kill detached screen sessions
-#sdk()
-#{
-#	screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
-#}
+#{ screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill ;}
 
 ##list screen processes
-#sls()
-#{
-#	screen -list | grep -Eo "[0-9]{4,}" | xargs -n 1 pstree -p
-#}
+#{ screen -list | grep -Eo "[0-9]{4,}" | xargs -n 1 pstree -p ;}
 #https://askubuntu.com/questions/302662/reattaching-to-an-existing-screen-session
 
 #tmux
@@ -604,9 +566,6 @@ batt()
 #from the real plato's sober october arch tips
 #https://therealplato.com/posts/soberoctober07/
 
-#bluetooth manager (cli)
-#alias bt='bluetoothctl'
-
 #disable bluetooth
 #rfkill block bluetooth
 #enable bluetooth
@@ -648,7 +607,6 @@ vifmh()
 alias vimdiff='vimdiff "+colorscheme default" "+syntax off" "+set t_Co=16"'
 # Ref vimdiff colurs: https://stackoverflow.com/questions/2019281/load-different-colorscheme-when-using-vimdiff
 alias diff='/usr/bin/diff -W$(tput cols) -y'
-gdiff() { git diff --name-only HEAD~${1:-1} HEAD ;}
 #https://www.reddit.com/r/git/comments/6mnnag/view_modified_files_in_the_last_n_commits_in_git/
 
 #vim
@@ -695,7 +653,7 @@ alias vless=les
 #the contents of the buffer will be written out to /tmp/foo.txt.
 
 #set bat pager offset
-alias bat='bat --terminal-width -2'
+#alias bat='bat --terminal-width -2'
 
 #move to trash
 trash()
@@ -728,11 +686,6 @@ kk()
 #edit c files
 alias vrc='vim ~/.vimrc'
 alias vfrc='vim ~/.config/vifm/vifmrc'
-alias xrc='vim ~/.Xresources'
-alias xbk='vim ~/.xbindkeysrc'
-#alias scrc='vim ~/.screenrc'
-alias trc='vim ~/.tmux.conf'
-alias mrc='vim ~/.mutt/muttrc'
 alias pkglist='vim ~/arq/docs/archInstallPkgSuggestion.txt'
 
 #edit and source
@@ -744,10 +697,6 @@ szrc()
 {
 	[[ -n "$ZSH_VERSION" ]] && exec zsh
 }
-#src()
-#{
-#	szrc || sbrc
-#}
 
 #~/.bashrc
 brc()
@@ -778,18 +727,6 @@ rc()
 #git diff HEAD versionHash [file]
 #https://stackoverflow.com/questions/3338126/how-do-i-diff-the-same-file-between-two-different-commits-on-the-same-branch
 
-#git add file
-gadd()
-{
-	git add "${@:--A}"
-}
-
-#git rm file
-grm()
-{
-	git rm "$1"
-}
-
 #git commit
 gcom()
 {
@@ -808,6 +745,16 @@ gdiff()
 	git diff HEAD~${1:-1} HEAD -- $2
 	#filename as $2 is optional
 }
+#{ git diff --name-only HEAD~${1:-1} HEAD ;}
+#alias gdca='git diff --cached' # diff between your staged file and the last commit
+#alias gdcc='git diff HEAD{,^}' # diff between your latest two commits
+#https://stackoverflow.com/questions/1191282/how-to-see-the-changes-between-two-commits-without-commits-in-between
+#compare files
+#{ git diff --no-index dir1/ dir2/ ;}
+#{ diff -r dir1/ dir2/ ;}
+#{ comm -23 <(ls dir1 |sort) <(ls dir2|sort) ;} #files in dir1 and not in dir2
+#https://stackoverflow.com/questions/16787916/find-the-files-existing-in-one-directory-but-not-in-the-other
+#find + md5sum + diff at: https://askubuntu.com/questions/421712/comparing-the-contents-of-two-directories
 
 #simple git sync
 gitup()
@@ -839,10 +786,6 @@ thumblr()
 # Meaningful thumbnails for a Video using FFmpeg
 #{ ffmpeg -ss 3 -i input.mp4 -vf "select=gt(scene\,0.4)" -frames:v 5 -vsync vfr -vf fps=fps=1/600 out%02d.jpg ;}
 #https://superuser.com/questions/538112/meaningful-thumbnails-for-a-video-using-ffmpeg
-
-#alias gdca='git diff --cached' # diff between your staged file and the last commit
-#alias gdcc='git diff HEAD{,^}' # diff between your latest two commits
-#https://stackoverflow.com/questions/1191282/how-to-see-the-changes-between-two-commits-without-commits-in-between
 
 #Github credentials for repository
 #SSH login:
@@ -930,13 +873,6 @@ ggrep()
 	git rev-list --all | xargs git grep "$@"
 }
 #https://stackoverflow.com/questions/2928584/how-to-grep-search-committed-code-in-the-git-history
-
-#compare files
-#{ git diff --no-index dir1/ dir2/ ;}
-#{ diff -r dir1/ dir2/ ;}
-#{ comm -23 <(ls dir1 |sort) <(ls dir2|sort) ;} #files in dir1 and not in dir2
-#https://stackoverflow.com/questions/16787916/find-the-files-existing-in-one-directory-but-not-in-the-other
-#find + md5sum + diff at: https://askubuntu.com/questions/421712/comparing-the-contents-of-two-directories
 
 #test if inside a git dir
 #{ git rev-parse --is-inside-work-tree ;}
@@ -1048,9 +984,6 @@ slurm()
 }
 #alias slurm="/bin/slurm -i enp3s0"
 
-#speedtest
-alias st='speedtest'
-
 #last log-ins
 alias lastl='last | head -5 | tr -s " "'
 #count log-ins
@@ -1096,25 +1029,7 @@ alias ...='cd ../../'
 # Enable aliases to be sudo’ed
 #alias sudo='sudo '
 
-#cd into my folders
-alias cda='cd ~/arq'
-alias cdb='cd ~/bak'
-alias cdc='cd ~/arq/concursos'
-alias cdd='cd ~/arq/docs'
-alias cdD='cd ~/Documents'
-alias cdm='cd ~/bin/markets'
-alias cdM='cd /media ;[[ -n "$(/bin/ls)" ]] || cd /run/media'
-alias cdmedia=cdM
-alias cds='cd ~/bin'
-alias cdt='cd ${TMPDIR:-/tmp}'
-alias cdT='cd ~/tmp'
-alias cdw='cd ~/Downloads'
-alias cdW='cd ~/www'
-
 alias du='du -h'
-
-alias winecd='cd $HOME/.wine/drive_c/users/jsn'
-#alias battle='WINEPREFIX="$HOME/.wine" wine "$HOME/.wine/drive_c/Program Files (x86)/Battle.net/Battle.net Launcher.exe"'
 
 alias ipmet=ipmet.sh
 
@@ -1123,29 +1038,10 @@ alias open='exo-open'
 
 #temperature converter
 alias ctemp='~/bin/ctemp.sh'
-alias ct=ctemp
-alias ct.sh=ctemp
 
-
-#alias b=binance.sh\ -3
-alias cd0='/storage/emulated/0'
 alias usd='cmc usd brl ;cgk usd brl ;uol.sh|sed -n 8p\;17p'
 
 #Android Termux
-#alias open=termux-open
-#alias o=open
-#O()
-#{
-#	termux-open --content-type="$(file --mime-type -b "$1")" "$1"
-#	#text/plain
-#}
-#alias oc='open --choose'
-#alias send='open --send'
-#alias s=send
-#alias S='termux-share' #file or stdin
-#alias gps='termux-location -p gps'
-#alias D='termux-download' #url
-
 #termux-setup-storage
 #this creates a new directory in termux, ~/storage, which contains simlinks to /storage/emulated/0 and can be accessed by a standard gui file manager. 
 
@@ -1476,10 +1372,6 @@ mping()
 #yay -- aur
 #search in oficial repos and aur
 alias s='yay -Ss'
-#aur only search
-alias ys='yay -Ssa'
-#yay arch news
-alias yw='yay -Pw'
 #skip validity checks, look for mflags
 #ex:yay -S package --mflags "--skipchecksums --skippgpcheck"
 
@@ -1519,139 +1411,10 @@ amail()
 	done
 }
 
-
-#debian -- list of all packages
-debian()
-{
-	echo 'List of all packages' >&2
-	curl -sL "https://packages.debian.org/${1:-stable}/allpackages?format=txt.gz"
-}
-#Distribution:   #Section:
-#  experimental  #  main
-#  unstable      #  contrib
-#  testing       #  non-free
-#  stable        #  any     
-#  oldstable
-#  any
-
-#debian -- list of all packages by repo (without version)
-debian2()
-{
-	local v r
-
-	echo 'List of all packages' >&2
-	for v in bullseye buster stretch jessie
-	do  	for r in main contrib non-free
-		do 	printf '%s in %s\n' "$v" "$r" | tr a-z A-Z >&2
-			curl -Ls "http://ftp.br.debian.org/debian/dists/${v}/${r}/source/Sources.xz" \
-				| unxz | grep Package:
-		done
-	done
-}
-#ftp.us.debian.org/debian/,ftp.de.debian.org/debian/ ,ftp.uk.debian.org/debian/
-#Debian8.11 	#jessie
-#Debian9.12 	#stretch
-#Debian10.3 	#buster
-#Debian 	#next bullseye
-#stable, testing, unstable, experimental, sid
-
-#ubuntu -- list all pkg names (without version)
-ubuntu()
-{
-	local v r
-	echo 'List of all packages' >&2
-	for v in 'jammy 22.04 LTS' 'impish 21.10' 'hirsute 21.04' \
-		'focal 20.04 LTS' 'bionic 18.04 LTS' 'xenial 16.04 LTS' \
-		'trusty 14.04' #devel
-	do 	for r in main multiverse restricted universe
-		do 	echo "$v in $r" | tr a-z A-Z >&2
-			curl -Ls "http://archive.ubuntu.com/ubuntu/dists/${v%% *}/${r}/source/Sources.gz" \
-				| gzip -dc | grep -F Package:
-		done
-	done
-}
-
-#ubuntu -- search a package in ubuntu repos
-ubuntu2()
-{
-	curl -sL "http://packages.ubuntu.com/${1:?pkg name required}" | sed -e 's/<[^>]*>//g'  -Ee 's/^(\s|\t)+//g' \
-		| sed -n '/You have searched for/,/This page is also/p' \
-		| sed -E ':a; N; $!ba; :b; s/([^\n])\n\n([^\n])/\1\n\2/g; tb' \
-		| sed -e ':a;N;s/\n\(.\)/ \1/;ta' \
-		| sed -e '/^\s*$/d' -e 's/^\s*//g' -e 's/^Package\s/\n&/g' \
-		| cat <(echo) - | tac -rs '^$'
-}
-#w3m "http://packages.ubuntu.com/$1" -dump | sed -n '/^Package/,$p' | tac
-
-#freebsd ports, list of all ports
-freebsd()
-{
-	local category
-	for category in accessibility arabic archivers astro audio base \
-		benchmarks biology cad chinese comms converters \
-		databases deskutils devel dns editors emulators finance \
-		french ftp games german graphics hebrew hungarian \
-		irc japanese java korean lang mail math misc \
-		multimedia net-im net-mgmt net-p2p net news \
-		polish ports-mgmt portuguese print russian science security \
-		shells sysutils textproc ukrainian vietnamese www x11-clocks \
-		x11-drivers x11-fm x11-fonts x11-servers x11-themes x11-toolkits x11-wm x11
-	do 	curl -sL "https://cgit.freebsd.org/ports/tree/$category" | htmlfilter
-	done
-	#older: http://www.cz.freebsd.org/ports/master-index.html
-}
-##mirrors
-#https://www.freebsd.org/doc/handbook/mirrors-ftp.html
-#main server: https://www.freebsd.org/ports/master-index.html
-#http://www1.fr.freebsd.org/ports/master-index.html
-#http://www.cz.freebsd.org/ports/master-index.html
-#also: ftp://ftp.freebsd.org/pub/FreeBSD/ports/
-
-#freebsd fresh ports (without version)
-freebsd2()
-{
-	curl -sL "https://www.freshports.org/search.php?stype=name&method=match&query=${1:?port name required}&num=500&orderby=category&orderbyupdown=desc&search=Search&format=plaintext&branch=head"
-}
-
-
-#gentoo pkg list from mirror
-gentoo()
-{
-	curl -Ls 'https://gentoo.osuosl.org/distfiles/' | sed 's/<[^>]*>//g'
-}
-#https://mirrors.lug.mtu.edu/gentoo/distfiles/
-
-#gentoo pkg list from search engine
-gentoo2()
-{
-	curl -Ls --compressed "https://packages.gentoo.org/packages/search?q=${1:?pkg name required}" \
-		| sed -e 's/<[^>]*>//g' -e 's/^\s*//g' \
-		| sed -n '/^Results/,/^Next/p' | cat -s
-}
-
-#fedora
-fedora()
-{
-	local ver index
-	echo 'List of (almost) all packages' >&2
-	for ver in 36
-	do 	for index in {a..z} {0..9}
-		do 	curl --compressed -sL "http://fedora.c3sl.ufpr.br/linux/releases/$ver/Everything/aarch64/os/Packages/$index" \
-				| sed -e 's/</\t&/g; s/<[^>]*>//g' -e 's/^[\s\t]*//; s/\t\+/\t/g; s/&nbsp;//' | cat -s
-		done
-		echo "Packages above from Fedora $ver repos" >&2
-	done
-}
-#https://admin.fedoraproject.org/mirrormanager/
-
-
 #test shell performance
 #{ strace -cf bash -c 'for i in $(seq 1 1000); do bash -c ":"; done' ;}
 
-cloudflare()
-{
-	python "$HOME/bin/more/CloudFlair/cloudflair.py" "$1"
-}
+#cloudflare() { python "$HOME/bin/more/CloudFlair/cloudflair.py" "$1" ;}
 #install the dependencies
 #$ cd cloudflair
 #$ pip install -r requirements.txt
@@ -1730,27 +1493,6 @@ sin()
 #extensão do OpenOffice
 #https://extensions.openoffice.org/en/node/6213
 
-#dicionários michaelis do uol
-#uso: inglês para português: $ dic en dog
-#uso: português para inglês: $ dic pt cachorro
-#uso: português-português:   $ dic cachorro
-dic()
-{
-	local url
-	case $1 in
-		english|ingl[eê]s|en|e|i)
-			url=https://michaelis.uol.com.br/moderno-ingles/busca/ingles-portugues-moderno/$2
-			;;
-		portugu[eê]s|pt|p)
-			url=https://michaelis.uol.com.br/moderno-ingles/busca/portugues-ingles-moderno/$2
-			;;
-		*) 	url=https://michaelis.uol.com.br/moderno-portugues/busca/portugues-brasileiro/$1
-			;;
-	esac
-	[[ $(curlu "$url") =~ ('<!-- MAIN CONTENT -->')(.*)'<!-- END MAIN CONTENT -->' ]] &&
-	htmlfilter <<<"${BASH_REMATCH[2]:-$MATCH}"
-}
-
 #for acronym list, check
 # package wtf
 # and: http://www.mirbsd.org/acronyms.gz
@@ -1758,52 +1500,12 @@ dic()
 # for random phrases, check
 # https://swanrad.ch/g.html
 
-#try to convert to ISO date
-ciso()
-{
-	(($#)) || [[ -t 0 ]] || set -- "$(</dev/stdin)"
-	busybox date -I -D '%d/%b/%Y' -d "$@" ||
-	busybox date -I -D '%d/%m/%Y' -d "$@" ||
-	date -I -d "$@"
-} 2>/dev/null
-
 #Serialization, time formats
 #RFC 5322: strftime({"%a, %d %b %Y %T %z"}, var.time);
 #ISO 8601: strftime({"%Y-%m-%dT%H:%M:%SZ"}, var.time);
 
-#date ranges script
+#datediff.sh
 alias d="$HOME/bin/datediff.sh"
-#d()
-#{ 	#debug
-#	[[ $1 = -* ]] && { 	local opt=$1 ;shift ;}
-#	~/bin/datediff.sh -dDD $opt $(date -Iseconds -d "${1:-now}") $(date -Iseconds -d "${2:-now}")
-#
-#}
-
-# Calculate the difference in whole days between two dates, ignoring timezone changes
-#datedifference() { echo $(( ($(date -u -d "$1" +%s) - $(date -u -d "$2" +%s)) / 86400)) days ;}
-#https://matt.blissett.me.uk/linux/zsh/zshrc
-
-# convertsecs
-# ------------------------------------------------------
-# Convert Seconds to human readable time
-#
-# To use this, pass a number (seconds) into the function as this:
-# print "$(convertsecs $TOTALTIME)"
-#
-# To compute the time it takes a script to run use tag the start and end times with
-#   STARTTIME=$(date +"%s")
-#   ENDTIME=$(date +"%s")
-#   TOTALTIME=$(($ENDTIME-$STARTTIME))
-# ------------------------------------------------------
-#convertsecs()
-#{
-#  ((h=${1}/3600))
-#  ((m=(${1}%3600)/60))
-#  ((s=${1}%60))
-#  printf "%02d:%02d:%02d\n" $h $m $s
-#}
-#https://github.com/natelandau/shell-scripts/blob/master/lib/sharedFunctions.sh
 
 #units - list units from default file
 unitsl()
@@ -1873,19 +1575,10 @@ tza()
 	tz & tz2 & tz3 & tz4 & tz5
 	wait
 )
-
 #also: https://www.timeanddate.com/time/zones/
 
 #geonames.org provides a data dump (by country) of all known cities and their Olson timezone.
 #Hands down the best way to do it. download.geonames.org/export/dump
-
-# imgur - post image to imgur.com
-# 20jul2014  +chris+  zsh function
-# 01apr2016  +chris+  use api v3
-#imgur() {
-#	curl -H "Authorization: Client-ID 3e7a4deb7ac67da" -F image=@$1 \
-#    https://api.imgur.com/3/upload | sed 's/.*http/http/; s/".*/\n/; s,\\/,/,g'
-#}
 
 vipef()
 {
@@ -1963,21 +1656,20 @@ cep()
 }
 #https://data.mendeley.com/datasets/g97jb8fp57/1
 #http://cep.la/baixar
+#discussões sobre cep
+#https://groups.google.com/forum/#!topic/python-brasil/wvERTS9Bz3M
+#https://groups.google.com/forum/#!searchin/python-brasil/correios$20a%C3%A7%C3%A3o/python-brasil/wvERTS9Bz3M/efQdlHDfLIgJ
+#https://blog.public.law/2013/11/06/usps-zip-codes-are-commercially-sensitive-trade-secrets/
+#download base de dados cep antiga: https://www.republicavirtual.com.br/cep/
 
 #indent a compact json (one-liner)
-#echo '{"test1": 1, "test2": "win"}' | python -m json.tool
+# python -m json.tool
 
 #pkgs to format text
 #procmail, fmt and nroff
 
 #font to source emoji (no need to use as defult font)
 #noto-fonts-emoji
-
-#discussões sobre cep
-#https://groups.google.com/forum/#!topic/python-brasil/wvERTS9Bz3M
-#https://groups.google.com/forum/#!searchin/python-brasil/correios$20a%C3%A7%C3%A3o/python-brasil/wvERTS9Bz3M/efQdlHDfLIgJ
-#https://blog.public.law/2013/11/06/usps-zip-codes-are-commercially-sensitive-trade-secrets/
-#download base de dados cep antiga: https://www.republicavirtual.com.br/cep/
 
 
 #genbank
@@ -2025,7 +1717,6 @@ gened()
 	return $ret
 }
 
-
 #linearise seq in fasta
 #usage: cat *.fsdt | fstlin
 fstlin()
@@ -2070,13 +1761,10 @@ codons()
 alias ff=firefox
 
 #URL lists (from ugrep.sh)
-
 #firefox user database
 FFUSER="$HOME/.mozilla/firefox/sdqosrgm.jsn_firefox/places.sqlite"
-
 #google chrome user database
 GCUSER="$HOME/.config/google-chrome/Default/History"
-
 #temp file
 TEMPFILE="$HOME/Downloads/urls.sqlite"
 
@@ -2114,7 +1802,7 @@ cburls()
 alias ugrep='faurls | tac | urlgrep.sh --color=always'
 
 #grep full text from URL sent via stdin
-ugrepfun()
+ugrepf()
 {
 	local url
 	while read url
@@ -2237,8 +1925,7 @@ gps()
 #by gps coordinates
 gspc()
 {
-	curl -sL -H "$UAG" "https://nominatim.openstreetmap.org/reverse?lat=${1:?lat: not set}&lon=${2:?lon: not set}&format=json&addressdetails=0" \
-	| jq .
+	curl -sL -H "$UAG" "https://nominatim.openstreetmap.org/reverse?lat=${1:?lat: not set}&lon=${2:?lon: not set}&format=json&addressdetails=0" | jq .
 }
 
 #get the distance (metres)
@@ -2354,7 +2041,6 @@ aworld()
 #{ ip -brief link show ;}
 #{ ip a ;}
 
-
 #ip adresses
 myip()
 {
@@ -2417,8 +2103,7 @@ ipgeo()
 #https://www.vivaolinux.com.br/topico/Shell-Script/SHELL-SCRIPT-45
 
 #wifi pass key list (passwords)
-#requires root access
-#all conections
+#all conections, requires root access
 psks()
 {
 	su root -c "awk '/^(id|psk)=/' /etc/NetworkManager/system-connections/*"
@@ -2594,13 +2279,6 @@ colours3()
 #{ wget -nd -H -p -A jpg,jpeg,png,gif -e robots=off "$*" ;}
 #https://davidwalsh.name/scrape-images-wget
 
-#scrape files required for a website
-#{ wget --page-requisites [-r] [URL] ;}
-#https://stackoverflow.com/questions/11124292/why-does-wget-only-download-the-index-html-for-some-websites
-#--no-check-certificate
-#--span-hosts  #visit other hosts
-#--convert-links  #fix src attributes to local urls
-
 #save cmd output as an image
 #requires 'imagemagick'
 #usage: cmd | toimage [filename].ext
@@ -2638,9 +2316,6 @@ alias autoclicker='xdotool click --repeat 100 --delay 18 1'
 #click and enter
 #{ xdotool click 1 key KP_Enter ;}
 
-# the terminal rickroll
-#alias rick='curl -s -L https://raw.githubusercontent.com/keroserene/rickrollrc/master/roll.sh  #| bash'
-
 #cheat sheets pkgs:
 #tldr
 #cht.sh
@@ -2667,11 +2342,6 @@ alias chessonline='telnet freechess.org 5000'
 
 #aria2
 alias a2='aria2c'
-
-#youtube-dl troubleshooting
-#try removing:
-#~/.cache/youtube-dl
-#~/.config/youtube-dl
 
 
 #youtube download fun
@@ -2745,22 +2415,6 @@ yts()
 #disable globbing
 alias c='noglob bcalc.sh -v'
 
-#bash calculator - bc
-#function c() { bc -l <<< "$*" ;}
-#alias cc="bc -l <<<'"  #ending ' missing
-
-#try to add a right zero in result
-#echo "scale = 2; x = 24 / 60; if (x < 1) print 0; x" | bc
-
-#Doing Floating-point Arithmetic in Bash
-#A noteworthy but unconventional way to do floating-point arithmetic
-#in native bash is to combine Arithmetic Expansion with printf
-#using the scientific notation.
-#In order to get the floating number using printf you
-#printf %.<precision>f "$((10**<multiplier> * <expression>))e-<multiplier>
-#printf %.3f "$((10**3 * 2/3))e-3"
-#https://www.shell-tips.com/bash/math-arithmetic-calculation/
-
 #mount sshfs (phone)
 moto()
 {
@@ -2817,13 +2471,9 @@ ffres()
 #usage: cvideo input.mp4 [output.mp4]
 #{ ffmpeg -i [infile.ext] -vcodec libx265 -crf 28 [outfile.ext]
 #{ ffmpeg -i 'input.mp4' -vcodec libx265 -crf 29 -filter:v "crop=352:540:0:50" -vf "scale=-1:450" 'output.mp4' ;}
-#reduce bitrate:
 #https://superuser.com/questions/4244/how-do-i-reduce-the-size-of-a-huge-mp4-video/4252#4252
-#encoder opts:
 #https://trac.ffmpeg.org/wiki/Encode/H.265
-#crop:
 #https://video.stackexchange.com/questions/4563/how-can-i-crop-a-video-with-ffmpeg
-#scale:
 #https://trac.ffmpeg.org/wiki/Scaling
 
 tomp3()
@@ -2909,6 +2559,21 @@ clr()
 }
 #{ tput clear ;}  #removes scrollback buffer
 
+#terminal escapes, clear line, clear screen
+#clear from the cursor position to the beginning of the line:
+#{ echo -e "\033[1K" ;}
+#or everything on the line, regardless of cursor position:
+#{ echo -e "\033[2K" ;}
+#https://unix.stackexchange.com/questions/26576/how-to-delete-line-with-echo
+#{ tput cuu1 && tput dl1 ;}
+#{ printf '\e[A\e[K' ;} # to move the cursor up one line and erase the line
+#https://stackoverflow.com/questions/5861428/bash-script-erase-previous-line
+
+#regex to search for non-ascii values
+#ASCII is in range of 0 to 127
+# [^\x00-\x7F]+
+#https://stackoverflow.com/questions/20889996/how-do-i-remove-all-non-ascii-characters-with-regex-and-notepad
+
 # Hex to Decimal Conversion Helper functions
 h2d()
 {
@@ -2952,7 +2617,13 @@ toBase58()
 
 #bitcoin-bash-tools
 #https://github.com/grondilu/bitcoin-bash-tools
-#many important tools, such as 'encodeBase58'
+
+#andreas antonopoulos' mastering bitcoin
+#https://github.com/bitcoinbook/bitcoinbook
+
+#utilities for bitcoin
+#https://github.com/igorbarinov/awesome-bitcoin#utilities
+#install hal crate (cargo install hal), very useful
 
 #bitcoin blockchain
 #you can just print every string in the blockchain database directly
@@ -3003,23 +2674,12 @@ alias blk="$HOME/bin/bitcoin.blk.sh"
 alias tx="$HOME/bin/bitcoin.tx.sh"
 #bitcoin.hx.sh
 alias hx="$HOME/bin/bitcoin.hx.sh"
-#bitcoin-cli
-alias bit=bitcoin-cli
-#electrum cli
-alias el=electrum
 
 #load a wallet
 #{ electrum daemon walletname ;}
 
 #tail bitcoind log
 alias btct='tail -f /media/primary/blockchain/debug.log'
-
-#andreas antonopoulos' mastering bitcoin
-#https://github.com/bitcoinbook/bitcoinbook
-
-#utilities for bitcoin
-#https://github.com/igorbarinov/awesome-bitcoin#utilities
-#install hal crate (cargo install hal), very useful
 
 #bitcoin historical price (time series)
 btchist()
@@ -3143,33 +2803,33 @@ cores()
 	grep -H . /sys/devices/system/cpu/cpu*/topology/thread_siblings_list
 }
 
-#check if intel hyperthread is enabled
-#prints 'ht' if enabled
-ht()
-{
-	grep -o ht /proc/cpuinfo #| uniq
-}
-
-#disable one of each sibling ht
-dht()
-{
-	#OBS: command may not run under TMUX!
-	local i
-	for i in 2 3
-	do 	echo "Disabling logical HT core $i"
-		echo 0 > /sys/devices/system/cpu/cpu${i}/online
-	done
-}
-
-#enable hyperthreading
-eht()
-{
-	local i
-	for i in 2 3
-	do 	echo "Enabling logical HT core $i"
-		echo 1 > /sys/devices/system/cpu/cpu${i}/online
-	done
-}
+##check if intel hyperthread is enabled
+##prints 'ht' if enabled
+#ht()
+#{
+#	grep -o ht /proc/cpuinfo #| uniq
+#}
+#
+##disable one of each sibling ht
+#dht()
+#{
+#	#OBS: command may not run under TMUX!
+#	local i
+#	for i in 2 3
+#	do 	echo "Disabling logical HT core $i"
+#		echo 0 > /sys/devices/system/cpu/cpu${i}/online
+#	done
+#}
+#
+##enable hyperthreading
+#eht()
+#{
+#	local i
+#	for i in 2 3
+#	do 	echo "Enabling logical HT core $i"
+#		echo 1 > /sys/devices/system/cpu/cpu${i}/online
+#	done
+#}
 
 #toggle 'caps lock' to 'esc'
 #defaults:
@@ -3231,18 +2891,9 @@ alias t='~/bin/test.sh'
 #imgur
 alias imgur=imgur.sh
 
-#spell
-#note: prefer aspell to hunspell (both are OK)
-sp()
-{
-	echo "PORTUGUESE"
-	aspell --lang=pt-BR --encoding=utf-8 pipe <<<"$1"
-
-	echo "ENGLISH"
-	aspell --lang=en-GB --encoding=utf-8 pipe <<<"$1"
-}
-#also:https://pseudoscripter.wordpress.com/2011/05/11/aspell-using-more-than-one-language/
-
+#{ aspell --lang=pt-BR --encoding=utf-8 pipe ;}
+#{ aspell --lang=en-GB --encoding=utf-8 pipe ;}
+#https://pseudoscripter.wordpress.com/2011/05/11/aspell-using-more-than-one-language/
 
 #espeak config speech synthesis
 alias espeak='/bin/espeak -a40 -s150 -p30'  #-v brazil
@@ -3265,8 +2916,6 @@ alias uah='curl https://www.nsstc.uah.edu/data/msu/v6.0/tlt/uahncdc_lt_6.0.txt'
  #####markets######
 ####################
 alias binfo='~/bin/binfo.sh'
-alias bitstamp='~/bin/markets/bitstamp.sh'
-alias binance='~/bin/markets/binance.sh'
 alias cgk='~/bin/markets/cgk.sh -3'
 alias cmc='~/bin/markets/cmc.sh -3'
 alias myc='~/bin/markets/myc.sh -3'
@@ -3284,26 +2933,27 @@ upchat()
 			./md2man.sh chatgpt.sh.1.md
 			cd $dir
 		}
-		cp -f ~/bin/chatgpt.sh $dir/ &&
+		\cp -fv ~/bin/chatgpt.sh $dir/ &&
 		gitup "$@"
 	done
 }
-upchataur()
-{
-	local com
-	cd $HOME/www/hub-shellChatGPT || return
-	com=${1:-$(git rev-parse main )}
-	
-	cd "$HOME"/bin/openai/ || return
-	./pkgbuild.sh $com || return
-
-	cd "$HOME"/tmp/build/chatgpt/ || return
-	
-	cp ./.SRCINFO $HOME/www/aur-chatgpt.sh/ &&
-	cp ./PKGBUILD $HOME/www/aur-chatgpt.sh/ &&
-	cd $HOME/www/aur-chatgpt.sh/ &&
-	pwd
-}
+#upchataur()
+#{
+#	local com
+#	cd $HOME/www/hub-shellChatGPT || return
+#	com=${1:-$(git rev-parse main )}
+#	
+#	cd "$HOME"/bin/openai/ || return
+#	./pkgbuild.sh $com || return
+#
+#	cd "$HOME"/tmp/build/chatgpt/ || return
+#	
+#	\cp -fv ./.SRCINFO $HOME/www/aur-chatgpt.sh/ &&
+#	\cp -fv ./PKGBUILD $HOME/www/aur-chatgpt.sh/ &&
+#	cd $HOME/www/aur-chatgpt.sh/ &&
+#	pwd
+#}
+upchat() { ! p Oh no, only critical bug corrections\! ;} ;upchataur() { upchat ;}
 
 #mop - stocks the hacker way
 mop()
@@ -3334,23 +2984,21 @@ plot4()
 {
 	gnuplot -p -e 'set term dumb' -e 'plot "-" with linespoints linestyle 1 notitle'
 }
-#-e 'set datafile separator "\t"'
-#-e 'set grid'
 #http://gnuplot.sourceforge.net/demo_5.5/datastrings.html
 #http://www.physics.smu.edu/fattarus/GnuplotTutorial.html
 #https://www.datafix.com.au/BASHing/2019-06-21.html
 
 #Get the list of functions in a script
-get_functions() {
-    # Usage: get_functions
-    IFS=$'\n' read -d "" -ra functions < <(declare -F)
-    printf '%s\n' "${functions[@]//declare -f }"
-}
+#get_functions() {
+#    # Usage: get_functions
+#    IFS=$'\n' read -d "" -ra functions < <(declare -F)
+#    printf '%s\n' "${functions[@]//declare -f }"
+#}
 #https://github.com/dylanaraps/pure-bash-bible
 
 #red display
-alias goclear='xcalib -clear'
-alias gored='xcalib -green .1 0 1 -blue .1 0 1 -red 0.5 1 40 -alter'
+#alias goclear='xcalib -clear'
+#alias gored='xcalib -green .1 0 1 -blue .1 0 1 -red 0.5 1 40 -alter'
 #https://blog.ynfonatic.de/2023/02/10/x-org-x11-set-your-monitor-to-monochrome-red-on-black.html
 
 #world population
@@ -3458,21 +3106,6 @@ mandelbrot3()
 }
 #https://bruxy.regnet.cz/web/linux/EN/mandelbrot-set-in-bash/
 
-#terminal escapes, clear line, clear screen
-#clear from the cursor position to the beginning of the line:
-#{ echo -e "\033[1K" ;}
-#or everything on the line, regardless of cursor position:
-#{ echo -e "\033[2K" ;}
-#https://unix.stackexchange.com/questions/26576/how-to-delete-line-with-echo
-#{ tput cuu1 && tput dl1 ;}
-#{ printf '\e[A\e[K' ;} # to move the cursor up one line and erase the line
-#https://stackoverflow.com/questions/5861428/bash-script-erase-previous-line
-
-#regex to search for non-ascii values
-#ASCII is in range of 0 to 127
-# [^\x00-\x7F]+
-#https://stackoverflow.com/questions/20889996/how-do-i-remove-all-non-ascii-characters-with-regex-and-notepad
-
 #ncdu for disk and folder usage
 #for a feh alternative, check sxiv
 
@@ -3566,22 +3199,6 @@ snow() { clear;while :;do echo $LINES $COLUMNS $(($RANDOM%$COLUMNS));sleep ${2:-
 #alias emoji_run='echo -n "ᕕ( ᐛ )ᕗ" | xclip -selection clipboard'
 #https://github.com/charnley/dotfiles/blob/master/bash_aliases
 
-#bash readline cheat sheet
-# Ctr + W  		Kill word backwards
-# Alt + B		Move one word backward
-# Ctrl+ Sft + _  	Undo
-#
-# Meta = Alt
-#
-# Meta + Sft + _  	Yaks last argument
-# Ctl + Meta + Y 	Yanks first argument
-# Meta + 2 and then
-#  	Ctl+ Meta + Y 	Yaks from $2
-# Ctl + Y 		Yank and past from buffer
-# Alt + B 		Go back one word at a time
-# Meta + R		Revert line like many  Undoes
-# Meta+. 		Repeatedly cycle through final
-
 #bash key mappings that are available
 #  The 2 unused keystrokes with Ctrl are
 #  the rather awkward:
@@ -3593,13 +3210,6 @@ snow() { clear;while :;do echo $LINES $COLUMNS $(($RANDOM%$COLUMNS));sleep ${2:-
 #  Meta+A, Meta+E, Meta+G, Meta+H, Meta+I,
 #  Meta+J, Meta+K, Meta+M, Meta+O, Meta+Q,
 #  Meta+S, Meta+V, Meta+W, Meta+X, and Meta
-
-#monero mining with nvidia
-#alias xxx='cd $HOME/*Minerador && sudo cpupower \
-#frequency-set -g performance && sudo sysct\
-#l -w vm.nr_hugepages=128 && xfce4-terminal \
-#-e "optirun -b none nvidia-settings -c :8"\
-#&& sleep 10s && xmr-stak'
 
 #nvidia
 #{ LD_PRELOAD=/usr/lib/libGL.so optirun %command% ;}
@@ -3635,10 +3245,8 @@ snow() { clear;while :;do echo $LINES $COLUMNS $(($RANDOM%$COLUMNS));sleep ${2:-
 #}
 ##https://www.drdobbs.com/shell-corner-bash-dynamically-loadable-b/199102950?pgno=1
 
-
 #useful one-liners
 #commands
-
 
 #vim, list all ed builtin commands:
 #:h ex-cmd-index
@@ -3690,22 +3298,18 @@ SUM2()
 #https://www.gnu.org/software/datamash/examples/
 #https://www.programmersought.com/article/92546043400/
 
+#add numbers
+#adds newline-separated numbers from stdin
+#until eof then output the total to stdout.
+#{ awk '{s+=$1} END {printf "%.'${1:-2}'f\n", s}' ;}
+#{ echo $(( $( tr '\n' +  < /dev/stdin) 0 )) ;}
+#https://stackoverflow.com/questions/450799/shell-command-to-sum-integers-one-per-line
+
 #sum same elements of the same column of different lines
 #{ datamash -t, sum 1-"$cols" ;}  #-t sets separator
 #{ awk '{s1+=$1;s2+=$2;s3+=$3;s4+=$4;s5+=$5}END{print s1,s2,s3,s4,s5}' ;}
 #{ awk '{s1+=$1;s2+=$2;s3+=$3;s4+=$4;s5+=$5}{print;}END{print "----------\n"s1,s2,s3,s4,s5}' ;}
 #https://www.vivaolinux.com.br/topico/Algoritmos-e-resolucao-de-problemas/somar-linhas-em-bash
-
-#change K, M, G Bytes (approximately)
-kbto()
-{
-	sed -E -e 's/[Bb][Yy][Tt][Ee][Ss]?/B/g' \
-		-e 's/[Bb][Ii][Tt][Ss]?/B/g' \
-		-e 's/[Kk]i?[Bb]?/*1000/g' \
-		-e 's/[Mm]i?[Bb]?/*1000000/g' \
-		-e 's/[Gg]i?[Bb]?/*1000000000/g' \
-		| bc "$@"
-}
 
 #print first 3 lines
 #{ head -n+3 ;}
@@ -3728,7 +3332,7 @@ kbto()
 #is a positive decimal integer.
 #tac may not be in osx
 
-#IPC#Different ways to print the next few lines after pattern match
+#!#different ways to print the next few lines after pattern match
 #https://www.theunixschool.com/2012/05/different-ways-to-print-next-few-lines.html?m=1
 
 #print last fiel
@@ -3833,25 +3437,10 @@ zultra()
 #<http://www.iwar.org.uk/hackers/resources/digital%20rebels/articles/unixtips.txt>
 #<http://www.lib.ru/SECURITY/hackalot.txt>
 
-#some dotfiles and script repos
-#https://github.com/kevva/dotfiles/blob/master/shell/curlrc
-#https://github.com/cowboy/dotfiles/
-#http://www.pixelbeat.org/scripts/
-#http://www.shelldorado.com/links/
-#https://www.cs.nmsu.edu/~tomohara/useful-scripts/
-#http://www.softpanorama.org/Scripting/Shellorama/shell_scripts_collections.shtml
-#http://kinzler.com/me/home.html#
-#https://legacy.cs.indiana.edu/~kinzler/
-
 #learn regex
 #{ perldoc perlretut ;}
 #{ perldoc perlrequick ;}
 #{ info sed ;}
-
-#sed, awk and perl one liners
-#http://www.pement.org/awk/awk1line.txt
-#http://sed.sourceforge.net/sed1line.txt
-#https://catonmat.net/ftp/perl1line.txt
 
 #"if there's one thing everyone should learn in perl, this is it"
 #Perl Pie: Replace String in Files
@@ -3874,12 +3463,6 @@ zultra()
 #i.e. add quotient to remainder and again take remainder,
 #to avoid negative remainder.
 #https://www.geeksforgeeks.org/modulus-on-negative-numbers/
-
-#chage new line for something else (X) in a string
-#${string//$'\n'/X}
-#string=${string/
-#/ /}
-#array: ${string[@]/%/X}
 
 #all array elements but the last
 #"${@:1:${#@}-1}"
@@ -3936,18 +3519,6 @@ emmets()
 
 
 #Arch maintenance
-#Video: http://youtu.be/dOzoUMKIJIU
-#- sudo pacman -S ncdu # ncdu /var/
-#- rm -r .cache/* # on occasion rm -r .thumbnails/*
-#- sudo nano /etc/systemd/journald.conf # SystemMaxUse=50M
-#- localepurge # in the AUR
-#- browser-vacuum and/or profile-cleaner # in the AUR
-#- pkgbrowser # in the AUR
-#- mirror list # status & gen
-#- journalctl --disk-usage
-#- systemctl --failed
-#- fstrim / -v # SSD ONLY!
-##### pacman .bashrc aliases #####
 # pacman aliases (if desired, adapt for your favourite AUR helper)
 #alias pac="sudo /usr/bin/pacman -S"		# default action	- install one or more packages
 #alias pacu="sudo /usr/bin/pacman -Syu"		# '[u]pdate'		- upgrade all packages to their newest version
@@ -3963,16 +3534,6 @@ alias pacimpl="sudo /usr/bin/pacman -D --asdep"	# 'mark as [impl]icit'	- mark on
 #alias pacro="/usr/bin/pacman -Qtdq > /dev/null && sudo /usr/bin/pacman -Rns \$(/usr/bin/pacman -Qtdq | sed -e ':a;N;$!ba;s/\n/ /g')"
 ##### EOF #####
 #https://github.com/midfingr
-
-#add numbers
-#adds newline-separated numbers from stdin
-#until eof then output the total to stdout.
-add()
-{
-	awk '{s+=$1} END {printf "%.'${1:-2}'f\n", s}'
-}
-#echo $(( $( tr '\n' +  < /dev/stdin) 0 ))
-#https://stackoverflow.com/questions/450799/shell-command-to-sum-integers-one-per-line
 
 #Gksu alternative
 alias gsu='pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS'
@@ -3996,7 +3557,6 @@ spacevis()
 #field $N exists, is non-empty and is non-zero
 #test:printf "a\n\n\x00\n\x20\n0\n00\n" | nl -ba -w1 |
 #{ awk -F"\t" '$2 != ""' ;}
-#
 
 #virtualbox compact command
 #{ vboxmanage  modifymedium --compact '/Vbox_machines/Win10.vdi' ;}
@@ -4024,19 +3584,6 @@ spacevis()
 #Swap stdout and stderr
 #$ command 3>&1 1>&2 2>&3
 #all about redirections: https://catonmat.net/bash-one-liners-explained-part-three
-
-#bash helpers
-#$ help if
-#$ help [
-#in bsd (macos)
-#man [
-#man -K keyword
-
-#useful sed expressions
-#https://gist.github.com/worker8/69d084c59a075fec589741ea0924e6d9
-
-#read with readline (-e), question (-p) initial value (-i)
-#read -e -p "Enter Your Name:" -i "Ricardo"
 
 #unit representations
 #k=K=kiB=KiB=1024
@@ -4130,11 +3677,13 @@ trim()
 #compatible with all posix shells
 #https://web.archive.org/web/20121022051228/http://codesnippets.joyent.com/posts/show/1816
 #bash:
-#shopt -s extglob
-#var="${var#*( )}" var="${var%*( )}"
-#printf %s "$var"
+#{ shopt -s extglob ;var="${var#*( )}" var="${var%*( )}" ;}
 #https://linuxhint.com/trim_string_bash/
-#read -r foo <<<"$foo"  #from usenet
+#{ read -r foo <<<"$foo" ;}  #from usenet
+#{ read -r -d$'\04' foo <<<"$foo" ;}
+
+#trim traling zeroes with sed
+#{ sed '/\./ s/\.\{0,1\}0\{1,\}$//' ;}
 
 #tip: sed `//d' removes last expression
 
@@ -4142,9 +3691,6 @@ trim()
 #{ eval "$var=\"\${!var#\$lead}\"" "$var=\"\${!var%\$trail}\"" ;}
 #bash:
 #{ declare "$var=${!var#$lead}" ;declare "$var=${!var%$trail}" ;}
-
-#trim traling zeroes with sed
-#{ sed '/\./ s/\.\{0,1\}0\{1,\}$//' ;}
 
 #simple http server
 #Python 2
@@ -4212,12 +3758,10 @@ reducepdf() {
 #{ ffmpeg -i Intro_do_Canal.mp4 -vf "scale=iw/1.8:ih/1.8" Intro_do_Canal_small.mp4 ;}
 #https://unix.stackexchange.com/questions/28803/how-can-i-reduce-a-videos-size-with-ffmpeg
 
-
 #libinput
 #{ xinput-list ;}
 #{ xinput set-prop 13 322 0.2 ;}
 #{ xinput set-prop 13 341 0 ;}
-
 
 #send quick mail (mutt hack)
 #usage: mail "[EMAIL].." [TEXT|ASCII FILE]               #simple message
@@ -4274,35 +3818,40 @@ você usar os seus humores em seu próprio proveito.'
 estarmos preparados pois já a enfrentamos.'
 'If you are going too fast, slow it down.'
 'Are you in the GAP or the GAIN?' #-- Benjamin P. Hardy & Dan Sullivan, www.fastcompany.com/90687442
-'The pain of Discipline or the pain of Regret'
+'The pain of Discipline or the pain of Regret.'
 'Motivation -> Discipline -> Habit' #https://www.youtube.com/watch?v=FMzk6e4Nokg
-'Live below your means and save everything, simple life'
+'Live below your means and save everything, simple life.'
 "Don't you see your father?"
 'If it is to be, it is up to me!!! -- Rusty78609'
 "Don't let the perfect be the enemy of the good -- Voltaire"
 '<https://www.reddit.com/r/getdisciplined/comments/rod44e/plan_day_29_no_videogames_and_no_porn_slowly/>'
-'Turn on, tune in, drop out - Timothy Leary'
+'Turn on, tune in, drop out - Timothy Leary.'
 'Si te cansas aprende a descansar, no a renunciar.'
 'InSiStIr, ReSiStIr, PeRsIsTiR y NuNcA dEsIsTiR.'
 'Gues what. No one cares.'
 'Key word is "addiction", nothing wrong with any of these if the addiction is not there. -- @woonomic'
 'The difference between a smart person and a clever person is that a smart person knows how to get out of trouble that a clever person wouldnt have gotten into in the first place.'
 'Go and touch the  grass. -- Brodie Robertson'
-'Essas substâncias você deve evitar.. Usar pouco, não abusar de jeito nenhum -- Drauzio Varela'
-'É difícil lutar contra você mesmo quando descobre a sua própria força -- Haikais'
+'Essas substâncias você deve evitar.. Usar pouco, não abusar de jeito nenhum -- Drauzio Varela.'
+'É difícil lutar contra você mesmo quando descobre a sua própria força -- Haikais.'
 'Saturation = exaggeration, Issac Asimov'
-'Se você quer ser feliz por um momento, beba. Se você quer ser feliz por um ano, case. Se você quer ser feliz para sempre, plante um jardim. - Ditado chinês.'
+'Se você quer ser feliz por um momento, beba. Se você quer ser feliz por um ano, case. Se você quer ser feliz para sempre, plante um jardim. - Ditado chinês'
 'To teach is to learn. -- Solano Aquino'
 "Concentrate on what you have, not on what you don't have. -- ReWild University"
 "What made the change was The Decision. -- Gabriel Madureira"
-'do the good things you did at 19. -- me'
+'Do the good things you did at 19. -- me'
 'It’s not what you do but who you are. -- book'
+'Não desfrutar de La Mierda -- Cojudo Cabrón.'
 
+'The sense of not being satisfied / longing, is really your loss of freedom. -- John McAfee'
 )
 if [[ $- = *i* ]] && [[ -t 1 ]] && [[ -n $TMUX ]]
 then
 	#[[ -e notes ]] && lolcat -F 0.05 notes
-	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}${KSH_VERSION+0}]}\e[0m\n"  #| cowthink -sn
+	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}${KSH_VERSION+0}]}
+$Green
+${MSG[-1]}
+\e[0m\n"  #| cowthink -sn
 fi
 unset MSG
 #{ fortune | cowsay ;}
