@@ -13,7 +13,7 @@ Shell, terminal, and other configuration files
 
 ---
 
-This repo moved to [GitLab](https://gitlab.com/mountaineerbr/dotfiles/).
+This repo __moved to [GitLab](https://gitlab.com/mountaineerbr/dotfiles/)__.
 
 ---
 
