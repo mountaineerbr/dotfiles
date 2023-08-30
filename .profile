@@ -86,6 +86,11 @@ export SUDO_EDITOR="$VISUAL"
 #man pager
 #export MANPAGER="vim -M +MANPAGER -u ~/.vimrc_manpager -"
 #export MANWIDTH=83
+#export MANPAGER='col -b | vim -u ~/.vimmanrc --not-a-term -'  #trilby
+#from arch wiki: https://wiki.archlinux.org/title/Color_output_in_console#Using_less
+#export MANPAGER="less -R --use-color -Dd+r -Du+b"
+export MANROFFOPT="-P -c"
+#grotty from groff >1.23.0 requires "-c" option to output overstricken output instead of ansi escapes. less relies on the overstrike formatting to apply its color options, so we need man to pass this option when formatting the man pages for customization to be effective.
 
 #pager
 export PAGER=less

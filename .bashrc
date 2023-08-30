@@ -25,15 +25,6 @@
 [[ $- != *i* ]] && return
 #https://wiki.archlinux.org/index.php/Talk:Bash
 
-#set xterm font
-#if [[ -z "$TMUX" ]]; then
-#	echo -e "\e]50;-xos4-terminus-medium-r-*--18-*-*-*-*-*-*-*\a"
-#fi
-
-#tmux
-#[[ -z "$TMUX" ]] && ((EUID > 0)) && exec tmux
-
-
 #PS1 prompt
 #colours
 endc='\[\033[00m\]'
@@ -52,8 +43,7 @@ c0="$bgreen"
 #widgets (ninja escaping required)
 #check subshell level (needs run only once)
 #OBS: SHLVL config depends on on your specific windowing system!
-prompt_ssl_max=2
-[[ -n $TMUX ]] && prompt_ssl_max=2 || prompt_ssl_max=4
+prompt_ssl_max=3
 prompt_ssl=$( ((SHLVL >= prompt_ssl_max)) && echo "${yellow}+${endc}" )
 #basic git integration (prints branch name)
 prompt_git="\$( branch=\$(git rev-parse --abbrev-ref HEAD 2>/dev/null) && echo \"[${yellow}\${branch}${endc}] \" )"
@@ -101,7 +91,8 @@ PROMPT_COMMAND=( _set_xterm_title )
 #	( -a ) append history lines from this session to the history file
 #	( -n ) read all history lines not already read
 #	from the history file and append them to the history list
-PROMPT_COMMAND+=('history -a' 'history -c' 'history -r')
+#PROMPT_COMMAND+=('history -a' 'history -c' 'history -r')
+PROMPT_COMMAND="${PROMPT_COMMAND%%;}; history -a; history -c; history -r"
 #https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history
 #https://www.shellhacks.com/tune-command-line-history-bash/
 #http://web.archive.org/web/20090815205011/http://www.cuberick.com/2008/11/update-bash-history-in-realtime.html
@@ -125,8 +116,8 @@ HISTCONTROL=erasedups:ignoredups
 HISTIGNORE=bash:q:exit:x:su:sdh:sdr:shutdown
 
 #history date format
-#HISTTIMEFORMAT="[%F %T]: "
-HISTTIMEFORMAT=$( echo -e "\033[0;32m[%F %T]:\033[0m " )
+HISTTIMEFORMAT="[%F %T]: "
+#HISTTIMEFORMAT=$( echo -e "\033[0;32m[%F %T]:\033[0m " )
 #end colour code: \033[0m
 #https://gist.github.com/avelino/3188137
 

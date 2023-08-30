@@ -12,43 +12,6 @@
 #source important files
 [[ -e ~/.rc ]] && . ~/.rc
 
-#tmux
-#file to hold Tmux signal
-_TMUXSIG="${TMPD:-/tmp}/tmux.exit.$EUID"
-#start tmux
-if [[ -z $TMUX$VIFMSET && $EUID -gt 0 ]]
-then
-	command tmux
-	#is exit signal file present?
-	if [[ -e $_TMUXSIG ]]
-	then
-		#execute a simple command
-		set -- "$(<"$_TMUXSIG")"
-		command rm "$_TMUXSIG"
-		eval "$*"
-		set --
-	fi
-#set DBUS for Tmux
-elif [[ -n $TMUX ]] && [[ -z $DBUS_SESSION_BUS_ADDRESS ]]
-then
-	pidof -q xfce4-session &&
-	export $(xargs --null --max-args=1 < /proc/$(pidof xfce4-session)/environ | grep DBUS_SESSION_BUS_ADDRESS)
-	#https://askubuntu.com/questions/772631/how-to-connect-screen-tmux-byobu-to-dbus
-fi
-#exit tmux and terminal emulator, too
-qq()
-{
-	#create signal file if within Tmux
-	[[ -n $TMUX ]] && echo exit >"$_TMUXSIG"
-	echo '[bye..]' >&2
-	exit
-}
-
-#set xterm font
-#if [[ -z "$TMUX" ]]; then
-#	echo -e "\e]50;-xos4-terminus-medium-r-*--18-*-*-*-*-*-*-*\a"
-#fi
-
 #GRML's zshrc
 grmlzsh() wget -qO- https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
 #http://deb.grml.org/pool/main/g/grml-etc-core/  -> '*/etc/zsh/zshrc'
@@ -365,7 +328,7 @@ c0=red
 c1=cyan
 #shell sublevels
 #OBS: SHLVL config depends on on your specific windowing system!
-[[ -n $TMUX ]] && prompt_ssl_max=3 || prompt_ssl_max=2
+prompt_ssl_max=3
 
 #PS1="%F{red}%B%(?..%? )%b%F{%(!.${c0}.${c1})}%n%F{white}@%m %40<...<%B%~%b%<< \${vcs_info_msg_0_}%f(%!%(1j.%%%j.))%F{yellow}%(${prompt_ssl_max}L.+.)%f%# "
 PS1="%F{red}%B%(?..%? )%b%F{%(!.${c0}.${c1})}%n%F{white}@%m %40<...<%B%~%b%<< \${vcs_info_msg_0_}%f%(1j.(%%%j).)%F{yellow}%(${prompt_ssl_max}L.+.)%f%# "

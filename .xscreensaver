@@ -1,5 +1,5 @@
 # XScreenSaver Preferences File
-# Written by xscreensaver-settings 6.06 for jsn on Sat Jan 14 23:29:15 2023.
+# Written by xscreensaver-settings 6.06 for jsn on Tue Mar  7 20:01:26 2023.
 # https://www.jwz.org/xscreensaver/
 
 timeout:	0:10:00
@@ -37,7 +37,7 @@ textFile:
 textProgram:	fortune
 textURL:	https://en.wikipedia.org/w/index.php?title=Special:NewPages&feed=rss
 dialogTheme:	default
-settingsGeom:	190,60 174,171
+settingsGeom:	137,34 174,171
 
 programs:								      \
 -				maze --root				    \n\
@@ -103,7 +103,7 @@ programs:								      \
   GL: 				glplanet --root				    \n\
 				interference --root			    \n\
 				kumppa --root				    \n\
-- GL: 				lament --root				    \n\
+  GL: 				lament --root				    \n\
 				moire2 --root				    \n\
   GL: 				sonar --root				    \n\
 - GL: 				stairs --root				    \n\

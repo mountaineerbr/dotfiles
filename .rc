@@ -10,6 +10,49 @@
 
 # this file is sourced by ~/.bashrc, ~/.kshrc, and ~/.zshrc
 
+#tmux
+#file to hold Tmux signal
+_TMUXSIG="${TMPD:-/tmp}/tmux.exit.$EUID"
+#start tmux
+if [[ -n $ZSH_VERSION && -z $TMUX$VIFMSET && $EUID -gt 0 ]]
+then
+	command tmux &&
+	#is exit signal file present?
+	if [[ -e $_TMUXSIG ]]
+	then
+		#execute a simple command
+		set -- "$(<"$_TMUXSIG")"
+		command rm "$_TMUXSIG"
+		eval "$*"
+		set --
+	fi
+#set DBUS (and other envars) for Tmux
+elif [[ -n $TMUX && -z $DBUS_SESSION_BUS_ADDRESS ]]
+then
+	pidof -q xfce4-session &&
+	export $(xargs --null --max-args=1 < /proc/$(pidof xfce4-session)/environ \
+	| grep -e DBUS_SESSION_BUS_ADDRESS -e XDG_ -e CDM_SPAWN -e DESKTOP_SESSION \
+	-e GTK3_ -e GTK_ -e LC_ -e MAIL -e MOTD_SHOWN -e PANEL_GDK_CORE_DEVICE_EVENTS \
+	-e SESSION_MANAGER -e WINDOWPATH)
+	#https://askubuntu.com/questions/772631/how-to-connect-screen-tmux-byobu-to-dbus
+fi
+#exit tmux and terminal emulator, too
+qq()
+{
+	#create signal file if within Tmux
+	[[ -n $TMUX ]] && echo exit >"$_TMUXSIG"
+	echo '[bye..]' >&2
+	exit
+}
+qq() { 	false ;}
+
+
+#set xterm font
+#if [[ -z "$TMUX" ]]; then
+#	echo -e "\e]50;-xos4-terminus-medium-r-*--18-*-*-*-*-*-*-*\a"
+#fi
+
+
 #sources
 [[ -e ~/.apikeys ]] && . ~/.apikeys
 
@@ -116,6 +159,10 @@ if ${use_color} ; then
 	#export LESS_TERMCAP_so=$'\E[01;44;33m'
 	#export LESS_TERMCAP_ue=$'\E[0m'
 	#export LESS_TERMCAP_us=$'\E[01;32m'
+	
+	export JQ_COLORS='1;31:0;35:1;35:0;37:0;33:1;39:1;32'
+	#https://github.com/statico/dotfiles/blob/main/.zshrc
+	#export JQ_COLORS="48;5;237:48;5;52:48;5;22:38;5;80:38;5;214:1;39:1;39"
 else
 	# show root@ when we don't have colors
 	PS1='\u@\h \w \$ '
@@ -604,7 +651,7 @@ vifmh()
 	#also: prompt-hist
 }
 
-alias vimdiff='vimdiff "+colorscheme default" "+syntax off" "+set t_Co=16"'
+alias vimdiff='vimdiff -o "+colorscheme default" "+syntax off" "+set t_Co=16"'
 # Ref vimdiff colurs: https://stackoverflow.com/questions/2019281/load-different-colorscheme-when-using-vimdiff
 alias diff='/usr/bin/diff -W$(tput cols) -y'
 #https://www.reddit.com/r/git/comments/6mnnag/view_modified_files_in_the_last_n_commits_in_git/
@@ -774,7 +821,7 @@ gaddr()
 thumblr()
 {
 	local f size
-	[[ "$1" =~ ^[0-9x]+ ]] && size=$1 && shift || size=200x150
+	[[ "$1" = [0-9x]* ]] && size=$1 && shift || size=200x150
 	for file in "$@"
 	do 	convert "$file" -resize $size\> "${file%.*}Thumb.${file##*.}"
 	done
@@ -963,6 +1010,7 @@ q()
 	[[ ! -t 1 ]] || echo '[bye..]' >&2
 	exit
 }
+q() { 	false ;}
 
 alias :q=q
 alias ::q=q
@@ -971,11 +1019,6 @@ alias ::Q=q
 alias ezit=q
 #alias '\;q'=q #alias ;q=q
 #bash cannot map ';q' but zsh can
-
-#for compatibility between my shell configs
-if ! declare -f qq  >/dev/null 2>&1
-then 	qq() { 	q ;}
-fi
 
 #slurm internet monitor
 slurm()
@@ -1918,7 +1961,7 @@ gps()
 	[[ -n ${*:?location: not set} ]] || return
 	
 	#https://nominatim.org/release-docs/develop/api/Lookup/
-	curl -sL -H "$UAG" "https://nominatim.openstreetmap.org/search?q=$(sed 's/\s/%20/g' <<< "$*")&format=json" \
+	curl -sL -H "$UAG" "https://nominatim.openstreetmap.org/search?q=$(sed 's/\s/%20/g' <<< "$*" | rmaccent)&format=json" \
 	| jq -r ".[]|.lat+\"\t\"+.lon+\"\t\"+.display_name"
 }
 
@@ -1967,7 +2010,7 @@ dist()
 _gps()
 {
 	local g
-	if g=($(grep -Eo '[+-]?[0-9]+[.][0-9]*' <<<"$*"))
+	if g=($(grep -Eo '(-?[0-9]+([.][0-9]+)?)' <<<"$*"))
 	   ! ((${#g[@]}==2))
 	then
 		if g=($(gps "$@" | _gps_fmt))
@@ -2026,7 +2069,7 @@ moonbrt()
 	
 	set -- $(sed -n '/<table/,/<\/table/p' "$tmpfile" | sed 's/<[^>]*>/ /g')
 
-	echo ${@:9+13+1+((${day}-1)*13)+${month}:1}
+	echo ${@:9+13+1+((${day##0}-1)*13)+${month##0}:1}
 }
 #https://aa.usno.navy.mil/data/MoonFraction
 
@@ -2687,7 +2730,7 @@ btchist()
 	curl https://nastyfans.org/exchangerate.csv | tr , \\t  | column -et -NDATE,PRICE
 }
 
-halving()
+_halving()
 {
 	local hgt secs
 	hgt=$(curl -s https://blockchain.info/q/getblockcount) || return
@@ -2696,6 +2739,13 @@ halving()
 	secs=$(( (840000-hgt)*(10*60) ))
 	datediff.sh -vvv ${secs}seconds 2>/dev/null
 	date -R -d"${secs}seconds"
+}
+halving()
+{
+	{ 	printf '---\n'
+		_halving
+		binfo.sh -ii 2>/dev/null | grep EH/s
+	} | tee -a ~/halving.txt
 }
 
 #cryptocurrency greps
@@ -2925,35 +2975,13 @@ alias ctop=cointop
 alias chat=chatgpt.sh
 upchat()
 {
-	local dir
-	for dir in ~/www/{lab,hub}-{scripts,shellChatGPT}
-	do
-		cd $dir || return  ;pwd
-		{ 	[[ -d man ]] && cd man &&
-			./md2man.sh chatgpt.sh.1.md
-			cd $dir
-		}
-		\cp -fv ~/bin/chatgpt.sh $dir/ &&
-		gitup "$@"
-	done
+	cd ~/www/lab-shellchatgpt || return
+	[[ -d man ]] && cd man &&
+	./md2man.sh chatgpt.sh.1.md
+	cd ../
+	\cp -fv ~/bin/chatgpt.sh ./ &&
+	gitup "$@"
 }
-#upchataur()
-#{
-#	local com
-#	cd $HOME/www/hub-shellChatGPT || return
-#	com=${1:-$(git rev-parse main )}
-#	
-#	cd "$HOME"/bin/openai/ || return
-#	./pkgbuild.sh $com || return
-#
-#	cd "$HOME"/tmp/build/chatgpt/ || return
-#	
-#	\cp -fv ./.SRCINFO $HOME/www/aur-chatgpt.sh/ &&
-#	\cp -fv ./PKGBUILD $HOME/www/aur-chatgpt.sh/ &&
-#	cd $HOME/www/aur-chatgpt.sh/ &&
-#	pwd
-#}
-upchat() { ! p Oh no, only critical bug corrections\! ;} ;upchataur() { upchat ;}
 
 #mop - stocks the hacker way
 mop()
@@ -3417,6 +3445,8 @@ bintext()
 
 #regex ip validation
 #IPREGEX='^([1-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.([0-9][0-9]?\.|1[0-9]{2}\.|2[0-4][0-9]\.|25[0-5]\.){2}([0-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-4])'
+alias grepip='grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"'
+#https://www.shellhacks.com/regex-find-ip-addresses-file-grep/
 
 #extract zip files to stdout
 #{ bsdtar -xvf - -O ;}
@@ -3823,6 +3853,7 @@ estarmos preparados pois já a enfrentamos.'
 'Live below your means and save everything, simple life.'
 "Don't you see your father?"
 'If it is to be, it is up to me!!! -- Rusty78609'
+"There is a storm across the valley.. Stand guard at the doors of your mind. Enjoy your life.. the best you can, and that is what I'm doing! -- Rusty78609"
 "Don't let the perfect be the enemy of the good -- Voltaire"
 '<https://www.reddit.com/r/getdisciplined/comments/rod44e/plan_day_29_no_videogames_and_no_porn_slowly/>'
 'Turn on, tune in, drop out - Timothy Leary.'
@@ -3830,7 +3861,7 @@ estarmos preparados pois já a enfrentamos.'
 'InSiStIr, ReSiStIr, PeRsIsTiR y NuNcA dEsIsTiR.'
 'Gues what. No one cares.'
 'Key word is "addiction", nothing wrong with any of these if the addiction is not there. -- @woonomic'
-'The difference between a smart person and a clever person is that a smart person knows how to get out of trouble that a clever person wouldnt have gotten into in the first place.'
+"The difference between a smart person and a clever person is that a smart person knows how to get out of trouble that a clever person wouldn't have gotten into in the first place."
 'Go and touch the  grass. -- Brodie Robertson'
 'Essas substâncias você deve evitar.. Usar pouco, não abusar de jeito nenhum -- Drauzio Varela.'
 'É difícil lutar contra você mesmo quando descobre a sua própria força -- Haikais.'
@@ -3842,20 +3873,19 @@ estarmos preparados pois já a enfrentamos.'
 'Do the good things you did at 19. -- me'
 'It’s not what you do but who you are. -- book'
 'Não desfrutar de La Mierda -- Cojudo Cabrón.'
+"There is darkness in the distance, from the way I'm living.. -- David Kushner"
+"The question is \`why'. --  Enigma"
 
 'The sense of not being satisfied / longing, is really your loss of freedom. -- John McAfee'
 )
 if [[ $- = *i* ]] && [[ -t 1 ]] && [[ -n $TMUX ]]
 then
 	#[[ -e notes ]] && lolcat -F 0.05 notes
-	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}${KSH_VERSION+0}]}
-$Green
-${MSG[-1]}
-\e[0m\n"  #| cowthink -sn
+	printf "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${MSG[${RANDOM} % ${#MSG[@]} + ${ZSH_VERSION+1}${BASH_VERSION+0}${KSH_VERSION+0}]}\e[0m\n"
+	printf "\n$Green${MSG[${#MSG[@]}${BASH_VERSION:+-1}]}\e[0m\n"
 fi
 unset MSG
-#{ fortune | cowsay ;}
-#{ repo-elephant ;}
+#{ fortune | cowsay | cowthink -sn | repo-elephant ;}
 
 #showerthoughts=$(curl -s --connect-timeout 5 -A '/u/<<<SEU USERNAME AQUI>>>>' \
 #'https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100' | \
@@ -3884,32 +3914,31 @@ ibgepop_helperf()
 #https://servicodados.ibge.gov.br/api/docs/projecoes
 #https://servicodados.ibge.gov.br/api/docs/localidades
 	
+#reuters covid19
+#https://graphics.thomsonreuters.com/data/2020/coronavirus/tracking/global/data.json
+#CSSE covid19 archive repo
+#https://github.com/CSSEGISandData/COVID-19
+
 
 ##################################################
 ############### FINANCIAL MARKETS ################
 ##################################################
-# 2021  by mountaineerbr
 
 #loss/gain reciprocal or symetrical ratio
 #usage: loss [+|-]VAL[%] [SCALE]
-#usage: VAL is an integer and if negative reads as gain
+#usage: VAL is an integer. negative values are read as gains.
 loss()
 {
 	local u g
-	u=${1%\%} u="${u#+}"
 
-	#check for invalid notations
-	if [[ "$u" = *[a-zA-Z]* || "$u" != *[0-9]* || ! "${u/[,.-]*}" =~ ^.?.?$ ]]
-	then 	echo -e 'err\nusage: loss [+|-]VAL[%] [SCALE]' >&2 ;return 1
+	u=${1##+} u=${u%%%}
+	if [[ ${u##-} != [0-9][0-9] ]] && [[ ${u##-} != [0-9] ]]
+	then 	printf 'err\nusage: loss [+|-]VAL[%%] [SCALE]\nexamp: loss 10%%\n' >&2
+		return 1
 	fi
 
-	#use zshell maths or bash bc?
-	if [[ -n $ZSH_VERSION ]]
-	then 	float u ;g=$(( ( (1 / (1 - (u / 100) ) ) - 1) * 100))
-	else 	g=$( bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100" )
-	fi
-
-	if [[ "$u" = -* ]]
+	g=$(bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100")
+	if [[ $u = -* ]]
 	then 	printf "%4s: %6.${2:-4}f %%\n" gain ${u#-} loss ${g#-}
 	else 	printf "%4s: %6.${2:-4}f %%\n" loss $u gain $g
 	fi
@@ -4076,8 +4105,8 @@ kitco()
 
 	#arrange parameters
 	set -- $( tr A-Z a-z <<< "$*" )
-	[[ "$1" =~ ^(ounce|gram|kilo|tola)$ ]] && set -- "$2" "$1"
-	[[ ! "$2" =~ ^(ounce|gram|kilo|tola)$ ]] && set -- "$1" ounce
+	case "$1" in 	ounce|gram|kilo|tola) set -- "$2" "$1" ;;esac
+	case "$2" in 	ounce|gram|kilo|tola) false;; 	*) set -- "$1" ounce;; esac
 	
 	#check if $1 is empty
 	#set default currency
@@ -4113,156 +4142,11 @@ kitco()
 
 
 #metal rates from infomine
-metals()
-{
-	curl -sL https://www.mining.com/markets/ |
-		grep "class='commodity-name'" |
-		sed 's/<div/\n&/g ;s/<[^>]*>//g'
-	echo '<https://www.mining.com/markets/>'
-}
-#Metals and Commodities
-#Spot - Gold, silver, palladium and platinum are updated every two minutes. Trading time is London, UK time. Spot data is 23 ½ hours
-#per day 6 days per week. The market is closed for 30 minutes every day and is also closed on Saturdays, North America timezone.
-#Data Provider: Xignite
-#Closing – LME data, such as copper, nickel and aluminum, is updated in the early evening hours, PST.
-#Data Provider: theFinancials
-#Uranium data tracks Ux U308 spot.
-#Data Provider: UX Consulting Company
-#Oil data tracks Brent crude oil.
-#Data Provider: ICE
-#Chromite: Ferro-Chrome (High Carbon) 65% min., Europe;
-#Cobalt: Cobalt 99.8% min.;
-#Iron Ore: CVRD;
-#Iron Ore: Hamersley;
-#Magnesium: Ingots 99.9%, Europe;
-#Manganese: Electrolytic flakes 99.7%, Europe;
-#Molybdenum: Molybdenum oxide (Western) 57% min;
-#Phosphates: Phosphate rock, 70% BPL, Morocco;
-#Potash: Potassium chloride, standard grade, Vancouver;
-#Titanium: Ferro-Titanium 68-72% min., Europe;
-#Tungsten: Ferro-Tungsten 75% min., Europe;
-#Vanadium: Ferro-Vanadium 78% min., Europe
-#Specialty/Minor and Bulk Metals prices are derived from various sources including but not limited to International Monetary Fund,
-#The World Bank, German Geoscience Institutes, Energy Information Administration and others. 
-#http://www.infomine.com/chartsdata/infominechartsdatareadme.pdf
+#https://www.mining.com/markets/
 
 #yahoo finance hack -- long ticker
-yfin()
-(
-	#parse some opts
-	if [[ "$1" = -h ]]
-	then 	printf 'usage: yfin [-jh] SYMBOL\n'
-		printf 'option -j to print raw json data\n'
-		return
-	elif [[ "$1" = -j ]]
-	then 	PJSON=1
-		shift
-	fi
-	
-	#set symbol to uppercase (POSIX-compatible)
-	SYMBOL="$( tr '[:lower:]' '[:upper:]' <<< "${1:-TSLA}" )"
+#https://query1.finance.yahoo.com/v7/finance/quote?symbols=${SYMBOL:-TSLA}&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance
 
-	#get data
-	YJSON="$( curl -sL "https://query1.finance.yahoo.com/v7/finance/quote?symbols=${SYMBOL:-TSLA}&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance" )"
-
-	#print json?
-	if [[ -n "$PJSON" ]]
-	then 	printf '%s\n' "$YJSON"
-		return
-	#check for error response
-	elif jq -e '.quoteResponse.error' <<< "$YJSON"  >/dev/null 2>&1
-	then 	jq -r '.quoteResponse.error' <<< "$YJSON"
-		return 1
-	#empty response?
-	elif ! jq -e '.quoteResponse.result[]' <<<"$YJSON"  >/dev/null 2>&1
-	then 	return 1
-	fi
-
-	#set timezone for displaying times
-	#TZ="GMT"
-	#set timezone according to info from yahoo
-	TZ="$(jq -r '.quoteResponse.result[]|.exchangeTimezoneName//.exchangeTimezoneShortName' <<< "$YJSON")"
-	export TZ
-
-	#format ticker
-	jq -r '.quoteResponse.result[]|
-		"Exchang: \(.fullExchangeName)",
-		"Timezon: \(.exchangeTimezoneName)  \(.exchangeTimezoneShortName)",
-		"Source_: \(.quoteSourceName)",
-		"Delayed: \(.exchangeDataDelayedBy)",
-		"Intervl: \(.sourceInterval)",
-		"",
-		"50-day",
-		"Average: \(.fiftyDayAverage)",
-		"Change_: \(.fiftyDayAverageChange)",
-		"Change%: \(.fiftyDayAverageChangePercent)",
-		"",
-		"200-day",
-		"Average: \(.twoHundredDayAverage)",
-		"Change_: \(.twoHundredDayAverageChange)",
-		"Change%: \(.twoHundredDayAverageChangePercent)",
-		"",
-		"52-week",
-		"Range__: \(.fiftyTwoWeekRange)",
-		"HChange: \(.fiftyTwoWeekHighChange)",
-		"HChang%: \(.fiftyTwoWeekHighChangePercent)",
-		"LChange: \(.fiftyTwoWeekLowChange)",
-		"LChang%: \(.fiftyTwoWeekLowChangePercent)",
-		"High___: \(.fiftyTwoWeekHigh)",
-		"Low____: \(.fiftyTwoWeekLow)",
-		"",
-		"Average daily volume",
-		"Last3Mo: \(.averageDailyVolume3Month)",
-		"Last10d: \(.averageDailyVolume10Day)",
-		"",
-		"Earnings",
-		"T_Stamp: \(.earningsTimestamp//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
-		"Start__: \(.earningsTimestampStart//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
-		"End____: \(.earningsTimestampEnd//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
-		"",
-		"BookVal: \(.bookValue)",
-		"ForwdPE: \(.forwardPE)",
-		"PToBook: \(.priceToBook)",
-		"",
-		"Earnings per share",
-		"12mTrai: \(.epsTrailingTwelveMonths)",
-		"Forward: \(.epsForward)",
-		"Populat: \(.esgPopulated)",
-		"",
-		"Post market",
-		"Time___: \(.postMarketTime//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
-		"Change%: \(.postMarketChangePercent)",
-		"Price__: \(.postMarketPrice)",
-		"Change_: \(.postMarketChange)",
-		"",
-		"Exchang: \(.exchange)",
-		"Market_: \(.market)",
-		"Name___: \(.longName)",
-		"Type___: \(.quoteType)",
-		"Symbol_: \(.symbol)",
-		"Currenc: \(.financialCurrency)",
-		"1stTrad: \(((.firstTradeDateMilliseconds//empty)/1000)|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
-		"MktStat: \(.marketState)",
-		"ShrOuts: \(.sharesOutstanding)",
-		"Mkt_Cap: \(.marketCap)",
-		"BidSize: \(.bidSize)",
-		"AskSize: \(.askSize)",
-		"Bid____: \(.bid)",
-		"Ask____: \(.ask)",
-		"",
-		"Regular market",
-		"Time___: \(.regularMarketTime//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
-		"DayRang: \(.regularMarketDayRange)",
-		"Change_: \(.regularMarketChange)",
-		"Change%: \(.regularMarketChangePercent)",
-		"DayHigh: \(.regularMarketDayHigh)",
-		"DayLow_: \(.regularMarketDayLow)",
-		"Volume_: \(.regularMarketVolume)",
-		"PrevClo: \(.regularMarketPreviousClose)",
-		"Open___: \(.regularMarketOpen)",
-		"Price__: \(.regularMarketPrice)"
-		' <<<"$YJSON" | grep -Fv 'null' | cat -s
-)
 #currency, language, triggerable, region, tradeable, priceHint, messageBoardId
 #shortName -- symbol short name; gmtOffSetMilliseconds
 #https://query1.finance.yahoo.com/v7/finance/quote?symbols=DANSKE.CO,ERIC-B.ST,FPKPEN.CO,SSO.OL,VWS.CO&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance
@@ -4412,24 +4296,27 @@ nlistjson()
 #multiple symbols table
 rates()
 {
-	if [[ ${*} =~ (-h|:?help) ]]
-	then 	curl -s 'rate.sx/:help'
-	else 	curl -s 'rate.sx/?TFq' | sed -e '1,6d' -e '$d'
-	fi
+	case "${*}" in
+		-h|help|:help)
+			curl -s 'rate.sx/:help';;
+		*)
+			curl -s 'rate.sx/?TFq' | sed -e '1,6d' -e '$d';;
+	esac
 }
 
 #single symbol graph
+#usage: rate [from_currency] [to_currency] [@date|?T|..]
 rate()
 {
-	#usage: rate [from_currency] [to_currency] [@date|?T|..]
-	if [[ -z "$2" ]] || [[ "$2" =~ [0-9]+ ]]
+	if [[ -z "$2" ]] || [[ "$2" = [0-9]* ]]
 	then 	set -- "$1" usd "$2"
-	elif [[ ${*} =~ (-h|:?help) ]]
-	then 	curl -s 'rate.sx/:help'
-		printf '\nusage: rate [from_currency] [to_currency] [@date|?T|..]\n' 
-		return
-	fi		
-	
+	else 	case "${*}" in
+			-h|help|:help)
+				curl -s 'rate.sx/:help'
+				printf '\nusage: rate [from_currency] [to_currency] [@date|?T|..]\n' 
+				return;;
+		esac
+	fi
 	curl -s "${2:-usd}.rate.sx/${1:-btc}${3}" | awk NF
 }
 
@@ -4600,119 +4487,8 @@ sochain()
 }
 #https://sochain.com/api
 #SoChain allows 300 requests/minute free-of-charge
+
 ##################################################
 ############# END FINANCIAL MARKETS ##############
 ##################################################
 
-
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
-#%%%%%%%%%%%%%% CORONA PANDEMICS %%%%%%%%%%%%%%%%#
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
-#brasil.io, csv data of municipalities
-coronab()
-{
-	local url tempfile
-	url='caso_full'
-	tempfile="${TMPDIR:-/tmp}/$url.$(date -I).csv"
-	case "$1" in
-		csv) 	#dados brutos em csv
-			curl -o - -L -H 'user-agent: Mozilla/5.0 Gecko' 'https://brasil.io/dataset/covid19/caso/?is_last=True&place_type=city&format=csv'
-			return ;;
-		boletim) #boletim, infomações gerais
-			url='boletim'
-			set -- . ;;
-		c) 	#casos, resumo
-			url='caso'
-			shift ;;
-		o) 	#óbitos, resumo
-			url='obito_cartorio'
-			shift ;;
-		*) 	#use existing file?
-			if [[ -e "$1" ]]
-			then 	tempfile="$1"
-				shift
-			fi ;;
-	esac
-
-	if [[ ! -e "$tempfile" ]]
-	then 	curl -o - -L -H 'user-agent: Mozilla/5.0 Gecko' "https://data.brasil.io/dataset/covid19/${url}.csv.gz" |
-			gunzip -c > "$tempfile" || return 1
-	fi
-	#if stdout is free and there is an arg
-	if [[ -t 1 ]] && (( $# ))
-	then 	column -et -s, -N"$(head -1 "$tempfile")" <( grep -i "${@:-.}" "$tempfile" ) | less -S
-	fi
-
-	#print column names
-	head -1  "$tempfile" >&2
-	echo "warning: temp file -- $tempfile" >&2
-}
-
-
-#international
-#reuters
-#usage: corona [-r] COL
-#flag -r to reverse order
-#COL is a numeric positional argument to select column sort
-corona()
-{
-	local flag=-n flag2=-r flag3=-c150
-	local sort data update keys stats
-	[[ $1 = -r* ]] && unset flag2 && shift
-	[[ -t 1 ]] && unset flag3
-	#sort order
-	[[ $1 = [1-6] ]] || set -- 1
-	case "$1" in
-		1) sort=CASES;;
-		2) sort=DEATHS;;
-		3) sort=POPULATION;;
-		4) sort=LETALITY%;;
-		5) sort=LETALITY/100K;;
-		6) sort=LOCATION; unset flag;;
-	esac
-		
-	data=$(curl -sL 'https://graphics.thomsonreuters.com/data/2020/coronavirus/tracking/global/data.json')
-	update=$(jq -r '.lastUpdated' <<< "$data")
-	keys=$(jq -r '.countries|keys_unsorted[]' <<< "$data")
-	stats=$(jq -r '.countries[] | "\(.cases[-1])\t\(.deaths[-1])\t\(.population)\t\(((.deaths[-1]/.cases[-1])*100) | tostring | .[0:6] )%\t\(((.deaths[-1]/.population)*100000) | tostring | .[0:7] )" ' <<<"$data")
-
-	paste <( echo "$stats") <( echo "$keys" ) |
-		sort ${flag} ${flag2} -t$'\t' -k"$1" | nl -s$'\t' -w1 | tac | 
-		column ${flag3} -ets$'\t' -N'RNK,CASES(1),DEATH(2),POP(3),LET%(4),LET/100K(5),LOC(6)' -T'LOC(6)'
-	echo "updated__: $update
-sorted_by: $sort
-source___: reuters news agency"
-}
-
-#corona-stats api
-#usage: corona3 [region]
-#[region] may be a two letter symbol for country, eg. us, br, it
-corona3()
-{
-        curl -s "https://corona-stats.online/$(tr 'a-z' 'A-Z' <<<"$1")?source=2&minimal=true"
-}
-#https://github.com/sagarkarira/coronavirus-tracker-cli
-
-corona3a()
-{
-	curl --compressed -s 'https://corona-stats.online?format=json' |
-		jq -r '(.data[],.worldStats)|"\(.country)\t\(.cases)\t\(.todayCases)\t\(.deaths)\t\((.deaths/.cases)*100)%\t\(.casesPerOneMillion)"' |
-		sort -nrt$'\t' -k2 | cat -n | tac |
-		sed -E 's/^\s*([0-9]+)(\s)(.*)/\1\t\3/' |
-		column -ets$'\t' -NRNK,LOCAL,CASES,NEW,DEATHS,MORT%,C/Mil -TLOCAL,MORT%
-}
-
-#johns hopkins university center for systems science and engineering (jhu csse)
-#usage: corona4 [confirmed|recovered|deaths] [global|US]
-#usage: corona4 recovered US
-#usage: corona4 '' US
-corona4()
-{
-	[[ $2 = us ]] && set -- "$1" US
-	curl -s "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_${1:-confirmed}_${2:-global}.csv"
-}
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
-#%%%%%%%%%%%% END CORONA PANDEMICS %%%%%%%%%%%%%%#
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
-
-# vi:filetype=sh

@@ -60,13 +60,13 @@
   alt + Mod2+mod4 + 0
 
 #bc window
-"uxterm -geometry 34x18"
-  Mod2+Mod4 + c
-"uxterm -geometry 34x18"
-  XF86Calculator
+#"uxterm -geometry 34x18"
+#  Mod2+Mod4 + c
+#"uxterm -geometry 34x18"
+#  XF86Calculator
 #calculator
-"speedcrunch"
-  alt + Mod2+Mod4 + c
+#"speedcrunch"
+#  alt + Mod2+Mod4 + c
 
 #firefox
 #run with pvkrun only if that pkg is present
@@ -99,8 +99,8 @@
  alt + Mod2+Mod4 + s
 
 #vifm
-"uxterm -e /usr/bin/vifm"
- Mod2+Mod4 + a
+#"uxterm -e /usr/bin/vifm"
+# Mod2+Mod4 + a
 
 #thunar
 "thunar"
@@ -142,8 +142,8 @@
  Mod2+Mod4 + k
 
 #rofimoji
-"rofimoji"
- Mod2+Mod4 + r
+#"rofimoji"
+# Mod2+Mod4 + r
 
 #location of pointer on keypress
 #must enable settings>acessibility>mouse in xfce4
@@ -181,12 +181,12 @@
 
 
 #price streams
-"$HOME/bin/markets/pricesroll.sh"
- Mod2+Mod4 + p
+#"$HOME/bin/markets/pricesroll.sh"
+# Mod2+Mod4 + p
 
 #price streams
-"$HOME/bin/markets/pricesroll2.sh"
- Shift + Mod2+Mod4 + p
+#"$HOME/bin/markets/pricesroll2.sh"
+# Shift + Mod2+Mod4 + p
 
 #xfce-like zoom
 "xdotool keydown Super click 4 keyup Super"
@@ -201,8 +201,8 @@
  alt + Mod2+Mod4 + b:1
 
 #html filter from clipboard
-"uxterm -e 'xclip -o -sel clip | w3m -dump -T text/html | less'"
- Mod2+Mod4 + h
+#"uxterm -e 'xclip -o -sel clip | w3m -dump -T text/html | less'"
+# Mod2+Mod4 + h
 
 
 #mouse razer deathadder v2 mini

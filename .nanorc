@@ -28,7 +28,7 @@ set autoindent
 set backup
 
 ## The directory to put unique backup files in.
-set backupdir "~/bak/nanoAutoBak"
+set backupdir "~/Downloads"
 
 ## Use bold text instead of reverse video text.
 #set boldtext
