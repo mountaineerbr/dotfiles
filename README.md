@@ -23,7 +23,7 @@ both [.bashrc](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.bashrc) an
 
 The [.rc file](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.rc) changes constantly and is also a testcamp for new code.
 When functions become large, and mature, they may be promoted to
-full-fledged scripts and moved to __[scripts repo](https://gitlab.com/mountaineerbr/dotfiles)__.
+full-fledged scripts and moved to __[scripts repo](https://gitlab.com/mountaineerbr/scripts)__.
 
 Some configuration files from `/etc` (such as `/etc/issue`) and subdirectories under `~/.config` (such as `~/.config/vifm/vifmrc`) are present but not hierarchically organised in this repo. 
 
