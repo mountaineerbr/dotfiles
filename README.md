@@ -1,5 +1,5 @@
 # dotfiles
-Shell, terminal multiplexer and other software configuration files
+Shell, terminal, and other configuration files
 
     :::::::-.      ...   ::::::::::::.-:::::'::: :::    .,:::::: .::::::. 
      ;;,   `';, .;;;;;;;.;;;;;;;;'''';;;'''' ;;; ;;;    ;;;;'''';;;`    ` 
@@ -9,16 +9,17 @@ Shell, terminal multiplexer and other software configuration files
       MMMMP"`    "YMMMMMP"    MMM     "MM,   MMM""""YUMMM""""YUMMM"YMmMY" 
 
 
-## Dotfiles, run control and c files
+## Dotfiles
 
-__Most shell functions and aliases are at__ __[.rc file](.rc)__. That is sourced from
+Most __shell functions__ and __aliases__ are at __[.rc file](.rc)__.
+That is sourced from
 both [.bashrc](.bashrc) and [.zshrc](.zshrc), which contain configs for each shell.
 
 The [.rc file](.rc) changes constantly and is also a testcamp for new code.
-When functions become too large and mature, they may be promoted to
-full-fledged scripts and moved to __[scripts repo](https://github.com/mountaineerbr/scripts)__.
+When functions become large, and mature, they may be promoted to
+full-fledged scripts and moved to __[scripts repo](https://gitlab.com/mountaineerbr/dotfiles)__.
 
-Some configuration files from `/etc` (such as `issue`) and subdirectories under `~/.config` (such as `vifmrc`) are present but not hierarchically organised in this repo. 
+Some configuration files from `/etc` (such as `/etc/issue`) and subdirectories under `~/.config` (such as `~/.config/vifm/vifmrc`) are present but not hierarchically organised in this repo. 
 
   
   
