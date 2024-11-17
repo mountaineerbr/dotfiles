@@ -79,7 +79,10 @@ if 1
   set noexpandtab
   " Set tab width
   set tabstop=8
-  set shiftwidth=8
+  "set softtabstop=8
+  "set shiftwidth=8
+" COBOL compact format extended
+" 1,6,10,14,18,22,26,30,34,38,42,46,50,54,58,62,67
   "
   " Use the indent of the previous line for a newly created line
   set autoindent
@@ -230,7 +233,7 @@ set colorcolumn=72,77
 " Tab and indent options
 "
 " set display width of tab; 1 tab = x space with
-set tabstop=8
+"set tabstop=8
 "
 " transform tab to x spaces (x is tabstop); on pressing tab, insert 4 spaces
 "set expandtab
@@ -291,6 +294,7 @@ if &diff
   set nohls
   syntax off
   colo 0x7A69_dark
+  set diffopt+=iwhite
   au VimEnter * RainbowParenthesesToggle
 endif
 "https://odd.blog/2016/11/24/howto-disable-syntax-highlighting-in-vimdiff/

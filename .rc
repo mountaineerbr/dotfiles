@@ -125,18 +125,17 @@ if ${use_color} ; then
 	# hence the 'Green' 'BRed' 'Red' sequence I often use in my prompt.
 	
 	# Normal Colors    # Bold              # Background
-	Black='\e[0;30m'   BBlack='\e[1;30m'   On_Black='\e[40m'
-	Red='\e[0;31m'     BRed='\e[1;31m'     On_Red='\e[41m'
-	Green='\e[0;32m'   BGreen='\e[1;32m'   On_Green='\e[42m'
-	Yellow='\e[0;33m'  BYellow='\e[1;33m'  On_Yellow='\e[43m'
-	Blue='\e[0;34m'    BBlue='\e[1;34m'    On_Blue='\e[44m'
-	Purple='\e[0;35m'  BPurple='\e[1;35m'  On_Purple='\e[45m'
-	Cyan='\e[0;36m'    BCyan='\e[1;36m'    On_Cyan='\e[46m'
-	White='\e[0;37m'   BWhite='\e[1;37m'   On_White='\e[47m'
-	
-	Alert=$BWhite$On_Red  # Bold White on red background
-	NC='\e[m'  # Color Reset
-	#\\e[0;0;0m \\e[m' #\e \E \033
+	Black='\e[0;30m'   BBlack='\e[1;30m'   On_Black='\e[40m'  \
+	Red='\e[0;31m'     BRed='\e[1;31m'     On_Red='\e[41m'  \
+	Green='\e[0;32m'   BGreen='\e[1;32m'   On_Green='\e[42m'  \
+	Yellow='\e[0;33m'  BYellow='\e[1;33m'  On_Yellow='\e[43m'  \
+	Blue='\e[0;34m'    BBlue='\e[1;34m'    On_Blue='\e[44m'  \
+	Purple='\e[0;35m'  BPurple='\e[1;35m'  On_Purple='\e[45m'  \
+	Cyan='\e[0;36m'    BCyan='\e[1;36m'    On_Cyan='\e[46m'  \
+	White='\e[0;37m'   BWhite='\e[1;37m'   On_White='\e[47m'  \
+	Bold='\u001b[0;1m' Alert=$BWhite$On_Red NC='\e[m'  # Color Reset
+	#Alert: Bold White on red background
+	#\\e[0;0;0m \\e[m' #\e \E \033 \u001b
 	#http://tldp.org/LDP/abs/html/sample-bashrc.html
 	
 	#coloured man pages
@@ -691,7 +690,7 @@ vifmh()
 
 #alias vimdiff='vimdiff -o "+colorscheme default" "+syntax off" "+set t_Co=16"'
 # Ref vimdiff colurs: https://stackoverflow.com/questions/2019281/load-different-colorscheme-when-using-vimdiff
-alias diff='/usr/bin/diff -W$(tput cols) -y'
+alias diff='/usr/bin/diff -W$(tput cols) -y --suppress-common-lines'
 #https://www.reddit.com/r/git/comments/6mnnag/view_modified_files_in_the_last_n_commits_in_git/
 
 #vim
@@ -750,12 +749,14 @@ alias bat='bat --style=changes,snip,header'
 #move to trash
 trash()
 {
-	local d f g
-	d=$(date +'%Y-%m-%dT%H_%M_%S')
+	local d f g trash
+	trash=$HOME/.local/share/Trash/files
+	d=$(date +'%Y-%m-%dT%H-%M-%S')
 	for f
 	do  f=${f%%/} g=${f##*/}
 	    [[ $g == .* ]] || [[ ${g%.*} == ${g} ]] || g=${g%.*}.${g##*.}
-	    /usr/bin/mv -v -- "$f" ~/.local/share/Trash/files/"${d}_${g}"
+	    /usr/bin/mv -v -- "$f" "${trash}/${g}"
+	    printf '%s\t%s\t%s\n' "$d" "$PWD" "$f" | tee -a "${trash}/.${g}" >/dev/null
 	done
 }
 
@@ -867,6 +868,9 @@ gaddr()
 	git remote -v
 }
 #https://stackoverflow.com/questions/8816107/how-can-i-retrieve-the-remote-git-address-of-a-repo
+
+#remove a release tag
+#{ git push --delete origin tagname ;}
 
 #Resize the image if it is larger than the specified dimensions.
 #This will automatically preserve the aspect ratio of the image too.
@@ -1173,9 +1177,9 @@ upchat()
 
 	~/bin/md2man.sh chatgpt.sh.1.md
 	\cp -fv ~/bin/chatgpt.sh ../ && gitup "${@}" ${@:+$'\n\n\n---\n'}"$msg"
-	#if cd ~/www/hub-shellChatGPT/  #hard-links
-	#then 	gitup "${@}" ${@:+$'\n\n\n---\n'}"$msg"
-	#fi
+	if cd ~/www/hub-shellChatGPT/  #hard-links
+	then 	gitup "${@}" ${@:+$'\n\n\n---\n'}"$msg"
+	fi
 }
 upchataur()
 {
@@ -1233,6 +1237,7 @@ upchatall()
 alias chat='chatgpt.sh -cc --google'
 alias unix="chatgpt.sh -..unix -cc -4000 --md --goo"
 alias unix2="chatgpt.sh -..unix -cc -4000 --mistral -mcodestral-latest"
+alias pt='chatgpt.sh -cc..pt'
 alias marv="chat -60 -cc --frequency-penalty=0.5 --temp=0.5 --top_p=0.3 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
 alias dchat=$HOME/bin/openai/debug.chatgpt.sh
 alias chatd='vimdiff ~/bin/chatgpt.sh ~/www/lab-shellchatgpt/chatgpt.sh'
@@ -2758,6 +2763,17 @@ yts()
 		mpv -vo null /dev/fd/3 3<&0 </dev/tty
 }
 
+ytcap()
+{
+	curl -s "${1?video_url}"|grep -o '"baseUrl":"https://www.youtube.com/api/timedtext[^"]*lang=en'|cut -d \" -f4|sed 's/\\u0026/\&/g'|xargs curl -Ls|grep -o '<text[^<]*</text>'|sed -E 's/<text start="([^"]*)".*>(.*)<.*/\1 \2/'|sed 's/\xc2\xa0/ /g;s/&amp;/\&/g'|recode xml|awk '{$1=sprintf("%02d:%02d:%02d",$1/3600,$1%3600/60,$1%60)}1'|awk 'NR%n==1{printf"%s ",$1}{sub(/^[^ ]* /,"");printf"%s"(NR%n?FS:RS),$0}' n=2|awk 1
+}
+#https://stackoverflow.com/questions/9611397/how-to-extract-closed-caption-transcript-from-youtube-video
+
+yt_url()
+{
+	grep -Eo -e "https://www\.youtube\.com/watch\?v=[0-9a-zA-Z_-]{8,20}" -e "https://youtu\.be/[0-9a-zA-Z_-]{8,20}"
+}
+#https://forums.mirc.com/ubbthreads.php/topics/269390/youtube-link-to-title-for-mirc
 
 ##shell globbing
 ##Z-SHELL has built-in `noglob' cmd
@@ -4137,9 +4153,10 @@ reducepdf() {
 #usage: mail "[EMAIL].." [-a FILE].. [-s SUBJECT]        #attach (binary) files
 #usage: vipe | mail "[EMAIL].." SUBJECT                  #stdin
 mail()
-{ 	local text size subj
+{
+	unset text size subj
 	if [[ $1 = *\@* ]]         #e-mail address
-	then 	local EMAIL="$1" ;set -- "${@:2}"
+	then 	EMAIL="$1" ;set -- "${@:2}"
 	fi
 	[[ $1 != \-\a ]] && [[ -e ${@:$#} ]] && set -- "${@:$#}" "${@:1:$# -1}" 
         if [[ $1 = \-\a || $(file --mime "$1") = *charset=binary* ]]  #opt -a or binary
@@ -4156,7 +4173,8 @@ mail()
 	fi
 	subj="$subj ${text:0:100}" subj="${subj//[$IFS]/ }" subj="${subj:0:50}"
 	echo $size B \| $((size/(2**10) )) KB \| $((size/(2**20) )) MB $'\n'${EMAIL:?e-mail address required} - $subj
-	mutt -s "$subj" "$@" $(echo $EMAIL) <<<"$text"
+	mutt -s "$subj" "$@" $EMAIL <<<"$text" >/dev/null 2>&1 &
+	echo pid=$! >&2;
 }
 alias m=mail
 #also see: xdg-email
@@ -4826,4 +4844,3 @@ catf() { 	printf '%s\n' "$(</dev/stdin )" ;}
 #return from a script if it is sourced
 #{ [[ ${BASH_SOURCE[0]} != "${0}" ]] && return 0; }
 
-alias pver='curl -\# https://github.com/yshui/picom/releases | grep -F '"'"'class="Link--primary Link"'"'"' | hf | sed "s/ /\n/g"'
