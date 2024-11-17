@@ -1,0 +1,51 @@
+#!/usr/bin/pulseaudio -nF
+#
+# This startup script is used only if PulseAudio is started per-user
+# (i.e. not in system mode)
+
+
+.include /etc/pulse/default.pa
+
+# From pulseaudio-module-xrdp
+#load-module module-load-file file=/etc/xrdp/pulse/default.pa
+#.include /etc/xrdp/pulse/default.pa
+
+
+.fail
+
+### Automatically restore the volume of streams and devices
+load-module module-stream-restore restore_device=false
+
+.nofail
+
+
+### Equalized audio configuration
+### Generated from: pulseaudio-equalizer
+#.nofail
+#load-module module-ladspa-sink sink_name=ladspa_output.mbeq_1197.mbeq sink_master=bluez_sink.E6_48_09_70_2F_3E.a2dp_sink plugin=mbeq_1197 label=mbeq control=3.0,7.0,7.3,7.0,3.0,-1.0,-6.6,-6.3,-4.5,-4.0,3.1,7.9,9.6,9.9,6.8
+#set-default-sink ladspa_output.mbeq_1197.mbeq
+#set-sink-mute bluez_sink.E6_48_09_70_2F_3E.a2dp_sink 0
+#.fail
+
+
+### Automatically switch to newly-connected devices
+load-module module-switch-on-connect
+
+# From Arch Wiki
+load-module module-bluetooth-policy
+load-module module-bluetooth-discover
+# If you want to auto-switch all audio to the Bluetooth device:
+#load-module module-switch-on-connect 
+#https://wiki.archlinux.org/title/Bluetooth#PulseAudio
+
+
+### Load the integrated PulseAudio equalizer and D-Bus module
+load-module module-equalizer-sink
+load-module module-dbus-protocol
+
+
+### Enable Echo/Noise-Cancellation
+load-module module-echo-cancel use_master_format=1 aec_method=webrtc aec_args="analog_gain_control=0 digital_gain_control=1" source_name=echoCancel_source sink_name=echoCancel_sink
+set-default-source echoCancel_source
+set-default-sink echoCancel_sink
+

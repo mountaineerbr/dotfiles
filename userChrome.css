@@ -1,0 +1,94 @@
+/* UserChrome.css for Firefox */
+
+/* Remove maximum/minimum width restriction of sidebar */
+#sidebar {
+    max-width: none !important;
+    min-width: 0px !important;
+}
+
+
+/* Inactive tabs: Outline style */
+
+.tabbrowser-tab:not([selected]):not([multiselected]) .tab-background {
+    border: 1px solid rgba(0, 0, 0, .20) !important;
+    border-bottom-color: transparent !important;
+}
+
+/* For dark backgrounds */
+[brighttext="true"] .tabbrowser-tab:not([selected]):not([multiselected]) .tab-background {
+    border: 1px solid rgba(255, 255, 255, .20) !important; /* Simplified color setting */
+    border-bottom-color: transparent !important;
+}
+
+
+/* Emulate blue tab line from Photon 57-88 UI */
+.tab-background::before {
+    content: "";
+    display: block;
+    height: 2px;
+    margin: -1px var(--user-tab-rounding) 0;
+}
+
+.tabbrowser-tab[selected] .tab-background::before {
+    background-color: #0a84ff;
+}
+
+.tabbrowser-tab[multiselected]:not([selected]) .tab-background::before {
+    background-color: color-mix(in srgb, #0a84ff 66%, transparent);
+}
+
+.tabbrowser-tab:not([selected], [multiselected]):hover .tab-background::before {
+    background-color: color-mix(in srgb, currentColor 33%, transparent);
+}
+
+
+/* Unload tabs line from Solarize Fox Theme Instructions*/
+.tabbrowser-tab[pending] .tab-background::before {
+    background-color: red;
+}
+
+
+/* Override font-size for tabs */
+.tabbrowser-tab {
+    font-size: 13px !important;
+}
+
+/* Remove extra padding between tabs */
+.tabbrowser-tab:not(:first-of-type) {
+    padding-left: 0 !important;
+}
+
+
+/* Proton Tabs Tweaks */
+#tabbrowser-tabs {
+    --user-tab-rounding: 5px;
+}
+
+.tab-background {
+    border-radius: var(--user-tab-rounding) var(--user-tab-rounding) 0px 0px !important;
+    margin-block: 1px 0 !important;
+}
+
+
+/* (likely obsolete) */
+/* Adjust scroll buttons */
+/*
+#scrollbutton-up, #scrollbutton-down {
+    border-top-width: 1px !important;
+    border-bottom-width: 0 !important;
+}
+*/
+
+
+/* Potentially obsolete */
+/* 1/16/2022 Tone down the Fx96 tab border with add-on themes in certain fallback situations */
+/*
+.tab-background:is([selected], [multiselected]):-moz-lwtheme {
+    --lwt-tabs-border-color: rgba(0, 0, 0, 0.5) !important;
+    border-bottom-color: transparent !important;
+}
+[brighttext="true"] .tab-background:is([selected], [multiselected]):-moz-lwtheme {
+    --lwt-tabs-border-color: rgba(255, 255, 255, 0.5) !important;
+    border-bottom-color: transparent !important;
+}
+*/
