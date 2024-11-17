@@ -1,0 +1,16 @@
+#env
+LESS = --IGNORE-CASE --SEARCH-SKIP-SCREEN --jump-target=5 --LONG-PROMPT --hilite-unread --no-init --RAW-CONTROL-CHARS --mouse --wheel-lines=4
+
+VISUAL = vim
+
+#command
+l	repaint
+^L	flush-repaint
+^D	quit
+
+# obs: `lesskey` compilation is not necessary anymore as of version 582.
+# --LINE-NUMBERS --quit-if-one-screen --quit-at-eof --status-column 
+# https://linux.die.net/man/1/lesskey
+# https://ascending.wordpress.com/2011/02/11/unix-tip-make-less-more-friendly/
+# https://unix.stackexchange.com/questions/255862/search-in-less-with-wrap-around-at-eof
+

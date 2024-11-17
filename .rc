@@ -1,0 +1,4829 @@
+#
+# ~/.rc
+# shell functions
+# 2024  by mountaineerbr
+# https://github.com/mountaineerbr/dotfiles
+#                        __       _                  ___
+#  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
+# /  ' \/ _ \/ // / _ \/ __/ _ `/ / _ \/ -_) -_) __/ _  / __/
+#/_/_/_/\___/\_,_/_//_/\__/\_,_/_/_//_/\__/\__/_/ /____/_/
+
+# This file is sourced by ~/.bashrc, ~/.kshrc, and ~/.zshrc
+
+#tmux
+#file to hold Tmux signal
+_TMUXSIG="${TMPD:-/tmp}/tmux.exit.$EUID"
+
+#exit tmux, and terminal emulator
+qq() { 	[[ -z $TMUX ]] || echo exit >"$_TMUXSIG"; exit ;}
+
+#start tmux
+if [[ -n $ZSH_VERSION && -z $TMUX$VIFMSET && $EUID -gt 0 ]]
+then
+	# Check if the line contains "attached"
+	unset REPLY session;
+	while IFS= read -r
+	do case "$REPLY" in *[Aa]ttached*) continue;;
+		[0-9]:*|[0-9][0-9]:*) session=${REPLY%%:*}; break;;
+	  esac;
+	done < <(tmux ls)
+	# If attached session is found, attach to it
+	if [[ -n $session ]]
+	then
+		command tmux attach  #attach-session -t $session
+	# If no detached session found, create a new session
+	else
+		command tmux
+	fi &&
+	#is exit signal file present?
+	if [[ -e $_TMUXSIG ]]
+	then
+		#execute a simple command
+		set -- "$(<"$_TMUXSIG")"
+		command rm "$_TMUXSIG"
+		eval "$*"
+		set --
+	fi
+	unset REPLY session;
+	#new-session -n $HOST
+	#tmux attach \; new-window
+#Tmux DBUS (and other envars) on my Arch Linux i7
+elif [[ -n $TMUX && -z $DBUS_SESSION_BUS_ADDRESS ]] && pidof -q xfce4-session
+then
+	while read envar
+	do 	export "$envar"
+	done < <(xargs --null --max-args=1 < /proc/$(pidof xfce4-session)/environ \
+	| grep -e DBUS_SESSION_BUS_ADDRESS -e CDM_SPAWN -e CREDENTIALS_DIRECTORY \
+	-e DEBUGINFOD_URLS -e GTK3_MODULES -e GTK_MODULES -e '^HG' -e LC_ADDRESS \
+	-e LC_MEASUREMENT -e LC_MONETARY -e LC_TIME -e LESSOPEN -e MAIL \
+	-e MOTD_SHOWN -e NVCC_PREPEND_FLAGS -e XDG_RUNTIME_DIR -e XDG_SEAT \
+	-e XDG_SESSION_CLASS -e XDG_SESSION_ID -e XDG_SESSION_TYPE -e XDG_VTNR)
+	unset envar
+	#https://askubuntu.com/questions/772631/how-to-connect-screen-tmux-byobu-to-dbus
+	#dont use: export $(dbus-launch)
+	#https://bbs.archlinux.org/viewtopic.php?id=289375
+fi
+
+#set xterm font
+#{ echo -e "\e]50;-xos4-terminus-medium-r-*--18-*-*-*-*-*-*-*\a" ;}
+
+#sources
+[[ -e ~/.apikeys ]] && . ~/.apikeys
+[[ -e ~/.rc_xtra ]] && . ~/.rc_xtra
+
+# Set colorful PS1 only on colorful terminals.
+# dircolors --print-database uses its own built-in database
+# instead of using /etc/DIR_COLORS.  Try to use the external file
+# first to take advantage of user additions.  We run dircolors directly
+# due to its changes in file syntax and terminal name patching.
+use_color=false
+if { 	[[ -n $BASH_VERSION ]] && type -P dircolors >/dev/null ;} ||
+	whence -p dircolors >/dev/null
+then
+	# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
+	LS_COLORS=
+	if [[ -f ~/.dir_colors ]] ; then
+		eval "$(dircolors -b ~/.dir_colors)"
+	elif [[ -f /etc/DIR_COLORS ]] ; then
+		eval "$(dircolors -b /etc/DIR_COLORS)"
+	else
+		eval "$(dircolors -b)"
+	fi
+	# Note: We always evaluate the LS_COLORS setting even when it's the
+	# default.  If it isn't set, then `ls` will only colorize by default
+	# based on file attributes and ignore extensions (even the compiled
+	# in defaults of dircolors). #583814
+	if [[ -n ${LS_COLORS:+set} ]] ; then
+		use_color=true
+	else
+		# Delete it if it's empty as it's useless in that case.
+		unset LS_COLORS
+	fi
+else
+	# Some systems (e.g. BSD & embedded) don't typically come with
+	# dircolors so we need to hardcode some terminals in here.
+	case ${TERM} in
+	[aEkx]term*|rxvt*|gnome*|konsole*|screen|tmux|cons25|*color) use_color=true;;
+	esac
+fi
+
+if ${use_color} ; then
+	#if [[ ${EUID} == 0 ]] ; then
+	#	PS1+='\[\033[01;31m\]\h\[\033[01;34m\] \w \$\[\033[00m\] '
+	#else
+	#	PS1+='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w \$\[\033[00m\] '
+	#fi
+	##BSD#@export CLICOLOR=1
+	##GNU#@alias ls='ls --color=auto'
+	#alias grep='grep --colour=auto'
+	#alias egrep='grep -E --colour=auto'
+	#alias fgrep='grep -F --colour=auto'
+
+	# Color definitions (taken from Color Bash Prompt HowTo).
+	# Some colors might look different of some terminals.
+	# For example, I see 'Bold Red' as 'orange' on my screen,
+	# hence the 'Green' 'BRed' 'Red' sequence I often use in my prompt.
+	
+	# Normal Colors    # Bold              # Background
+	Black='\e[0;30m'   BBlack='\e[1;30m'   On_Black='\e[40m'
+	Red='\e[0;31m'     BRed='\e[1;31m'     On_Red='\e[41m'
+	Green='\e[0;32m'   BGreen='\e[1;32m'   On_Green='\e[42m'
+	Yellow='\e[0;33m'  BYellow='\e[1;33m'  On_Yellow='\e[43m'
+	Blue='\e[0;34m'    BBlue='\e[1;34m'    On_Blue='\e[44m'
+	Purple='\e[0;35m'  BPurple='\e[1;35m'  On_Purple='\e[45m'
+	Cyan='\e[0;36m'    BCyan='\e[1;36m'    On_Cyan='\e[46m'
+	White='\e[0;37m'   BWhite='\e[1;37m'   On_White='\e[47m'
+	
+	Alert=$BWhite$On_Red  # Bold White on red background
+	NC='\e[m'  # Color Reset
+	#\\e[0;0;0m \\e[m' #\e \E \033
+	#http://tldp.org/LDP/abs/html/sample-bashrc.html
+	
+	#coloured man pages
+	man()
+	{
+		if [[ "$TERM" = linux ]]
+		then 	env \
+				LESS_TERMCAP_mb=$(printf "\e[34m") \
+				LESS_TERMCAP_md=$(printf "\e[1;31m") \
+				LESS_TERMCAP_me=$(printf "\e[0m") \
+				LESS_TERMCAP_se=$(printf "\e[0m") \
+				LESS_TERMCAP_so=$(printf "\e[44;93m") \
+				LESS_TERMCAP_ue=$(printf "\e[0m") \
+				LESS_TERMCAP_us=$(printf "\e[32m") \
+						/usr/bin/man "$@"
+		else 	env \
+				LESS_TERMCAP_mb=$(printf "\e[1;34m") \
+				LESS_TERMCAP_md=$(printf "\e[38;5;9m") \
+				LESS_TERMCAP_me=$(printf "\e[0m") \
+				LESS_TERMCAP_se=$(printf "\e[0m") \
+				LESS_TERMCAP_so=$(printf "\e[44;93m") \
+				LESS_TERMCAP_ue=$(printf "\e[0m") \
+				LESS_TERMCAP_us=$(printf "\e[38;5;10m") \
+						/usr/bin/man "$@"
+		fi
+	}
+	#https://boredzo.org/blog/archives/2016-08-15/colorized-man-pages-understood-and-customized
+	#https://misc.flogisoft.com/bash/tip_colors_and_formatting#colors2
+	#https://bbs.archlinux.org/viewtopic.php?id=181414
+	# GRML-zshrc (alternative)
+	#export LESS_TERMCAP_mb=$'\E[01;31m'
+	#export LESS_TERMCAP_md=$'\E[01;31m'
+	#export LESS_TERMCAP_me=$'\E[0m'
+	#export LESS_TERMCAP_se=$'\E[0m'
+	#export LESS_TERMCAP_so=$'\E[01;44;33m'
+	#export LESS_TERMCAP_ue=$'\E[0m'
+	#export LESS_TERMCAP_us=$'\E[01;32m'
+	
+	export JQ_COLORS='1;31:0;35:1;35:0;37:0;33:1;39:1;32'
+	#https://github.com/statico/dotfiles/blob/main/.zshrc
+	#export JQ_COLORS="48;5;237:48;5;52:48;5;22:38;5;80:38;5;214:1;39:1;39"
+else
+	# show root@ when we don't have colors
+	PS1='\u@\h \w \$ '
+fi
+
+# Try to keep environment pollution down, EPA loves us.
+unset use_color
+#https://gitweb.gentoo.org/repo/gentoo.git/tree/app-shells/bash/files/bashrc
+#https://github.com/magnuskiro/configs/blob/ddb877dbd344fd9000bdcd47fc4b3d44e188b8ba/color.bashrc
+
+#colour packages
+#colorize-git, ccat, rainbow, lolcat, ls++
+#pipe.sh, cmatrix
+#<https://misc.flogisoft.com/bash/tip_colors_and_formatting>
+#<https://www.reddit.com/r/linux/comments/94nh4w/what_is_your_ps1/>
+
+#the xhost program is used to add and delete host names or user names to
+#the list allowed to make connections to the X server. In the case of hosts,
+#this provides a rudimentary form of privacy control and security.
+xhost +local:root >/dev/null 2>&1
+#also check ~/.Xauthority
+
+#ex - archive extractor
+#usage: ex <file>
+extract()
+{
+	if [[ -f "$1" ]]
+	then 	case "$1" in
+			*.tar.bz2) tar xvjf "$1" ;;
+			*.tar.gz)  tar xvzf "$1" ;;
+			*.bz2)     bunzip2 "$1" ;;
+			*.rar)     unrar x "$1" ;;
+			*.gz)      gunzip "$1" ;;
+			*.tar)     tar xvf "$1" ;;
+			*.tbz2)    tar xvjf "$1" ;;
+			*.tgz)     tar xvzf "$1" ;;
+			*.zip)     unzip "$1" ;;
+			*.Z)       uncompress "$1" ;;
+			*.7z)      7z x "$1" ;;
+			*.deb)     ar x "$1" ;;
+			*.zstd)    zstd -d "$1" ;;
+			*.xz)      unxz "$1" ;;
+			*.exe)     cabextract "$1" ;;
+			*.tar.*)   tar xvf "$1" ;;
+			*)  echo "'$1' cannot be extracted via ex()" >&2;;
+		esac
+	else 	echo "'$1' is not a valid file" >&2
+	fi
+}
+#also check 'unp' script
+
+#bigger font for terminal
+alias bigger='echo "setfont iso02-12x22" ;setfont iso02-12x2'
+
+#font list
+alias fontlist='fc-list | col | sort | less'
+#https://wiki.netbsd.org/tutorials/how_to_use_ttf_fonts_in_xterm/
+
+#check which fonts have got some (unicode) characters:
+#{ fc-list :charset=A4B0,A4B1 }
+
+#alias cp="cp -i" # confirm before overwriting something
+alias df='df -h'  # human-readable sizes
+#alias free='free -m' # show sizes in MB
+#alias np='nano -w PKGBUILD'
+
+#safeguards for common operations
+#removing files: set -I to interactively ask once
+alias rm='rm --interactive=always'
+#copying: '-i' interactively & recursively on
+alias cp='cp --interactive'
+#moving
+alias mv='mv --interactive'
+
+#grep cmds
+#colorise grep (useful for retrieving logs)
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias cgrep='grep --color=always'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias igrep='grep -i'
+#'agrep' for approximate search from the 'tre' pkg
+
+#ls, du, df output with commas:
+#export BLOCK_SIZE="'1"
+
+#l() { ls -hF --group-directories-first "$@" | cut -c1-22 | column -c 80 ;}
+#la() { ls -ahF --group-directories-first "$@" | cut -c1-22 | column -c 80 ;}
+alias ll='ls++ --potsf'
+#https://unix.stackexchange.com/questions/112335/can-i-truncate-long-file-names-in-ls-listing/112341#112341
+
+#alias l='ls -l'
+#alias ll='ls -l'
+#alias ls='ls -F'
+alias lsd='command ls -lsd'
+
+pl() { 	printf '%s\n' "$@" ;}
+p() { 	printf '%s\n' "$*" ;}
+
+#alias j='jobs -l'
+#alias pu=pushd
+#alias po=popd
+
+#print all /bin files
+lsb()
+{
+	local dir ar
+	ar=(${path[@]:-${PATH//:/ }})
+	for dir in ${ar[@]}
+	do 	if (($#))
+		then 	ls $dir | grep "$@"
+		else 	ls $dir
+		fi
+	done
+}
+
+#grep file name
+lgrep()
+{
+	[[ -n $ZSH_VERSION ]] || shopt -s globstar
+	printf '%s\n' **/* | grep -i "${@:?name}"
+}
+#grep file name of all files
+llgrep()
+(
+	[[ -n $ZSH_VERSION ]] && setopt dotglob || shopt -s dotglob
+	lgrep "$@"
+)
+
+
+#parent pid of given process
+ppid()
+{
+	local id=${1:-$$}
+
+	ps -p $id -o ppid=
+	#ps j $id
+	#pstree -sg $id
+	#grep '^PPid:' /proc/$id/status
+}
+#https://superuser.com/questions/150117/how-to-get-parent-pid-of-a-given-process-in-gnu-linux-from-command-line
+#scripts: parent pid is in shell variable $PPID
+
+#grep id and process
+grepid()
+{
+	ps -eo ppid,pid,cmd | awk '{p[$1]=p[$1]","$3}END{ for(i in p) print i, p[i]}'
+}
+#use pstree -s to get a tree of the process
+#https://stackoverflow.com/questions/7138783/how-to-display-the-current-process-tree-of-a-bash-session
+
+#For the full command, not just the name of the program:
+pscom()
+{
+	local pid=$1
+	ps -p $pid -o command
+	#ps -p $pid -o comm=
+}
+#https://superuser.com/questions/632979/if-i-know-the-pid-number-of-a-process-how-can-i-get-its-name
+
+# Make your directories and files access rights sane.
+sanitize()
+{
+	chmod -R u=rwX,g=rX,o= "$@"
+}
+
+#(un)archive and gpg file/dir
+gar()
+{
+	#decrypt (sigle file)
+	if [[ "$1" = *.tar.gpg* ]]
+	then 	gpg -d -- "$1" | tar xk
+	#encrypt (multiple files)
+	else 	tar c --format pax -- "$@" | gpg -ci -o "${1%/}".tar.gpg
+	fi
+}
+#cli password dialog: gpg --pinentry-mode loopback
+#preferably, use gnu/gnutar or pax/posix formats
+#(pax format causes extended headers to be extracted as files by a few implementations)
+#https://www.baeldung.com/linux/encrypting-decrypting-directory
+#https://www.gnu.org/software/tar/manual/html_node/Standard.html
+#https://www.gnu.org/software/tar/manual/html_node/gnu.html#SEC145
+#https://mgorny.pl/articles/portability-of-tar-features.html
+#https://serverfault.com/questions/250511/which-tar-file-format-should-i-use
+#also see: `gpgtar' (mainly written due the problems of porting a shell
+#script making use of tar (gpg-zip) to Windows; may be slower than
+#standard tar on Linux platforms)
+#https://lists.gnupg.org/pipermail/gnupg-users/
+
+#forget gpg session passwords
+#{ gpg-connect-agent reloadagent /bye ;}
+#https://askubuntu.com/questions/349238/how-can-i-clear-my-cached-gpg-password
+
+#silver searcher
+alias ag='/usr/bin/ag --nofollow --hidden --smart-case'
+#alias grep=ag
+#also check vimgrep, ripgrep, agrep
+
+#user agent
+#usage: curl/wget --header "$UAG"
+#chrome on windows 10
+UAG='user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36'
+#simple
+UAG2='user-agent: Mozilla/5.0 Gecko'
+
+#ask for compressed data
+alias curl='curl -f --compressed'
+alias curlu='curl -f -L --compressed --insecure --cookie non-existing --header "$UAG"'
+
+#html filter
+htmlfilter()
+{
+	case "$1" in
+		w3m)    w3m -dump -T text/html ${@:2} ;;
+		elinks) elinks -force-html -dump -no-references ${@:2} ;;
+		links)  links -force-html -dump ${@:2} ;;
+		lynx)   lynx -force_html -dump -nolist $([[ -t 0 ]] || echo -stdin) ${@:2} ;;
+		sed)    sed '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }' ${@:2} ;;
+		*)      htmlfilter w3m "$@" ;;
+	esac
+}
+alias htmldump=htmlfilter
+alias hf=htmlfilter
+alias hf2="sed 's/<[^>]*>//g'"
+alias hf3="sed -Ee 's/<\/\?(script|style)[^>]*>/\n&\n/g' | sed -Ee '/^<(script|style)[^>]*>/,/^<\/(script|style)>/ d' -e '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }'"
+#https://www.thegeekstuff.com/2009/12/unix-sed-tutorial-6-examples-for-sed-branching-operation/
+
+#filter html from clipboard
+chf()
+{
+	xclip -o -sel clip | htmlfilter
+}
+
+#Remove the data between pattern ” ” in a whole file
+#{ sed ':loop ;$!{ N ;/\n$/!b loop } ;s/\"[^\"]*\"//g' ;}
+
+#If a line ends with a backslash append the next line to it.
+#alias unbackslash="sed ':loop ;/\\$/N ;s/\\\n */ / ;t loop'"
+
+#Commify a numeric strings
+alias commify="sed ':loop ;s/\(.*[0-9]\)\([0-9]\{3\}\)/\1,\2/; t loop'"
+
+#Replace every leading space of a line with ‘+’
+#{ sed 's/^ */&\n/ ;:loop ;s/^\n//;s/ \n/\n+/ ;t loop' ;}
+
+
+#curly brackets filter
+#{ sed ':again;N;b again; s/{[^}]*}//g' ;}
+#https://unix.stackexchange.com/questions/166873/how-can-i-delete-all-text-between-curly-brackets-in-a-multiline-text-file
+
+#css filter
+#{ sed "s@/\*.*\*/@@g" | sed '/\/\*/,/\*\//d' ;}
+#https://www.linuxquestions.org/questions/programming-9/remove-css-comments-with-sed-776853/
+
+#website links
+sedlinks()
+{
+	sed "s|href=[\"']|\n&|g" | sed -nE "s|.*href=['\"]([^'\"]+)['\"].*|\1| p"
+}
+sedlinks2()
+{
+	perl -ne "while ( m/href=['\"]([^'\"]*)['\"]/gc ) { print \$1, \"\n\"; }"
+}
+#https://stackoverflow.com/questions/1881237/easiest-way-to-extract-the-urls-from-an-html-page-using-sed-or-awk-only
+
+sedtags()
+{
+	sed -E -e 's/<(p|h1|h2)[ >]/\n&/g' -e 's/<\/(p|h1|h2)>/\n&/g' | sed -E -n -e '/<(p|h1|h2)[ >]/,/<\/(p|h1|h2)>/p'
+}
+
+#jq filters
+#get all paths of a json
+jqpath()
+{
+	 jq -r 'def path2text($value):
+		  def tos: if type == "number" then . else tojson end;
+		  reduce .[] as $segment ("";  .
+		    + ($segment
+		       | if type == "string" then "." + . else "[\(.)]" end))
+		  + " = \($value | tos)";
+
+		paths(scalars) as $p
+		  | getpath($p) as $v
+		  | $p | path2text($v)' "$@"
+}
+jqpath2()
+{
+	jq -rc 'path(..)|[.[]|tostring]|join("/")' "$@"
+	#jq -r '[path(..)|map(if type=="number" then "[]" else tostring end)|join(".")|split(".[]")|join("[]")]|unique|map("."+.)|.[]' "$@"
+
+}
+#https://github.com/stedolan/jq/issues/243
+#also see `gron' package to flatten json
+#https://www.datafix.com.au/BASHing/2022-03-23.html
+
+#browse usenet
+#from w3m man page
+w3mu()
+{
+	w3m -m "nntp://news.aioe.org/${1:-comp}"
+}
+#w3m -m nntp://news.aioe.org/comp.os.linux.networking
+
+#start virtualbox from command line
+bsd13()
+{
+	VBoxManage startvm "bsd13" --type headless
+}
+bsd13halt()
+{
+	ssh -t jack@bsd 'doas shutdown -h now' || return
+	echo "VBox: \`resume' or \`pause' or \`*poweroff'" >&2
+	sleep 30
+	VBoxManage controlvm "bsd13" ${1:-poweroff} --type headless
+	#resume or pause or poweroff
+}
+#https://www.techrepublic.com/article/how-to-run-virtualbox-virtual-machines-from-the-command-line/
+#check runnign VMs: { VBoxManage list runningvms ;}
+
+#parse sitemap.xml
+#{ sed 's|<loc>\(.*\)<\/loc>$|\1|g' ;}
+#sitemap() { sed -n 's|.*<loc>\(.*\)<\/loc>.*|\1|g p' ;}
+
+#beautify css
+#{ 	[[ -t 0 ]] && opt=-f || opt=-s
+#	"$HOME/node_modules/.bin/cssbeautify-cli" "$opt" "$1" ;}
+#https://prefetch.net/blog/2017/12/02/formatting-css-from-the-linux-command-line/
+
+#dump page with chromium/chrome
+cdump()
+{
+	google-chrome-stable --disable-gpu --headless --dump-dom --user-agent="$UAG" "${@:?address required}"
+}
+cdump2()
+{
+	chromium --disable-gpu --headless --dump-dom --user-agent="$UAG" "${@:?address required}"
+}
+#https://developers.google.com/web/updates/2017/04/headless-chrome
+#https://intoli.com/blog/making-chrome-headless-undetectable/
+
+#headless chrome and chromium flags
+#list of chromium command line switches:
+#https://peter.sh/experiments/chromium-command-line-switches/
+#http://www.chromium.org/developers/how-tos/run-chromium-with-flags
+
+#headless firefox flags
+#https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options
+#also see: wkhtmltopdf
+
+#feh automatically scale image to fit window
+alias feh='feh --edit --scale-down --auto-zoom -g 640x480 --insecure' #--borderless --draw-filename --draw-tinted
+#newsboat
+alias nb=newsboat
+alias nbrc='vim ~/.newsboat/urls'
+
+
+#shell history
+h()
+{
+	[[ -n "$ZSH_VERSION" ]] && set -- "${1:-0}"
+	history "$@"
+}
+
+#edit grub config
+gconf()
+{
+	sudo vim /etc/default/grub
+	echo "Don't forget to update GRUB!" >&2
+}
+#grub update hook
+alias upgrub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
+
+#visudo
+alias visudo='sudo /usr/bin/visudo'
+
+#shutdown
+sdh()
+{
+	echo '[halt]' >&2
+	sudo systemctl poweroff
+	#sudo poweroff
+	#sudo halt -p
+	#sudo shutdown -h now
+	#xfce4-session-logout --halt
+}
+
+#reboot
+sdr()
+{
+	echo '[reboot]' >&2
+	sudo systemctl reboot
+	#sudo reboot
+	#sudo halt --reboot
+	#sudo shutdown -r now
+	#xfce4-session-logout --reboot
+}
+
+#xfce4 logout
+out()
+{
+	if ps aux | grep \[x\]fce4-session | grep -q "^$(whoami)"
+	then 	if [[ -n "$TMUX" ]]
+		then 	echo 'xfce4-session-logout --logout --fast' >"$_TMUXSIG"
+			exit
+		else 	xfce4-session-logout --logout --fast
+		fi
+	fi
+	echo '[nothing to do]' >&2
+	return 1
+}
+#OBS: ``$_TMUXSIG'' is defined at ~/.rc file!
+
+#exit tmux and rerun last command
+#{
+#	if [[ -n $TMUX ]]
+#	then 	fc -ln -- -1 >"$_TMUXSIG"
+#		exit
+#	else 	fc -s
+#	fi ;}
+
+#startx
+#alias x=startx
+
+##kill detached screen sessions
+#{ screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill ;}
+
+##list screen processes
+#{ screen -list | grep -Eo "[0-9]{4,}" | xargs -n 1 pstree -p ;}
+#https://askubuntu.com/questions/302662/reattaching-to-an-existing-screen-session
+
+#tmux
+alias tls='tmux ls'
+alias ta='tmux attach-session -t'
+
+#kill dettached tmux sessions
+tdk()
+{
+	local line
+	tmux list-sessions | grep -E -v '\(attached\)$' |
+		while read line
+		do 	tmux kill-session -t "${line%%:*}"
+		done
+}
+#https://superuser.com/questions/635904/how-to-delete-a-detached-tmux-session
+
+#kill process
+alias ka='killall'
+#kill user
+alias ku='sudo pkill -15 -u'
+
+#kill sub-processes
+#{ kill -- -$$  ;} #kill a process group
+#{ kill 0 ;}
+#{ pkill -P $$ ;}
+
+#SIGINT = 1 , SIGKILL = 9 , SIGTERM = 15
+#list of exit signals
+#install core/man-pages -> man 7 signal
+
+
+#check battery level on arch linux
+batt()
+{
+        X=$( < /sys/class/power_supply/BAT0/charge_now )
+        Y=$( < /sys/class/power_supply/BAT0/charge_full )
+        python2 -c "z=$X/$Y.; print('%.2f' % z)"
+
+	acpi -bi
+}
+#from the real plato's sober october arch tips
+#https://therealplato.com/posts/soberoctober07/
+
+#disable bluetooth
+#rfkill block bluetooth
+#enable bluetooth
+#rfkill unblock bluetooth
+
+#calendar
+alias cal='cal -s'
+
+#vifm
+#set shell working directory after leaving Vifm
+#type :cq[uit] to cancel directory picking
+#record working directory leaving Vifm
+vf()
+{
+	local recfile="$HOME/.config/vifm/vifmcd.txt"
+	VIFMSET=1 command vifm --choose-dir "$recfile" "$@"
+	echo -e "\aPWD: $PWD"
+}
+((VIFMSET)) && echo -e \\aYou are within VIFM! >&2
+
+#cd to last visited dir in Vifm
+vfcd()
+{
+	local recfile="$HOME/.config/vifm/vifmcd.txt"
+	cd "$(<"$recfile")" || return
+	echo -e "\aPWD: $PWD"
+}
+#see another idea from:
+#https://wiki.vifm.info/index.php?title=How_to_set_shell_working_directory_after_leaving_Vifm
+
+#vifm command history
+vifmh()
+{
+	local vifminfo="$HOME/.config/vifm/vifminfo.json"
+	jq -r '.["cmd-hist"][] | "\(.ts|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))  text: \(.text)"' "$vifminfo"
+	#also: prompt-hist
+}
+
+#alias vimdiff='vimdiff -o "+colorscheme default" "+syntax off" "+set t_Co=16"'
+# Ref vimdiff colurs: https://stackoverflow.com/questions/2019281/load-different-colorscheme-when-using-vimdiff
+alias diff='/usr/bin/diff -W$(tput cols) -y'
+#https://www.reddit.com/r/git/comments/6mnnag/view_modified_files_in_the_last_n_commits_in_git/
+
+#vim
+alias v=vim
+alias e=vim
+#vim -u NONE         <-- starts Vim without any vimrc
+#vim -u NORC         <-- starts Vim without any vimrc, but with plugins
+
+#open last vim file
+#register nought "'0" jumps back to where you exited last
+alias vimlast='vim -c "normal '"'"'0"'
+alias vlast=vimlast
+
+#cd to vim backup
+alias vbak='cd ~/.vim/bak'
+#cd to vim swap
+vswap()
+{
+	vim -r
+	cd ~/.vim/swap || return
+	echo "$PWD"
+}
+
+#pager
+#alias more=less
+#tip: use less -R to respect ANSI color escapes
+alias lss=less
+
+#vim pager
+les()
+{
+	vim -c 'runtime! macros/less.vim' "$@"
+}
+alias vless=les
+#https://github.com/isaacs/.vim/blob/master/macros/less.sh
+
+vman()
+{
+	COLUMNS=$((COLUMNS-5)) /usr/bin/man ${@-man} | col -bpx | iconv -c | vim -c 'set ft=man nomod' -c 'set noeb vb t_vb=' -c 'map q <Esc>:q!<cr>' -c 'map i <nop>' -
+} 
+
+#copy less buffer
+#in less --help:
+#|Xcommand     Pipe file between current pos & mark X to shell command.
+#a mark is any upper-case or lower-case letter. Certain marks are predefined:
+#     ^  means  beginning of the file
+#     $  means  end of the file
+#so if you go to the top of the buffer (<) and then:
+#|$cat > /tmp/foo.txt
+#the contents of the buffer will be written out to /tmp/foo.txt.
+
+#set bat pager offset
+#alias bat='bat --terminal-width -2'
+alias bat='bat --style=changes,snip,header'
+
+#move to trash
+trash()
+{
+	local d f g
+	d=$(date +'%Y-%m-%dT%H_%M_%S')
+	for f
+	do  f=${f%%/} g=${f##*/}
+	    [[ $g == .* ]] || [[ ${g%.*} == ${g} ]] || g=${g%.*}.${g##*.}
+	    /usr/bin/mv -v -- "$f" ~/.local/share/Trash/files/"${d}_${g}"
+	done
+}
+
+#reload ~/.Xresources
+rr()
+{
+	xrdb -remove
+	sleep 2
+	xrdb -load ~/.Xresources
+	sleep 2
+	xrdb -query
+	echo '[.Xresources reloaded]' >&2
+}
+
+#xbindkeys rebind keys
+kk()
+{
+	#OBS: avoid starting xbindkeys in TMUX
+	killall -15 xbindkeys
+	sleep 1
+	xbindkeys  #-f ~/.xbindkeysrc
+	sleep 1
+	xbindkeys --show
+}
+
+#edit c files
+alias vrc='vim ~/.vimrc'
+alias vfrc='vim ~/.config/vifm/vifmrc'
+alias pkglist='vim ~/arq/docs/archInstallPkgSuggestion.txt'
+
+#edit and source
+sbrc()
+{
+	[[ -n "$BASH_VERSION" ]] && exec bash
+}
+szrc()
+{
+	[[ -n "$ZSH_VERSION" ]] && exec zsh
+}
+
+#~/.bashrc
+brc()
+{
+	vim ~/.bashrc
+	sbrc
+}
+
+#~/.zshrc
+zrc()
+{	vim ~/.zshrc
+	szrc
+}
+
+#~/.rc
+rc()
+{
+	vim ~/.rc
+	szrc || sbrc
+}
+
+#git aliases
+
+#use gitk --all for a gui interface
+#install git and tk
+#gnu git viewer: gitg
+#use git log or gitk to get hashes
+#git diff HEAD versionHash [file]
+#https://stackoverflow.com/questions/3338126/how-do-i-diff-the-same-file-between-two-different-commits-on-the-same-branch
+
+#git commit
+gcom()
+{
+	git commit -m "${*:-sync..}"
+}
+
+#git push
+gpush()
+{
+	git push origin "${1:-master}"
+}
+
+#git diff
+gdiff()
+{
+	git diff HEAD~${1:-1} HEAD -- $2
+	#filename as $2 is optional
+}
+#{ git diff --name-only HEAD~${1:-1} HEAD ;}
+#alias gdca='git diff --cached' # diff between your staged file and the last commit
+#alias gdcc='git diff HEAD{,^}' # diff between your latest two commits
+#https://stackoverflow.com/questions/1191282/how-to-see-the-changes-between-two-commits-without-commits-in-between
+#compare files
+#{ git diff --no-index dir1/ dir2/ ;}
+#{ diff -r dir1/ dir2/ ;}
+#{ comm -23 <(ls dir1 |sort) <(ls dir2|sort) ;} #files in dir1 and not in dir2
+#https://stackoverflow.com/questions/16787916/find-the-files-existing-in-one-directory-but-not-in-the-other
+#find + md5sum + diff at: https://askubuntu.com/questions/421712/comparing-the-contents-of-two-directories
+
+#simple git sync
+gitup()
+{
+	git add -A && git commit -m "${*:-sync}" && git push
+	#git add -A && git commit -m "${*:-sync}"; git push;
+}
+
+#retrieve the remote git address of a repo?
+gaddr()
+{
+	git remote -v
+}
+#https://stackoverflow.com/questions/8816107/how-can-i-retrieve-the-remote-git-address-of-a-repo
+
+#Resize the image if it is larger than the specified dimensions.
+#This will automatically preserve the aspect ratio of the image too.
+thumblr()
+{
+	local f size
+	[[ ${size:=$1} = [0-9Xx]*[!a-wyzA-WYZ] ]] && shift || size=200x150
+	for file in "$@"
+	do 	convert "$file" -resize $size\> "${file%.*}_thumb.${file##*.}"
+	done
+}
+#OBS: prefer to use programme `thumb' from imagemagickA6
+# Using FFMPEG to Extract a Thumbnail from a Video
+#{ ffmpeg -i InputFile.FLV -vframes 1 -an -s 400x222 -ss 30 OutputFile.jpg ;}
+#https://networking.ringofsaturn.com/Unix/extractthumbnail.php
+# Meaningful thumbnails for a Video using FFmpeg
+#{ ffmpeg -ss 3 -i input.mp4 -vf "select=gt(scene\,0.4)" -frames:v 5 -vsync vfr -vf fps=fps=1/600 out%02d.jpg ;}
+#https://superuser.com/questions/538112/meaningful-thumbnails-for-a-video-using-ffmpeg
+
+#Github credentials for repository
+#SSH login:
+#{ git remote set-url origin git@github.com:mountaineerbr/REPONAME.git ;}
+#older (deprecated) login methods:
+#{ git config --local user.name [username] ;}
+#{ git config --local user.email [email] ;}
+#{ git push ;}  #will ask to update password
+#{ git config --local credential.helper ;}
+#{ git config --local --unset user.password ;}
+#{ git config --local credential.helper "" ;} ;{ git push origin master ;}
+
+#init new git repo (must have created it on GitHub website)
+#gnew()
+#{
+#	local usr repo
+#	usr=bionota repo="${1:?repo name required}"
+#	#create a new repository on the command line
+#	echo "# $repo" >> README.md
+#	git init &&
+#	git add README.md &&
+#	git commit -m "init" &&
+#	git branch -M main &&  #used to be `master`
+#	#or only push an existing repository from the command line
+#	git remote add origin https://github.com/$usr/$repo.git &&
+#	git remote set-url origin git@github.com:$usr/$repo.git &&
+#	git push -u origin main
+#}
+
+#reset/refresh cloned repo
+gres()
+{
+	git fetch --all && { 
+	    git reset --hard "${1:-origin/main}" || {
+	    [[ -z $1 ]] && git reset --hard origin/master ;}
+	}
+	#git clean -f -d -x
+}
+#use a commit hash or 'HEAD^' to revert to last commit
+#https://stackoverflow.com/questions/4327708/git-reset-hard-head-leaves-untracked-files-behind/4327720
+
+#remove last n commit
+#use: grmlast 2  # removes last 2 commits, otherwise removes last commit
+grmlast()
+{
+	[[ -z "$1" ]] && set -- 'HEAD^'
+	[[ -n "$1" ]] && [[ "${#1}" -le 2 ]] && set -- "HEAD~$1"
+
+	git reset --hard "$1" && git push origin -f
+}
+#https://gist.github.com/CrookedNumber/8964442
+
+#switching between branches in a repository you already have
+#overwrite a file with a version of that file from another revision
+#checkout to a particular status of a particular file
+gout()
+{
+	git checkout HEAD -- "$1"
+}
+
+#remove large .git/objects
+#this will not keep your old commit history around
+grmob()
+{
+	#checkout
+	git checkout --orphan latest_branch
+	#add all the files
+	git add -A
+	#commit the changes
+	git commit -am sync
+	#delete the branch
+	git branch -D main
+	#rename the current branch to main
+	git branch -m main
+	#finally, force update your repository
+	git push -f origin main
+
+	#push the current branch and set the remote as upstream
+	git push --set-upstream origin main
+}
+#https://stackoverflow.com/questions/13716658/how-to-delete-all-commit-history-in-github
+#also check 'bgf repo-cleaner' https://rtyley.github.io/bfg-repo-cleaner/
+
+#git grep
+ggrep()
+{
+	git rev-list --all | xargs git grep "$@"
+}
+#https://stackoverflow.com/questions/2928584/how-to-grep-search-committed-code-in-the-git-history
+
+gdate()
+{
+	git log -1 --format="%ad" "${@:?Commit hashes required}"
+}
+
+#test if inside a git dir
+#{ git rev-parse --is-inside-work-tree ;}
+#{ git -C DIR rev-parse --is-inside-work-tree ;}
+
+#download a single file from github repos
+#usage:  gd [LAB|HUB] [USER] [REPO[/BRANCH]] [SUBREPO/PATH/]FILE
+#usage:  gd  grml  grml-etc-core  etc/zsh/zshrc
+#one positional parameter is read as FILE or a subrepo path to a FILE;
+#two args are read as REPO and FILE;
+#three arguments give the full address to a git USER, REPO and FILE location.
+#must set def git user and repo
+gd()
+{
+	local defuser defrepo hub branch url
+	defuser=mountaineerbr
+	defrepo=dotfiles
+
+	#print usage
+	case "$1" in
+		[Gg][Ii][Tt][Hh][Uu][Bb]|[Hh][Uu][Bb])
+			echo "GitHub" >&2; shift; ((++hub));;
+		[Gg][Ii][Tt][Ll][Aa][Bb]|[Ll][Aa][Bb])
+			echo "GitLab" >&2; shift;;
+	esac
+	if [[ -z "$1" || -n "$4" ]]
+	then 	echo "Usage: gd [LAB|HUB] [USER] [REPO[/BRANCH]] [SUBREPO/PATH/]FILE" >&2
+		return 1
+	fi
+
+	#set positional parameters (default user, repo etc if empty..)
+	(( ${#@} - 1 )) || set -- "${3:-$defuser}" "${2:-$defrepo}" "$1"
+	(( ${#@} - 2 )) || set -- "${3:-$defuser}" "$1" "$2"
+	if [[ $2 = */* ]]
+	then 	branch="${2##*/}"
+		set -- "${@:1:1}" "${2%%/*}" "${@:3}"
+	fi
+	branch="${branch:-main}"
+	set -- ${@%/} ;set -- ${@#/}
+	((hub)) && url="https://raw.githubusercontent.com/$1/$2/$branch/$3" \
+		|| url="https://gitlab.com/$1/$2/-/raw/$branch/$3"
+
+	#download and print file
+	if [[ -t 1 ]]
+	then 	#if stdout is free
+		curl -fL\# "$url"
+	else 	#otherwise, copy to stderr for conference
+		curl -fL\# "$url" | tee /dev/stderr
+		echo -e '\a\ngd.func: copy sent to stderr' >&2
+	fi
+	echo "$url" >&2
+}
+#"https://github.com/$1/$2/blob/main/${3}?raw=true"
+
+#check local hash sums of same-named local files
+#usage:  gk  [USER] [REPO] [SUBREPO/PATH/]FILE
+#usage:  gk  mountaineerbr dotfiles .bashrc
+#requires 'gd' function
+gk()
+(
+	(( $# )) || return 1
+
+	#set shell options
+	[[ -n "$ZSH_VERSION" ]]  && setopt nullglob dotglob globstarshort
+	[[ -n "$BASH_VERSION" ]] && shopt -s nullglob dotglob globstar
+
+	#get filename from user input
+	file="${3:-${2:-$1}}"  file="${file%/}"  file=${file##*/}
+
+	#use func gd() to download file from repo
+	gd "$@" | if [[ -e "$file" ]]
+		then 	#$file is at current local dir
+			tee >(cksum -- - "$file" >&2)
+		else 	#$file is down local dir hierarch
+			tee >(cksum -- - **/"$file" >&2 2>/dev/null)
+		fi
+)
+
+#functions and aliases
+#declare -f
+#declare -F  #prints only func names!
+#alias
+#zsh: which [alias|function]
+
+#exits
+alias ezit=exit
+#alias q=exit; alias :q=q; alias ::q=q; alias :Q=q; alias ::Q=q;
+
+#slurm internet monitor
+slurm()
+{
+	/bin/slurm -i "$( iw dev | awk '/Interface/ {print $2}' )"
+}
+#alias slurm="/bin/slurm -i enp3s0"
+
+#last log-ins
+alias lastl='last | head -5 | tr -s " "'
+#count log-ins
+countl()
+{
+	local user
+	for user in /home/*
+	do 	echo -ne "$user\t"
+		last "$user" | wc -l
+	done
+}
+#https://www.networkworld.com/article/3431864/keeping-track-of-linux-users-when-do-they-log-in-and-for-how-long.html
+
+#the holy trinity of memory information
+meminfo()
+{
+	cat /proc/meminfo 	;echo
+	free -m 		;echo
+	vmstat
+}
+#https://www.linuxquestions.org/questions/linux-newbie-8/conky-has-me-like-why-is-my-ram-always-cached%5Cfull-so-%5Bbloged%5Dclean-ram-every-10-minutes-4175595656/
+#extensive system info:
+#inxi -Fxz
+#lshw
+#lscpu
+
+## Memory overview
+#memusage() {
+#    ps aux | awk '{if (NR > 1) print $5;
+#                   if (NR > 2) print "+"}
+#                   END { print "p" }' | dc
+#}
+
+#cd hacks
+alias cd..='cd ..'
+alias ..='cd ..'
+alias ...='cd ../../'
+#alias ~="cd ~" # `cd` is probably faster to type though
+#alias -- -="cd -"
+#cd -  #back to the previous directory
+#cd ~  #cd user home dir
+
+# Enable aliases to be sudo’ed
+#alias sudo='sudo '
+
+alias du='du -h -c'
+
+alias open='exo-open'
+#alias open='xdg-open'
+
+#docker image size
+dockerimagesize()
+{
+	local REPLY sum;
+	docker manifest inspect -v "$1" \
+	| jq -r '..|(.size//empty)?' | {
+	  while read; do ((sum+=REPLY)); done; echo $sum;
+	} | numfmt --to=si;
+}
+#https://gist.github.com/MichaelSimons/fb588539dcefd9b5fdf45ba04c302db6
+
+#Android Termux
+#termux-setup-storage
+#this creates a new directory in termux, ~/storage, which contains simlinks to /storage/emulated/0 and can be accessed by a standard gui file manager. 
+
+#keep cpu from sleep, may improve performance
+#alias lock=termux-wake-lock
+#alias unlock=termux-wake-unlock
+
+#print ssh command to connect to current machine
+alias shh='echo ssh $(whoami)@$(ip -4 n | awk "{print \$3;exit}" | ip -br -4 a s $(echo Device: >&2 ;cat /dev/stdin) | grep -Eo "[0-9.]{7,}")' 
+
+#list local ips
+iplist()
+{
+	nmap -sn 192.168.0.0/24
+}
+#https://superuser.com/questions/261818/how-can-i-list-all-ips-in-the-connected-network-through-terminal-preferably
+
+
+upchat()
+{
+	typeset f1 f2
+	f1=$HOME/www/lab-shellchatgpt/chatgpt.sh 
+	f2=$HOME/bin/chatgpt.sh 
+	cd ~/www/lab-shellchatgpt/man || return
+
+	~/bin/openai/chatgpt-test.sh || return 1
+	((1+SKIP)) ||
+	/usr/bin/diff -q $f1 $f2 &>/dev/null ||
+	local msg=$( { 	/usr/bin/diff ~/www/lab-shellchatgpt/chatgpt.sh ~/bin/chatgpt.sh ;
+			/bin/diff ~/www/lab-shellchatgpt/README.md <(gd fenixdragao shellChatGPT README.md 2>/dev/null);
+		} | ~/bin/chatgpt.sh -mgpt-4o -mgpt-4-0125-preview -Ecc..unix -512 $'Please, create a simple commit message for bash chatgpt.sh script update. The commit message is very concise. Always comment when there are very important changes in code unmentioned. Do not repeat developer comments or diff output because these will already be available in the commit head itself. Explain what effects the update may have that have not been explicitly mentioned as far as you can see. Be succinct.' "${@:+$'\n\n'Developer comments: $*$'\n\n'}" $'\n\nDIFF OUTPUT:\n\n')  #git diff --cached
+	printf 'Diff %%%f\n' $(bc <<<"scale=8; ($(diff -y --suppress-common-lines $f1 $f2 | wc -l)/$(wc -l <$f2))*100");
+
+	printf 'press\r' >&2; (read);
+
+	~/bin/md2man.sh chatgpt.sh.1.md
+	\cp -fv ~/bin/chatgpt.sh ../ && gitup "${@}" ${@:+$'\n\n\n---\n'}"$msg"
+	#if cd ~/www/hub-shellChatGPT/  #hard-links
+	#then 	gitup "${@}" ${@:+$'\n\n\n---\n'}"$msg"
+	#fi
+}
+upchataur()
+{
+	local dir source ver commit
+	dir=$HOME/www/aur-chatgpt.sh
+	source=$HOME/www/lab-shellchatgpt
+
+	cd $dir || return
+
+	\cp -vf $source/pkg/PKGBUILD $dir/PKGBUILD
+
+	latest=$(cd $source && git rev-parse HEAD)
+	printf 'Latest commit: %s\n' $latest >&2;
+	printf 'Target commit: %s\n' "$1" >&2;
+	printf 'Pkg   release: %s\n' "$2" >&2;
+	((${#1})) || set -- $latest "${@:2}"
+	commit=${1:?Commit hash required}  pkgrel=${2:-1}
+	ver=$(grep -m1 '# v' "$source/chatgpt.sh") || return
+	ver="${ver#*v}" ver="${ver%% *}"
+
+	sed -i -e "/^pkgrel=.*/ s/.*/pkgrel=$pkgrel/" ./PKGBUILD || return
+	sed -i -e "/^pkgver=.*/ s/.*/pkgver=$ver/" ./PKGBUILD || return
+	sed -i -e "/^_commit=.*/ s/.*/_commit=$commit/" ./PKGBUILD || return
+	makepkg --printsrcinfo | tee ./.SRCINFO || return
+	[[ -s ./.SRCINFO ]] || return
+
+	#test PKGBUILD
+	builtin cd "$(mktemp -d)" || return
+	ln -sv $dir/PKGBUILD ./PKGBUILD
+	
+	namcap -i ./PKGBUILD &&
+	makepkg && {
+		echo >&2
+		set -- ./chatgpt.sh*zst
+		namcap -i $1 || return
+		pacman -Qlp $1
+		pacman -Qip $1
+		tree ./src ./pkg
+		ls
+	}; pwd
+	echo $'\n'Version=$ver, Rel=$pkgrel, Commit=$commit >&2
+	echo $'Please `cd -; gitup [commit_message]`' >&2
+	cd -;
+}
+#https://wiki.archlinux.org/title/Creating_packages
+
+upchatall()
+{
+	upchat "$1" &&
+	upchataur '' "$2" &&
+	(echo press.. >&2; read) &&
+	gitup;
+}
+
+alias chat='chatgpt.sh -cc --google'
+alias unix="chatgpt.sh -..unix -cc -4000 --md --goo"
+alias unix2="chatgpt.sh -..unix -cc -4000 --mistral -mcodestral-latest"
+alias marv="chat -60 -cc --frequency-penalty=0.5 --temp=0.5 --top_p=0.3 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
+alias dchat=$HOME/bin/openai/debug.chatgpt.sh
+alias chatd='vimdiff ~/bin/chatgpt.sh ~/www/lab-shellchatgpt/chatgpt.sh'
+
+lchat()
+{
+	local model
+	model=Wizard-Vicuna-7B-Uncensored.Q4_K_S.gguf
+	model=luna-ai-llama2-uncensored.Q4_K_M.gguf
+	MOD=$model MOD_CHAT=$model llchat -m$model "$@"
+}
+llchat()
+{
+	OPENAI_API_HOST="http://127.0.0.1:8080" MOD_AUDIO="whisper-base" \
+	MOD_IMAGE="stablediffusion" START='### Response:' RESTART='### User:' \
+	~/bin/chatgpt.sh -r'\n### User: ' -R'\n### Response:' -s'### User:' -s'### Response:' -s'### Instruction:' "$@"
+}
+
+ochat()
+{
+	~/bin/chatgpt.sh -O -m llama2-uncensored:latest -R'\n### RESPONSE:' -r'\n### HUMAN: ' -s'### RESPONSE:' -s'### HUMAN:' "$@"
+}
+
+mchat()
+{
+	~/bin/chatgpt.sh --mistral "$@"
+}
+
+alias lai=/home/LocalAI/local-ai.sh
+
+tts()
+{
+	local in out;
+	[[ -t 0 ]] && { 	vipe | tts "$@"; return; }
+	in=$(cat) out="$HOME/Downloads/tts.mp3"; echo "$out" >&2;
+	gtts-cli "$@" "$in" | tee "$out" | play -t mp3 -;
+}
+
+#temperature converter
+alias ctemp='~/bin/ctemp.sh'
+alias ipmet=ipmet.sh
+
+
+#make dir and change dir to it - GRML has one mkcd function
+#mkcd() { mkdir "$1" && cd "$1" ;}
+
+#make a temporary directory
+tmpd()
+{
+	(( $# )) && set -- .${1##*/}
+	builtin cd "$( mktemp -d "${TMPDIR:-/tmp}/$( date +%s )${1}.XXXXXX" )" || return
+	echo "$PWD"
+}
+alias tmpdd="TMPDIR=$HOME/tmp tmpd"
+
+#view mounted drives
+mnt()
+{
+	mount | awk -F' ' '{ printf "%s\t%s\n",$1,$3; }' |
+		column -t | grep -E '^/dev/' | sort
+}
+
+#find out where a mount/partition or file is
+wherep()
+{
+	[[ -z "$*" ]] && set -- .
+	df -P  "$@" | tail -1 | cut -d' ' -f 1
+}
+#https://stackoverflow.com/questions/3274354/how-to-find-out-mount-partition-a-directory-or-file-is-on-linux-server
+
+#copy buffer to clipboard
+#usage: echo 'copy this' | clip
+#usage: clip FILE..
+clip()
+{
+	if ((${#}))
+	then 	cat "$@" | xsel -b
+	else 	xsel -b
+	fi
+}
+#to use with GNU Screen: 1.Copy buffer (Ctrl+a [); 2. entre this function; 3. Paste (Ctrl+a ]); 4. Ctrl+d
+#https://stackoverflow.com/questions/16111548/how-to-copy-the-gnu-screen-copy-buffer-to-the-clipboard
+
+#selection buffer monitors
+#with xsel
+clipboard()
+{
+	while :
+	do 	echo -ne "\n${Purple}PRIMARY__:$NC "
+		xsel -p -o
+		echo -ne "\n${Blue}CLIPBOARD:$NC "
+		xsel -b -o
+		sleep 1
+	done
+}
+#with xclip
+clipboard2()
+{
+	while :
+	do 	echo -ne "\n${Purple}PRIMARY__:$NC "
+		xclip -o -sel p
+		echo -ne "\n${Blue}CLIPBOARD:$NC "
+		xclip -o -sel c
+		sleep 1
+	done
+}
+#https://unix.stackexchange.com/questions/212360/copying-pasting-with-urxvt
+
+#gram to avoirdupois ounce ratio
+OZ=28.349523125
+#https://en.wikipedia.org/wiki/Ounce
+#gram to troy ounce ratio for precious metals
+TOZ=31.1034768  #also? 31.1034807
+#https://goldprice.com/troy-ounce-vs-ounce/
+
+#AST bin
+AST="/opt/ast/arch/linux.i386-64/bin"
+#https://github.com/att/ast/
+
+#emulate ksh with zsh
+#use 'emulate -L ksh' for scripts
+kshf()
+{
+	ARGV0=ksh exec zsh
+}
+
+#chmod +x [file1] [file2]
+cx()
+{
+	local f;
+	for f
+	do 	chmod +x "$f" || break;
+	done
+}
+
+#debug shell function
+setxv()
+{
+	set -xv ;"$@" ;set +xv
+}
+
+#advanced bash scripting guide
+#http://tldp.org/LDP/abs/html/
+
+#z-shell original user guide by Paul Falstad
+z()
+{
+	less ~/arq/docs/zShellDocs/zshGuide/plainTxt/zShellGuideAll.man
+}
+#also check the mailing list!
+#https://www.zsh.org/mla/users/
+#http://zsh.sourceforge.net/Guide
+#http://zsh.sourceforge.net/Doc
+#latest Z-Shell pdf doc:
+#/usr/share/doc/zsh/zsh.pdf
+
+#zshell mailing list
+zz()
+{
+	bat -l eml --style plain ~/arq/docs/zShellDocs/zshUsersMailingList/zshUserMailingListConcat.txt
+}
+
+#zsh release notes
+zzz()
+{
+	curl https://zsh.sourceforge.io/releases.html| htmlfilter
+}
+
+b()
+{
+	bat -l eml --style plain ~/arq/docs/bash_help_mailing_list.txt
+}
+
+
+xtitle () 
+{ 
+	echo -n -e "\033]0;$*\007"
+}
+#also see bashrc of gentoo and arch linux
+
+#check which library files a binary points to
+#ldd $( which bash )
+
+#network manager
+#available wifi networks:
+#nmcli dev wifi
+#more info:
+#nmcli -f ALL dev wifi
+
+#pacman
+#sync pkg
+alias pac='sudo pacman -S'
+#search pkg
+alias pacs='sudo pacman -Ss'
+#remove pkg and unnecessary deps
+#{ pacman -Rns ;}
+#remove pkg but do not check for deps
+#{ pacman -Rdd ;}
+#sync system pkgs
+#{ pacman -Syu ;}
+#pkgs with upgrades available
+alias pacc='sudo pacman -Sy && pacman -Qu'
+#pkgs with upgrades available - another way
+alias pacp='sudo pacman -Syup'
+#https://bbs.archlinux.org/viewtopic.php?id=8181
+
+#run `pkgfile --update` and `sync`
+#or add a pacman hook to sync data to disk
+#https://bbs.archlinux.org/viewtopic.php?id=261655
+
+#edit config
+alias pconf='sudo vim /etc/pacman.conf'
+#edit mirrorlist
+alias pmir='sudo vim /etc/pacman.d/mirrorlist'
+#cd pacman lib
+alias plib='cd /var/lib/pacman/local'
+#cd pacman cache
+alias pcache='cd /var/cache/pacman/pkg'
+
+#extract installation info
+alias pacdate='expac --timefmt="%F %T" "%l %n" | sort -n'
+#paclog, coloured pacman log
+#alias pl='paclog'
+
+#query the file database
+#look for packages owning certain files or display files owned by certain
+#packages. only packages that are part of your sync databases are searched
+#{ pacman -F '[pkg]' ;}
+#pkg reports
+#blame by 'install size'
+#{ expac -H M -l '\n' '%m %n' | sort -k1nr ;}
+#blame by 'depends on'
+#{ expac -l ' ' '%n %E' | awk '{print NF - 1, $1}' | sort -k1nr ;}
+# blame by 'required by'
+#{ expac -l ' ' '%n %N' | awk '{print NF - 1, $1}' | sort -k1nr ;}
+#https://bbs.archlinux.org/viewtopic.php?id=194188
+#check packages of a base group
+#pacman -Sgq gnome
+
+#list all pkgs from a repo
+#{ LANG=C pacman -Sl multilib | grep installed | cut -d ' ' -f 2 ;}
+
+#pacman sync messages
+pacmsg()
+{
+	sed -n 's/.*SCRIPTLET] //p' /var/log/pacman.log
+}
+
+#Listing changed config files
+#If you want to backup your system configuration files you could copy all
+#files in /etc/, but usually you are only interested in the files that you
+#have changed. Modified backup files can be viewed with the following command: 
+#{ pacman -Qii | awk '/^MODIFIED/ {print $2}' ;}
+#https://wiki.archlinux.org/index.php/Pacman/Tips_and_tricks
+
+#pkg info
+paci()
+{
+	#check for arg
+	[[ -z "$*" ]] && return
+	{ 	echo "[online mirror]"
+		pacman -Si "$@"
+		echo "[local cache]"
+		pacman -Qi "$@"
+	} | cat -n | sort -k2 | uniq -f 1 | sort -n | cut -f2
+		#perl -ne 'print unless $seen{$_}++'
+		#awk '!seen[$0]++'  ##seen is merely a var
+ 		#nl | sort -k2 -u | sort -n | cut -f2
+		#zshell: print -l "${(fu)$( <infile.txt )}"
+} 2>/dev/null
+
+alias unseen="perl -ne 'print unless \$seen{\$_}++'"
+
+#pkg file lists
+pls()
+{
+	[[ -n "$1" ]] || return
+	printf '%s\n' /var/lib/pacman/local/"$1"*
+
+	tac /var/lib/pacman/local/"$1"[0-9-]*/files \
+	|| tac /var/lib/pacman/local/"$1"*/files \
+	|| pacman -Ql "$1" \
+	|| { pacman -F "$1" ;ls /bin/*"$1"* ;}
+} 2>/dev/null
+
+#pkg update count
+puc()
+{
+	grep upgraded /var/log/pacman.log \
+	| awk -F ' ' '{print $5}' \
+	| sort | uniq -c | sort -nr
+}
+
+#lists the dependencies for a given binary
+pdep()
+{
+	readelf -d $1 \
+	| sed -n 's|.*Shared library: \[\([^\]*\)\]|/usr/lib/\1|p' \
+	| pacman -F - | sed 's|^|/|;s| .*||' | pacman -Qqo - \
+	| sort -u
+}
+#https://bbs.archlinux.org/viewtopic.php?id=287794
+
+missinglibs()
+{
+	ldd /bin/* 2>/dev/null | awk '
+	/^\// { exe = $1 }
+	/not found/ { list[exe] = list[exe] " " $1 }
+	END { for (key in list) print key list[key] }
+'
+}
+
+# upgrade all outdated python libraries
+# OBS: dangerous if your package manager does this (such as `pacman`)
+#
+pyup()
+{
+	pip install -U pip
+	pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 pip install -U
+}
+#https://pastebin.com/yYFes5dG
+
+#print pkgs managed by pip only (arch linux)
+#obs: version of pkgs are not considered
+piponly()
+{
+	local x
+	grep -v -i -f <(pacman -Qq | grep python- | cut -f2 -d-) <(pip list | sed 1,2d | cut -d\  -f1) |
+	while read x;
+       	do 	pacman -Q python-$x &>/dev/null ||
+       		yay -Ss $x | grep -q -i -e "$x.*(Installed)" ||
+	       	echo pip-only: $x;
+       	done;
+}
+
+#list aur packages
+alias aurl='curl https://aur.archlinux.org/packages.gz'
+#see also package aurutils, man aur-pkglist
+#https://wiki.archlinux.org/title/Arch_User_Repository#How_can_I_obtain_a_list_of_all_AUR_packages?
+
+#How do I find out if any of my installed packages disappeared from AUR?
+#The simplest way is to check the HTTP status of the package's AUR page:
+alias aurmiss='comm -23 <(pacman -Qqm | sort) <(curl https://aur.archlinux.org/packages.gz | sort)'
+
+#get a mirrorlist (arch linux)
+mlist()
+{
+	if (( ${#1} != 2 ))
+	then curl https://www.archlinux.org/mirrorlist/all/
+	else 	set -- $( tr '[:lower:]' '[:upper:]' <<< "$1" )
+		curl "https://www.archlinux.org/mirrorlist/?country=$1&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
+	fi
+}
+
+#mirror status (arch linux)
+#usage: mstatus [PATTERN|json]
+#PATTERN may be a country, e.g. Brazil
+mstatus()
+{
+	#get json?
+	if [[ "$1" = json ]]
+	then 	curl https://www.archlinux.org/mirrors/status/json/
+	else 	w3m -dump https://www.archlinux.org/mirrors/status/ |
+			if [[ -z "$1" ]]
+			then 	cat
+			else 	grep --no-group-separator -Ei -e "$1" -e '^\s*(Successfully Syncing Mirrors|Out of Sync Mirrors|Mirror Syncing Error Log|Completion μ Delay|Mirror URL|\(s\)\s*\(s\)|hours|Last\s*Occurrences).*'
+			fi
+	fi
+}
+#{ curl --compressed -L https://www.archlinux.org/mirrors/status/json/ | jq -r '.urls[]|select(.country=="Brazil")|"\(.completion_pct)\t\(.url)"' ;}
+
+#"Can't update: signature from *** is marginal trust" or "invalid or corrupted package"
+#you probably just need to update your package signing keys:
+#{ sudo pacman -Sy archlinux-keyring ;sudo pacman-key --populate archlinux ;sudo pacman-key --refresh-keys ;}
+#https://archived.forum.manjaro.org/t/pacman-is-not-working-fine/120878
+
+#test ping of arch mirror
+#usage: mping \.nz
+mping()
+{
+	local REPLY p q
+	q="${1:-\.br}"
+
+	echo "query: $q"
+	sed -nE "/$q/ s|.*//([^/]*).*|\1|p" /etc/pacman.d/mirrorlist |
+		sort -u | tee >( echo "servs: $(wc -l)" ) |
+		while read
+		do 	p=$( ping -c 1 "$REPLY" | grep -o --color=always 'time=.*' | tee >(read x ;echo -e "$x\t$REPLY" >&2) )
+			printf '%s\t%s\n----\n' "$p" "$REPLY"
+		done | sort -Vru
+}
+
+#yay -- aur
+#search in oficial repos and aur
+alias s='yay -Ss'
+#skip validity checks, look for mflags
+#ex:yay -S package --mflags "--skipchecksums --skippgpcheck"
+
+#arch linux archieve explorer script
+alias ala='~/bin/ala.sh'
+
+#get a PKGBUILD
+pkgb()
+{
+	aur.sh -p "$@" || _pkgb "$@"
+}
+_pkgb()
+{
+	local page
+	if page=$(curl -f\# "https://gitlab.archlinux.org/archlinux/packaging/packages/${1}/-/raw/main/PKGBUILD")
+		[[ $page = *\<html\>* ]]
+	then 	page=$(curl -f\# "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${1}") || return
+	fi
+	printf '%s\n' "$page"
+}
+
+#arch linux mail
+#usage: amail | less #bat -l mbx
+amail()
+{
+	local urlroot=https://lists.archlinux.org/archives/list
+	select list in arch-{general,dev,events,proaudio,mirrors,mirrors-announce,announce} aur-{general,requests} pacman-dev
+	do 	for m in $(curl "$urlroot/arch-general@lists.archlinux.org/" |
+			sed -n '/^<ul/,/^<\/ul/p' |
+			sed -nE "/<[Aa] / s/.*href=['\"]([^'\"]+)['\"].*/\1/ ;s/^.*linux\.org\///p")
+		do 	m=${m%/}  m=${m/\//-}
+			curl -L "$urlroot/${list}@lists.archlinux.org/export/${list}@lists.archlinux.org-${m}.mbox.gz?start=${m}-01&end=$(date -Idate -d"${m}-01 + 1month")" |
+			gzip -c -d
+			echo "MONTH: $m" >&2
+			#break 2
+		done
+	done
+}
+
+#test shell performance
+#{ strace -cf bash -c 'for i in $(seq 1 1000); do bash -c ":"; done' ;}
+
+#cloudflare() { python "$HOME/bin/more/CloudFlair/cloudflair.py" "$1" ;}
+#install the dependencies
+#$ cd cloudflair
+#$ pip install -r requirements.txt
+#https://github.com/christophetd/CloudFlair
+#https://medium.com/bugbountywriteup/bypass-cloudflare-waf-to-pwned-application-2c9e4f862319
+
+#moby hyphenator dictionary
+#usage: hy dog
+#usage: hy '^dog'
+hy()
+{
+	local dic diclist tcol expression
+	expression="$*"
+	#local copy
+	dic="$HOME/arq/docs/MobyHyphenatorII/mhyph.txt"
+	#process raw dictionary
+	diclist=$(paste "$dic" <(tr '¥' '-' <"$dic") | tr -dc '[:print:]\n\s\t' | sed 's/--/-/g')
+	#set columns for interactive pretty print
+	[[ -t 1 ]] && tcol='-TWORD,HYPHENED'
+
+	#grep and format table
+	{ 	grep -iE "^$expression"$'\t' <<<"$diclist" \
+			|| grep -iE "^$expression" <<<"$diclist" \
+			|| grep -iE "$expression" <<<"$diclist"
+	} | column -et -s$'\t' -NWORD,HYPHENED $tcol
+}
+#http://www.gutenberg.org/files/3204/files/mhyph.txt
+#also: http://www.gutenberg.org/ebooks/3204
+#https://raw.githubusercontent.com/mountaineerbr/dotfiles/master/mhyphMobyHyphenatorII.txt
+
+#from the internet
+hy2()
+{
+	w3m "https://www.howmanysyllables.com/words/$1" \
+		| sed -n '/^\s*Divide/ s/^.*:\s*//p'
+}
+
+#hyphenation with python2
+#does not check for orthography
+#the liang algorithm does not provide all possible hyphenation points.
+#it merely tries to provide some of them, without providing any wrong ones.
+#so the set of breaks from hyphenate.py will be a subset of the full set
+#of break points.
+hy3()
+{
+	python2 ~/bin/more/hyphenate.py "$1"
+}
+#https://nedbatchelder.com/code/modules/hyphenate.html
+
+#thesaurus
+
+#mythes
+#installed from oficial repos mythes-en
+th()
+{
+	sed -n "/^${1:-.*}|/,/^[a-z.]/ p" /usr/share/mythes/th_en_US_v2.dat \
+		| sed -Ee 's/^([a-z.].*)\|([0-9]+)/\1  \[\2\]/' -e 's/^\(([^\)]+)\)\|(.*)/>>\1 -- \2/ ; s/\|/, /g' \
+		| sed \$d
+}
+
+#dicionário de sinônimos
+#português
+sin()
+{
+	local dic
+	dic="$HOME/arq/docs/dicionarioSinonimos_th_pt_BR.dat"
+
+	if [[ -f "$dic" ]]
+	then 	cat "$dic"
+	else 	curl -Lo- "https://downloads.sourceforge.net/project/aoo-extensions/6212/0/dicsin-br.oxt?r=extensions.openoffice.org&ts=$( date +%s )&use_mirror=ufpr" \
+			| bsdtar -xf - -O "*th_pt_BR.dat"
+	fi | sed -n "/^${1:-.*}|/,/^\s*$/ p" \
+		| sed -Ee 's/^([a-z.].*)\|([0-9]+)/\1  \[\2\]/' -e 's/^\(([^\)]+)\)(.*)/>>\1 -- \2/; s/\|/, /g' \
+		| sed \$d
+}
+#extensão do OpenOffice
+#https://extensions.openoffice.org/en/node/6213
+
+#for acronym list, check
+# package wtf
+# and: http://www.mirbsd.org/acronyms.gz
+
+# for random phrases, check
+# https://swanrad.ch/g.html
+
+#Serialization, time formats
+#RFC 5322: strftime({"%a, %d %b %Y %T %z"}, var.time);
+#ISO 8601: strftime({"%Y-%m-%dT%H:%M:%SZ"}, var.time);
+
+#datediff.sh
+alias d="$HOME/bin/datediff.sh"
+
+#units - list units from default file
+unitsl()
+{
+	less "$(units -U)"
+}
+
+#utc time
+utc()
+(
+	TZ=UTC date -d@"$(curl -sL 'https://api.binance.com/api/v3/time' | grep -oE '[0-9]{10}')" &
+	curl -sL 'http://worldtimeapi.org/api/timezone/Etc/GMT.txt' | awk -F': ' '/utc_datetime: /{print $2}'
+	wait
+)
+
+#http://technostuff.blogspot.com/2008/10/some-useful-socat-commands.html
+
+#New York EST ET time
+est()
+{
+	TZ=America/New_York date -d now
+}
+
+#timezones
+#use with grep
+
+#city names
+tz()
+{
+	curl -sL 'https://www.zeitverschiebung.net/en/all-time-zones.html' \
+		| sed -e 's/<strong>/\n&/g' -e 's/Time Difference<\/h4>.*//g' -e 's/<[^>]*>//g' \
+		| sed -Ee 's/\s\s*/ /g' -e 's/\s*$//g' -e '/(\{\s*var|analytics)/ d'
+}
+
+#city names
+tz2()
+{
+	curl -sL 'https://www.timeanddate.com/worldclock/full.html' \
+		| sed -n '/Around the World/p' \
+		| sed -Ee 's/([0-9])(<\/td>)/\1\n\2/g'  -e 's/<\/a>/  &/g' -e 's/<[^>]*>//g'
+}
+
+#city names
+tz3()
+{
+	curl -sL "https://www.worldtimeserver.com/worldclock.aspx" \
+		| grep -A1 '?city=[^"]' | grep -v '^--' \
+		| sed -e 's/<[^>]*>//g' -e 's/\r//g' | sed -e 'N;s/\n/ /' -e 's/^\s*//'
+}
+
+#systemd tzs
+tz4()
+{
+	timedatectl list-timezones
+}
+
+#system tzs
+tz5()
+{
+	ls /usr/share/zoneinfo*/*
+}
+
+#all timezone functions
+#use with grep
+tza()
+(
+	tz & tz2 & tz3 & tz4 & tz5
+	wait
+)
+#also: https://www.timeanddate.com/time/zones/
+
+#geonames.org provides a data dump (by country) of all known cities and their Olson timezone.
+#Hands down the best way to do it. download.geonames.org/export/dump
+
+vipef()
+{
+	local tmpf=$(mktemp)
+	cat > "$tmpf"
+	${VISUAL:-vim} "$tmpf" </dev/tty >/dev/tty
+	cat "$tmpf"
+	/usr/bin/rm "$tmpf"
+}
+
+# unfmt - convert paragraphs into long lines
+# 20jul2014  +chris+  zsh function
+# 15dec2014  +chris+  simplify
+unfmt()
+{
+	perl -00pe 's/\s*\n\s*/ /g; s/\s*\Z/\n/;' -- "$@"
+}
+
+# wrap - wrap long lines using backslashes
+wrap()
+{
+	perl -pe 's/.{'$(( ${COLUMNS:-80} - 1))'}/$&\\\n/g' -- "$@"
+}
+#https://leahneukirchen.org/dotfiles/.zshrc
+
+## Some quick Perl-hacks aka /useful/ oneliners
+#bew() { perl -le 'print unpack "B*","'"$1"'"' ;}
+#web() { perl -le 'print pack "B*","'"$1"'"' ;}
+#hew() { perl -le 'print unpack "H*","'"$1"'"' ;}
+#weh() { perl -le 'print pack "H*","'"$1"'"' ;}
+#pversion()    { perl -M"$1" -le "print $1->VERSION" ;} # i. e."pversion LWP -> 5.79"
+#getlinks ()   { perl -ne 'while ( m/"((www|ftp|http|https):\/\/.*?)"/gc ) { print $1, "\n"; }' "$*" ;}
+#gethrefs ()   { perl -ne 'while ( m/href="([^"]*)"/gc ) { print $1, "\n"; }' "$*" ;}
+#getanames ()  { perl -ne 'while ( m/a name="([^"]*)"/gc ) { print $1, "\n"; }' "$*" ;}
+#getforms ()   { perl -ne 'while ( m:(\</?(input|form|select|option).*?\>):gic ) { print $1, "\n"; }' "$*" ;}
+#getstrings () { perl -ne 'while ( m/"(.*?)"/gc ) { print $1, "\n"; }' "$*" ;}
+#getanchors () { perl -ne 'while ( m/«([^«»\n]+)»/gc ) { print $1, "\n"; }' "$*" ;}
+#showINC ()    { perl -e 'for (@INC) { printf "%d %s\n", $i++, $_ }' ;}
+#vimpm ()      { vim `perldoc -l "$1" | sed -e 's/pod$/pm/'` ;}
+#vimhelp ()    { vim -c "help $1" -c on -c "au! VimEnter *" ;}
+
+# zombies - list all zombies and their parents to kill
+# 23jul2014  +chris+  zsh function
+zombies()
+{
+	ps f -eo state,pid,ppid,comm | awk '
+	{ cmds[$2] = $NF }
+	/^Z/ { print $(NF-1) "/" $2 " zombie child of " cmds[$3] "/" $3 }'
+}
+
+# zpass - generate random password
+# 01nov2014  +chris+
+# 10mar2017  +leah+  default to length 12
+zpass()
+{
+	LC_ALL=C tr -dc '0-9A-Za-z_@#%*,.:?!~' </dev/urandom | head -c${1:-12}
+	echo
+
+	tr -dc 'a-zA-Z0-9_#@.-' </dev/urandom | head -c${1:-12}
+	echo
+}
+#https://leahneukirchen.org/dotfiles/.zshrc
+
+#ASCII chars
+#ascii=$(for ((i=32;i<127;i++)) ;do printf "\\$(printf %03o "$i")"; done)
+#ascii="\ \!\"#\$%\&\'\(\)\*+\,./0123456789:\;\<=\>\?@ABCDEFGHIJKLMNOPQRSTUVWXYZ\[\]\^_\`abcdefghijklmnopqrstuvwxyz\{\|\}~\\-"
+
+#cep dos correios
+cep()
+{
+	tr -d \\r <~/arq/docs/cep_TB_CEP_BR_2018.csv \
+		| grep "${@:?grep requer args}" \
+		| sed 's/...../&-/' | sort -t\; -k2 \
+		| column -ets\; | less -S
+}
+#https://data.mendeley.com/datasets/g97jb8fp57/1
+#http://cep.la/baixar
+#discussões sobre cep
+#https://groups.google.com/forum/#!topic/python-brasil/wvERTS9Bz3M
+#https://groups.google.com/forum/#!searchin/python-brasil/correios$20a%C3%A7%C3%A3o/python-brasil/wvERTS9Bz3M/efQdlHDfLIgJ
+#https://blog.public.law/2013/11/06/usps-zip-codes-are-commercially-sensitive-trade-secrets/
+#download base de dados cep antiga: https://www.republicavirtual.com.br/cep/
+
+#search and set cliboard with CEP from BRASIL CORREIOS API
+cepsh()
+{
+	local cep st
+	{ 	read -r cep st;
+		printf '%s *%s\n' "$cep" "$st" 
+		cat
+		xsel -b <<<"$cep"
+	} < <(~/bin/cep.sh -s "$@")
+}
+alias cep.sh=cepsh
+
+
+#indent a compact json (one-liner)
+# python -m json.tool
+
+#pkgs to format text
+#procmail, fmt and nroff
+
+#font to source emoji (no need to use as defult font)
+#noto-fonts-emoji
+
+
+#genbank
+#visualise seq from genbank
+#nucleotide or protein
+#usage:  gene KF600613 NC_005147 JX869059 ..
+gene()
+{
+	local gencode ret
+	for gencode
+	do 	curl --compressed -sL "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?report=fasta&id=$gencode"
+		((ret+=$?))
+	done
+	return $ret
+}
+#https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?tool=portal&save=file&log$=seqview&db=nuccore,protein&report=fasta&id=143811370&conwithfeat=on&show-cdd=on&showgi=1
+
+#download from genbank
+#nucleotide or protein
+#file is created at $PWD
+#usage:  gened KF600613 NC_005147 JX869059 ..
+#see also package `datasets`: https://www.ncbi.nlm.nih.gov/datasets/docs/command-line-start/
+gened()
+{
+	local gencode tmpfile filename ret
+	for gencode in "$@"
+	do
+		tmpfile="${gencode}.fst.tmp"
+		#download and check for data validity
+		if gene "$gencode" >"$tmpfile" && grep -q '^>' "$tmpfile"
+		then 	#rename it to something more meaningful
+			filename=$(head -1 -- "$tmpfile" | tr -d '>\r' | tr '|/*,><}{&#@% ' '_')
+			filename="${filename:0:28}".fst  #limit filename length, add extension
+			mv -f -- "$tmpfile" "$filename"  #rename file
+			ls -- "$filename" >&2            #print file path
+		else 	#error
+			((ret+=$?))
+			cat -- "$tmpfile" >&2
+			#echo "err: id -- $gencode" >&2
+
+			#rm -- "$tmpfile"
+			mv -f -- "$tmpfile" err_"$tmpfile"
+		fi
+	done
+	return $ret
+}
+
+#linearise seq in fasta
+#usage: cat *.fsdt | fstlin
+fstlin()
+{
+	#linearise
+	sed -e 's/\(^>.*$\)/#\1#/'  | tr -d '\r\n' |
+		sed -e 's/$/#/' | tr '#' '\n' | sed -e '/^$/d'
+}
+#https://www.biostars.org/p/17680/
+
+fstlin2()
+{
+	perl -ne 'if(/^[^>]/){chomp; print}elsif(/\S/){print "\n" , $_;};END}{print"\n";'
+}
+#https://community.unix.com/t/how-to-rollup-multiple-lines-into-a-single-line-starting-with-a-specific-text/380527/5
+
+#split a multi-FASTA file into individual FASTA files
+fstsplit()
+{
+	awk '/^>/{s=++d".fa"} {print > s}' "${1:-/dev/stdin}"
+}
+
+#output sequence name and its length for every sequence within a fasta file
+seqlen()
+{
+	awk '$0 ~ ">" {print c; c=0;printf substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END { print c; }' "${1:-/dev/stdin}"
+}
+
+#print all possible 3mer DNA sequence combinations
+codons()
+{
+	printf '%s\n' {A,C,G,T}{A,C,G,T}{A,C,G,T}
+}
+
+#bioinformatics refs
+#https://github.com/stephenturner/oneliners
+#http://williamslab.bscb.cornell.edu/?page_id=235
+#https://towardsdatascience.com/my-journey-into-data-science-and-bio-informatics-749ece4d8860
+#fasta utilities: seqkit, fasta_utilities, fastx_toolkit, pyfaidx, seqmagick, seqtk
+
+#firefox alias
+alias ff=firefox
+
+#URL lists (from ugrep.sh)
+#firefox user database
+FFUSER="$HOME/.mozilla/firefox/sdqosrgm.jsn_firefox/places.sqlite"
+#google chrome user database
+GCUSER="$HOME/.config/google-chrome/Default/History"
+#temp file
+TEMPFILE="$HOME/Downloads/urls.sqlite"
+
+#firefox -- all urls (history, etc)
+faurls()
+{ 
+	/bin/cp "$FFUSER" "$TEMPFILE" <<<y || return
+	sqlite3 "$TEMPFILE" <<<'select url from moz_places where 1;'
+	/bin/rm "$TEMPFILE"
+}
+
+#firefox -- bookmarks
+fburls()
+{ 
+	/bin/cp "$FFUSER" "$TEMPFILE" <<<y || return
+	sqlite3 "$TEMPFILE" <<<'select url from moz_bookmarks, moz_places where moz_places.id=moz_bookmarks.fk;'
+	/bin/rm "$TEMPFILE"
+}
+
+#chrome -- all urls (history, etc)
+caurls()
+{ 
+	/bin/cp "$GCUSER" "$TEMPFILE" <<<y || return
+	sqlite3 "$TEMPFILE" <<<'select url from urls where 1;'
+	/bin/rm "$TEMPFILE"
+}
+
+#chrome -- bookmarks
+cburls()
+{
+	jq -r '..|.url? //empty' "$HOME/.config/google-chrome/Default/Bookmarks"
+}
+
+#url grep
+alias ugrep='faurls | tac | urlgrep.sh --color=always'
+
+#grep full text from URL sent via stdin
+ugrepf()
+{
+	local url
+	while read url
+	do 	curl -fSs "$url" | grep "$@" && echo ">>>$REPLY"
+	done
+}
+
+
+#check unicode chars
+#usage: unichar ⛄
+unichar()
+{
+	python -c "print(\"U+{:04x}\".format(ord(\"$1\")))"
+	#python -c "print(format(ord(\"$1\"), \"04x\"))"
+}
+#see also: https://stackoverflow.com/questions/41125346/how-do-i-display-the-unicode-syntax-uxxxx-from-a-string/41125383
+
+#url encode/decode - percente codes
+#python2
+#alias urldecode='python -c "import sys, urllib as ul; print ul.unquote_plus(sys.argv[1])"'
+#alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])"'
+#python3
+#usage: urldecode 'string'
+#alias urldecode='python3 -c "import sys, urllib.parse as ul; print(ul.unquote_plus(sys.argv[1]))"'
+#alias urlencode='python3 -c "import sys, urllib.parse as ul; print (ul.quote_plus(sys.argv[1]))"'
+#
+#see a complete shell plugin:
+#https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/urltools/urltools.plugin.zsh
+#
+#sed
+#alias urldecode="sed 's@+@ @g;s@%@\\x@g' | xargs -0 printf '%b'"
+#
+urlencode()
+{
+    local i length="${#1}"
+    #busybox: for i in $(seq 0 $((length-1))); do
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:$i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf "$c" ;;
+            *) printf '%%%02X' "'$c" ;;
+        esac
+    done
+}
+urldecode()
+{
+    local url_encoded="${1//+/ }"
+    printf '%b' "${url_encoded//\%/\\x}"
+}
+#https://gist.github.com/cdown/1163649
+#https://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
+#
+#decode url, works with zsh:
+#x='a%20%25%e3%81%82';printf "${x//\%/\\x}"
+#In zsh ${x//%/a} adds a to the end but ${x//\%/a} replaces % with a.
+#https://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
+
+#submit sitemap to google
+#usage: gsitemap "https://your.website.com/sitemap.xml"
+gsitemap()
+{
+	curl -L "http://www.google.com/webmasters/tools/ping?sitemap=$(urlencode "$1")"
+}
+#https://developers.google.com/search/docs/guides/submit-URLs?utm_source=wmx&utm_medium=deprecation-pane&utm_content=submit-url
+
+#firefox with nvidia
+#{
+#    type nvs; sudo optirun nvidia-settings -c :8 &
+#}
+#{
+#    type pff; primusrun firefox &
+#}
+#{ optirun -b none nvidia-settings -c :8 ;}
+#{ optirun firefox ;}
+#{ primusrun /usr/lib/firefox/firefox ;}
+#primus_vk, pvkrun
+#'nvidia-smi' to check gpu load
+#TROUBLESHOOTING:
+#Cannot access secondary GPU
+#https://bbs.archlinux.org/viewtopic.php?id=271469
+
+#weather forecast
+#google 
+wf()
+{
+	local location
+	location="${*:-sao paulo}" location="${location// /%20}"
+	curl -fsL --header "$UAG" "https://www.google.com/search?q=weather+${location}" |
+		sed 's|<[^/]*>[^>]*>|&\n|g' |
+		grep -E -e '"wob_(wc|loc|dts|dcp|dc|pp|hm|ws)"' -e id=\"wob_t\" -e \"wob_t\?tm\" |
+		sed -e 's/<[^>]*>//g' -e '1d' -e'2s/$/ °C/' -e '3s/$/ °F/'
+}
+
+#requires the script 'ansiweather'
+wf2() { 	ansiweather -l "${*:-${CITY:-londrina}}" ;}
+
+#weather forecast (previsão do tempo)
+#and moon phase forecast
+#type :help to see options summary
+wf3()
+{
+    local request="wttr.in/${1}"  #it chooses location automatically
+    [[ "$COLUMNS" -lt 125 ]] && request+='?nMAFqT'
+    curl -fsH "Accept-Language: ${LANG%_*}" --compressed "$request" | tac
+}
+#<curl wttr.in/:bash.function>
+
+#Sunspot number (wld-silso)
+alias sunspots='curlu https://www.sidc.be/SILSO/DATA/SN_d_tot_V2.0.txt'  #daily
+alias sunspotsm='curlu https://www.sidc.be/SILSO/DATA/SN_m_tot_V2.0.txt'  #monthly
+alias sunspots_old='curlu https://www.sidc.be/SILSO/DATA/ARCHIVE/V1.0/dayssn_import.dat'
+alias sunspotsm_old='curlu https://www.sidc.be/SILSO/DATA/ARCHIVE/V1.0/monthssn.dat'
+#https://www.sidc.be/SILSO/datafiles
+
+#curl 'https://services.swpc.noaa.gov/json/solar-cycle/sunspots.json' --compressed -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Accept-Language: en-GB,pt-BR;q=0.8,pt;q=0.6,en-US;q=0.4,en;q=0.2' -H 'Accept-Encoding: gzip, deflate, br' -H 'X-Requested-With: XMLHttpRequest' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Referer: https://services.swpc.noaa.gov/dynamic/solar_cycle_charts' -H 'Sec-Fetch-Dest: empty' -H 'Sec-Fetch-Mode: cors' -H 'Sec-Fetch-Site: same-origin' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' -H 'TE: trailers'
+#https://www.swpc.noaa.gov/products/solar-cycle-progression
+
+#get gps coordenates
+#usage: gpsf [location|coordinates]
+gps()
+{
+	[[ -n ${*:?location: not set} ]] || return
+	
+	#https://nominatim.org/release-docs/develop/api/Lookup/
+	curl -fsL -H "$UAG" "https://nominatim.openstreetmap.org/search?q=$(sed 's/\s/%20/g' <<< "$*" | rmaccent)&format=json" \
+	| jq -r ".[]|.lat+\"\t\"+.lon+\"\t\"+.display_name"
+}
+
+#by gps coordinates
+gspc()
+{
+	curl -fsL -H "$UAG" "https://nominatim.openstreetmap.org/reverse?lat=${1:?lat: not set}&lon=${2:?lon: not set}&format=json&addressdetails=0" | jq .
+}
+
+#get the distance (metres)
+#usage: distf -[car|bike|foot] [from_location] [to_location]
+dist()
+{
+	local by from to
+	
+	case "$1" in
+	  -bike|-foot|-car)  by="${1##-}"; shift;;
+	esac
+	
+	from=$(_gps "${1:?from: not set}") || return
+	to=$(_gps "${2:?to: not set}") || return
+	
+	#coordinates: {longitude},{latitude};
+	from="${from##*[$IFS]},${from%%[$IFS]*}"
+	to="${to##*[$IFS]},${to%%[$IFS]*}"
+
+	#distance (metres)
+	#http://project-osrm.org/docs/v5.5.1/api/
+	curl -sL -H "$UAG" "https://routing.openstreetmap.de/routed-${by:-car}/route/v1/driving/${from};${to}?overview=false&alternatives=true&steps=false" \
+	| jq -r '.routes[]|(.distance|tostring)+" m"'
+
+	#estimated time of arrival
+	curl -sL -H "$UAG" "http://router.project-osrm.org/table/v1/driving/${from};${to}" \
+	| jq -r "def pad(x): tostring | (length | if . >= x then \"\" else \"0\" * (x - .) end) as \$padding | \"\(\$padding)\(.)\";
+		def seconds_to_time_string:
+		def nonzero: floor | if . > 0 then . else empty end;
+		if . == 0 then \"00\"
+		else
+		[(./60/60         | nonzero),
+		 (./60       % 60 | pad(2)),
+		 (.          % 60 | pad(2))]
+		| join(\":\")
+		end; .durations[] |map(if . != 0 then . else empty end)|.[]|seconds_to_time_string"
+	#jq -r '[.durations[] |map(if . != 0 then . else empty end)|.[] ]|join(" / ")+" secs"'
+}
+_gps()
+{
+	local g
+	if g=($(grep -Eo '(-?[0-9]+([.][0-9]+)?)' <<<"$*"))
+	   ! ((${#g[@]}==2))
+	then
+		if g=($(gps "$@" | _gps_fmt))
+		   ! ((${#g[@]}==2))
+		then
+			g=($(gps2 "$@" | _gps_fmt))
+		fi
+	fi
+	((${#g[@]:?}==2)) && printf '%s\t%s\n' "${g[@]}"
+}
+_gps_fmt()
+{
+	local var
+	var=$(sed -n 1p)
+	printf '%s\n' "$var" >&2
+	printf '%s\n' "${var%$'\t'*}" 
+}
+
+#get coordinates from opencage
+gps2()
+{
+	[[ -n "${*:?location required}" ]] || return
+	curl -sL "https://api.opencagedata.com/geocode/v1/json?q=$(sed 's/\s/%20/g' <<< "${*}")&key=${OPENCAGEKEY}&no_annotations=1&language=en" |
+		jq -r '.results[]|"\(.geometry.lat)\t\(.geometry.lng)\t\(.formatted)"'
+}
+
+#only big cities - api without many locations available
+gps3()
+{
+	[[ -n "${*:?location required}" ]] || return
+	curl -Ls "https://www.metaweather.com/api/location/search/?query=$(sed 's/\s/%20/g' <<<"$*")" |
+	jq .
+}
+
+#Earth's Seasons - equinoxes, solstices, perihelion, and aphelion (US Navy API, v4.0.0)
+#usage: TZ=UTC-00  equinox [YYYY]
+equinox()
+{ 	local year tz tz_sign url tmpdir tmp
+	year=${1:-$(date +%Y)}
+	tz=$(date +%z) || tz=-00
+	tz_sign=${tz:0:1} tz=${tz:1:2}
+
+	tmpdir="${HOME}/.cache/USNavyMoon"
+	mkdir -p "$tmpdir" || tmpdir=${TMPDIR:-/tmp}
+	tmp="${tmpdir%%/}/USNavyEarthSeasons${year:0:4}TZ${tz_sign}${tz}.html"
+	url="https://aa.usno.navy.mil/calculated/seasons?year=${year:?required}&tz=${tz}&tz_sign=${tz_sign}1&tz_label=false&dst=false&submit=Get+Data"
+	
+	[[ -f $tmp ]] || curl -\# --fail --compressed --header "$UAG" --header 'Referer: https://aa.usno.navy.mil/data/Earth_Seasons' "$url" -o "$tmp"
+	
+	sed -n -e '/<table/,/<\/table/p' "$tmp" | sed -e 's/<[^>]*>/ /g' \
+	  -e '/^\s*$/d' -e 's/^\s\s*//' -e 's/\s\s*$//' -e 's/  /,/g' -e 's/,,/,/g' \
+	| column -t -s, -N1,2,3 -O2,3,1 | sed -e '1d' -e 's/^\s\s*//'
+}
+#https://aa.usno.navy.mil/data/Earth_Seasons
+
+#Phase of the Moon (US Navy API, v4.0.0)
+#usage: moonphase [YYYY-MM-DD] [NUMBER_OF_PHASES]
+moonphase()
+{ 	local tmpdir tmp url date nump
+	date=$(date -Idate ${1:+-d"$1"} || echo "$1")
+	nump=${2:-6}  #number of phases < 100
+
+	tmpdir="${HOME}/.cache/USNavyMoon"
+	mkdir -p "$tmpdir" || tmpdir=${TMPDIR:-/tmp}
+	tmp="${tmpdir%%/}/USNavyMoonPhases${date:0:7}:${nump:0:2}.json"
+	url="https://aa.usno.navy.mil/api/moon/phases/date?date=${date:0:10}&nump=${nump:0:2}"
+	
+	[[ -f $tmp ]] || curl -f "$url" -o "$tmp"; [[ -f $tmp ]] || return
+	
+	jq -r '.phasedata[]|"\(.year)-\(.month)-\(.day)\t\(.time)\t\(.phase)"' "$tmp" \
+	|| { 	mv -fv "$tmp" "${tmp%.*}bad.json"; ! echo err >&2 ;}
+}
+#https://aa.usno.navy.mil/data/MoonPhases
+#https://aa.usno.navy.mil/data/api#phase
+
+#Illuminated Fraction of Moon (US Navy scrape, quantised)
+#usage: TZ=UTC-00  moonbrt [YYYY-MM-DD] [HH]
+moonbrt()
+{ 	local tmpdir tmp year month day hour min sec var url tz tz_sign brt brtp brtq ind
+	IFS=$IFS'/.Tt:+-' read year month day hour min sec var < <(date -Iseconds ${*:+-d"$*"} || echo "$*")
+	
+	((year&&month&&day)) || return
+	: ${hour:=00} ${min:=00} ${sec:=00};
+	tz=$(date +%z) || tz=-00
+	tz_sign=${tz:0:1} tz=${tz:1:2}
+	
+	tmpdir="${HOME}/.cache/USNavyMoon"
+	mkdir -p "$tmpdir" || tmpdir=${TMPDIR:-/tmp}
+	tmp="${tmpdir%%/}/USNavyMoon${year}TZ${tz_sign}${tz}.html"
+	url="https://aa.usno.navy.mil/calculated/moon/fraction?year=${year}&task=00&tz=${tz##0}.00&tz_sign=${tz_sign##+}1&tz_label=false&submit=Get+Data"
+
+	[[ -f $tmp ]] || curl -\# --fail --compressed --header "$UAG" "$url" -o "$tmp"; [[ -f $tmp ]] || return
+	set -- Day $(sed -n -e '/<table/,/<\/table/p' "$tmp" | sed -e 's/<[^>]*>/ /g' -e '1,/^\s*Day/d')
+	
+	ind=$((13 + 1 + ( (${day##0} - 1) * 13) + ${month##0}));
+	brtp=${@:$((ind)):1}; brtq=${@:$((ind+13)):1};
+	[[ ${brtq:---} = -- ]] && brtq=${@:$((ind+13-((day+1-1)*13)+1)):1};
+	brt=$(bc <<<"scale=16;
+		brtp=${brtp}; brtq=${brtq};
+		unix=(${hour}*60*60)+(${min}*60)+${sec};
+		diff=brtq-brtp
+		rate=diff/(24*60*60);
+		((brtp+(rate*unix))*100)/1;")
+
+	((ind==416)) && brt=${brtp/./} hour=00 min=00 sec=00 #bug dec-31
+
+	printf '%.4f%%  %s\n' "$brt" "${year}-${month}-${day}T${hour}:${min}:${sec}${tz_sign}${tz}"
+	
+	((${#}==416)) || { 	mv -fv "$tmp" "${tmp%.*}bad.html"; ! echo err >&2 ;}
+}
+#https://aa.usno.navy.mil/data/MoonFraction
+
+moon()
+{ 	moonphase "$@"; echo >&2;
+	datediff.sh -m "$@";
+	moonbrt "$@";
+}
+alias mbrt=moonbrt; alias mphase=moonphase;
+
+#ascii world
+aworld()
+{
+	while asciiworld -soT -t MUNDO ;do sleep 30 ;done
+}
+#https://www.uninformativ.de/git/asciiworld/file/README.html
+
+#check interfaces (wlan or eth0)
+#{ ip -brief link show ;}
+#{ ip a ;}
+
+#ip adresses
+myip()
+{
+	{
+	  date -R
+	  { 	#wget -cq http://jsonip.com/ -O -
+		wget -qO- https://ipv4.jsonip.com/
+		wget -qO- https://ipv6.jsonip.com/
+	  } | jq -r '.ip'
+	} | tee -a ~/.myIP.log
+}
+#sed -Ee 's/.*("ip"[^,]*).*/\1/' -e 's/["]//g;s/:/ /;s/$/\n/'
+#https://www.ostechnix.com/how-to-parse-and-pretty-print-json-with-linux-commandline-tools/
+
+myip2()
+{
+	curl -s -4 'http://ifconfig.io'
+	curl -s -6 'http://ifconfig.io'
+}
+
+#ip by dns lookup utility
+myip3()
+{
+	dig ANY +short @resolver2.opendns.com myip.opendns.com
+ 	dig ANY +short @ns1-1.akamaitech.net  whoami.akamai.net
+}
+#https://linuxize.com/post/how-to-find-ip-address-linux/
+
+#others
+myip4()
+{
+    curl -s https://checkip.amazonaws.com
+    wget -O - -q https://icanhazip.com/
+    curl -s api.infoip.io/ip
+}
+
+# get public ip
+myip5()
+{
+	local api
+	case "$1" in
+		"-4") api="http://v4.ipv6-test.com/api/myip.php";;
+		"-6") api="http://v6.ipv6-test.com/api/myip.php";;
+		*)    api="http://ipv6-test.com/api/myip.php";;
+	esac
+	curl -s "$api"
+	echo # Newline
+}
+
+#upload text and get a URL
+upload()
+{
+	if [[ -f $1 ]]
+	then 	curl -F "file=@${1}" 0x0.st;
+	elif [[ ! -t 0 ]]
+	then 	curl -F "file=@-" 0x0.st;
+	else 	false;
+	fi
+}
+
+_greek() { 
+sed 'y/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/αβcδεφγηιθκλμνοπχρστυvωξψζΑΒCΔΕΦΓΗΙΘΚΛΜΝΟΠΧΡΣΤΥVΩΞΨΖ/'; }
+#https://bbs.archlinux.org/viewtopic.php?pid=2122857#p2122857
+
+greek() { rmaccent | _greek ;}
+
+# IP addresses
+#alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+#alias localip="ipconfig getifaddr en0"
+#alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
+#https://github.com/mathiasbynens
+#also check pkg `geoip' and `geoip-database' from oficial repos
+
+#get geo info from ip addr
+ipgeo()
+{
+	local ip="$1"
+	curl -s -N "https://ipapi.co/$ip/json/"
+}
+#https://www.vivaolinux.com.br/topico/Shell-Script/SHELL-SCRIPT-45
+
+#wifi pass key list (passwords)
+#all conections, requires root access
+psks()
+{
+	sudo su root -c "awk '/^(id|psk)=/' /etc/NetworkManager/system-connections/*"
+}
+alias passkeys=psks
+
+#current wifi connection
+psk()
+{
+	local interface=$(iw dev | awk '/Interface/ {print $2}')
+	local ssid=$(iw dev $interface link | sed -n '/SSID:/ s/^.*SSID: //p')
+	[[ -z "$ssid" ]] && return 1
+
+	sudo su root -c "awk '/^(id|psk)=/' /etc/NetworkManager/system-connections/${ssid}.nmconnection"
+
+	nmcli device wifi show-password
+}
+#https://www.vivaolinux.com.br/topico/Iniciantes-no-Linux/Existe-algum-comando-para-exibir-a-senha-do-wifi-que-estou-conectado-no-momento/
+alias passkey=psk
+
+
+#url shortner
+turl()
+{
+	curl -sL "http://tinyurl.com/api-create.php?url=$*"
+}
+
+# Create a git.io short URL
+gitio()
+{
+	echo "https://git.io/$( curl -sL 'https://git.io/create' -H "$UAG" --compressed --data-raw "url=$*" )"
+}
+
+
+# Run `dig` and display the most useful info
+digga()
+{
+	dig +nocmd "$1" any +multiline +noall +answer;
+}
+
+# UTF-8-encode a string of Unicode symbols
+escape()
+{
+	printf "\\\x%s" $(printf "$@" | xxd -p -c1 -u);
+	# print a newline unless we’re piping the output to another program
+	if [ -t 1 ]; then
+		echo ""; # newline
+	fi;
+}
+
+# Decode \x{ABCD}-style Unicode escape sequences
+unidecode()
+{
+	perl -e "binmode(STDOUT, ':utf8'); print \"$@\"";
+	# print a newline unless we’re piping the output to another program
+	if [ -t 1 ]; then
+		echo ""; # newline
+	fi;
+}
+
+# Get a character’s Unicode code point
+codepoint()
+{
+	perl -e "use utf8; print sprintf('U+%04X', ord(\"$@\"))";
+	# print a newline unless we’re piping the output to another program
+	if [ -t 1 ]; then
+		echo ""; # newline
+	fi;
+}
+
+#escape html entities
+#{ perl -e 'use CGI qw(escapeHTML); print escapeHTML("<hello>\n");' ;}
+
+#char sets:
+#0-127   ASCII, 7-bit char
+#0-255   ISO 8859-1, ISO Latin-1
+#0-65535 16-bit char range
+#https://webtips.dan.info/char.html
+
+#emoji, a little hard on the terminal buffer
+alias emoji='curl https://www.unicode.org/Public/emoji/14.0/emoji-test.txt'
+alias emoji2='htmlentities 129510 8986'
+
+# Ring the terminal bell, and put a badge on Terminal.app’s Dock icon
+# (useful when executing time-consuming commands)
+#alias badge="tput bel"
+
+#ascii town
+alias atown='ssh torus@ascii.town'
+#https://ascii.town/
+alias nethack-online='ssh nethack@nethack.alt.org ; clear'
+alias tron-online='ssh sshtron.zachlatta.com ; clear'
+
+#play tron
+#use wasd to move
+tron() { 	ssh sshtron.zachlatta.com ;}
+
+#get colour information
+#color hex, name, rgb, hsl or hs
+cinfo()
+{
+	firefox "https://www.color-hex.com/color/${*#\#}" &
+}
+
+#color functions
+colours()
+{
+	local x i a
+	for x in {9..1} ;do
+		for i in {30..37} ;do
+			for a in {40..47} ;do
+				echo -ne "\e[$x;$i;$a""m\\\e[$x;$i;$a""m\e[0;37;40m "
+			done ;echo
+		done
+	done
+}
+#https://askubuntu.com/questions/27314/script-to-display-all-terminal-colors
+
+colours2()
+{
+	local fgc bgc vals seq0
+
+	printf "Color escapes are %s\n" '\e[${value};...;${value}m'
+	printf "Values 30..37 are \e[33mforeground colors\e[m\n"
+	printf "Values 40..47 are \e[43mbackground colors\e[m\n"
+	printf "Value  1 gives a  \e[1mbold-faced look\e[m\n\n"
+
+	# foreground colors
+	for fgc in {30..37} ;do
+		# background colors
+		for bgc in {40..47} ;do
+			fgc=${fgc#37} # white
+			bgc=${bgc#40} # black
+			vals="${fgc:+$fgc;}${bgc}"
+			vals=${vals%%;}
+			seq0="${vals:+\e[${vals}m}"
+
+			printf "  %-9s" "${seq0:-(default)}"
+			printf " ${seq0}TEXT\e[m"
+			printf " \e[${vals:+${vals+$vals;}}1mBOLD\e[m"
+		done ;echo ;echo
+	done
+}
+#https://gitlab.com/dwt1/dotfiles/blob/master/.bashrc
+
+#print 256 colours
+colours3()
+{
+	local x y i o p
+	x=`tput op` y=`printf %76s`
+	for i in {0..256} ;do
+		o=00$i
+		p=`tput setaf $i ;tput setab $i`
+		echo -e ${o:${#o}-3:3} $p${y// /=}$x
+	done
+}
+#https://wiki.archlinux.org/index.php/Color_output_in_console#diff
+
+#use feh to nicely view images
+#openimage() {
+#	local types='*.jpg *.JPG *.png *.PNG *.gif *.GIF *.jpeg *.JPEG'
+#
+#	cd "$(dirname "$1")" || exit
+#	local file
+#	file=$(basename "$1")
+#
+#	feh -q "$types" --auto-zoom \
+#		--sort filename --borderless \
+#		--scale-down --draw-filename \
+#		--image-bg black \
+#		--start-at "$file"
+#}
+
+#scrape images from website
+#{ wget -nd -H -p -A jpg,jpeg,png,gif -e robots=off "$*" ;}
+#https://davidwalsh.name/scrape-images-wget
+
+#save cmd output as an image
+#requires 'imagemagick'
+#usage: cmd | toimage [filename].ext
+toimage()
+{
+	[[ -z "$1" ]] && set -- "$HOME/Downloads/cmd_$(date +%FT%T%Z).png"
+	[[ "$1" != *.??? ]] && [[ "$1" != *.???? ]] && set -- "$1.png"
+	convert label:@- "$1" && echo "$1"
+}
+#-font -misc-fixed-*-*-*-*-*-*-*-*-*-*-*-*
+#https://www.ostechnix.com/save-linux-command-output-image-file/
+
+#creater extra cursor for my touchpad
+xpointer()
+{
+	if [[ $* = rm ]]
+	then 	#xinput reattach 16 "Virtual core pointer" &&
+		xinput remove-master "Virtual core pointer"
+	else 	
+		xinput list | grep -q "Auxiliary pointer" \
+		|| xinput create-master Auxiliary
+		xinput reattach 16 "Auxiliary pointer" \
+		&& xinput reattach 26 "Auxiliary keyboard" \
+		&& xinput reattach 28 "Auxiliary keyboard" \
+		&& xinput reattach 29 "Auxiliary keyboard"
+	fi
+}
+#https://wiki.archlinux.org/title/Multi-pointer_X
+
+#autoclicker
+alias autoclicker='xdotool click --repeat 100 --delay 18 1'
+#which means: click a hundred times, every 18 milliseconds, using left mouse button (1 at the end)
+#https://www.reddit.com/r/incremental_games/comments/4pygkl/autoclicker_for_ubuntu_linux/
+
+#click and enter
+#{ xdotool click 1 key KP_Enter ;}
+
+#cheat sheets pkgs:
+#tldr
+#cht.sh
+
+emmetcht()
+{
+	curl https://raw.githubusercontent.com/mattn/emmet-vim/master/TUTORIAL
+}
+#see also `emmets' command
+
+#gnu screen cheat sheet
+screencht()
+{
+	w3m http://aperiodic.net/screen/quick_reference
+}
+
+
+#parrot fun
+alias parrot='curl parrot.live'
+
+#chess online
+alias chessonline='telnet freechess.org 5000'
+#you may log in as 'guest'
+
+#aria2
+alias a2='aria2c'
+
+
+#youtube download fun
+#command:
+YTDL_CMD=yt-dlp
+
+#YOUTUBE-DL WRAPPERS
+#	yt  [URL..]     -- download wrapper, restrict filenames
+#	yta [URL..]     -- bestaudio only
+#	ytb [URL..]     -- bestaudio+bestvideo
+#	ytc [URL..]     -- medium quality (18) or worstaudio
+#	ytm [URL..]     -- bestaudio and convert to mp3
+#	yts [KEY_WORDS] -- search for keyword and play *audio* with mpv
+
+#simple download
+#usage: yt [urls..]
+_yt()
+{
+	$YTDL_CMD --restrict-filenames -o "%(title)s-%(id)s.%(ext)s" "$@"
+}
+#dl audio and convert to mp3 (MUSIC)
+_ytm()
+{
+	$YTDL_CMD -k -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 \
+		--restrict-filenames --metadata-from-title '(?P<artist>.+?)-(?P<title>.+)' \
+       		--embed-thumbnail --add-metadata -o "%(title)s.%(ext)s" "$@"
+}
+#dl general audio only stream (GENERAL AUDIO)
+_yta()
+{
+	$YTDL_CMD -k -f bestaudio --restrict-filenames -o "%(title)s.%(ext)s" "$@"
+}
+#dl audio and video of best quality
+_ytb()
+{
+	yt -f best "$@"
+}
+#dl video of medium quality  (for cellphone)
+#codec set to 18, works for most yt vids
+_ytc()
+{
+	yt -f 18 "$@" || yt -f worstaudio "$@"
+}
+
+alias ytc='noglob _ytc'
+alias ytb='noglob _ytb'
+alias yta='noglob _yta'
+alias ytm='noglob _ytm'
+alias yt='noglob _yt'
+
+#https://github.com/xeronull/dotfiles/blob/master/.bashrc
+# search and play youtube audio with preferred player
+# how to use --- yt search_term_here
+yts()
+{
+	$YTDL_CMD -q -f bestaudio --max-downloads 1 --no-playlist --default-search ${2:-ytsearch} "$1" -o - |
+		mpv -vo null /dev/fd/3 3<&0 </dev/tty
+}
+
+
+##shell globbing
+##Z-SHELL has built-in `noglob' cmd
+## ~/.bashrc
+#noglob_helper() {
+#	"$@"
+#	case "$shopts" in
+#		*noglob*) 	;;
+#		*) 	set +f ;;
+#	esac
+#	unset shopts
+#}
+#alias noglob='shopts="$SHELLOPTS"; set -f; noglob_helper'
+##check: https://www.chiark.greenend.org.uk/~sgtatham/aliases.html
+
+
+#calc
+_c()
+{
+	bcalc.sh -v "$@" || datediff.sh "$@" 2>/dev/null
+}
+alias c='noglob _c'
+
+#mount sshfs (phone)
+moto()
+{
+	sshfs u0_a214@moto:/data/data/com.termux/files/home "${1:-$HOME/mnt}" -C -o idmap=user -o follow_symlinks
+}
+umoto()
+{
+	fusermount3 -u "${1:-$HOME/mnt}"
+}
+
+
+#find files not owned by user in $HOM
+homesudo()
+{
+	find "$HOME" ! -uid "$( id -u )" ! -gid "$( id -g )"
+}
+#https://bbs.archlinux.org/viewtopic.php?id=245416
+
+#permissions - display octal values
+octal()
+{
+	if [[ -z "$1" ]]
+	then 	/usr/bin/stat -c "%a %u %U >> %n" -- *
+	else 	/usr/bin/stat -c "%a %u %U >> %n" "$1"
+	fi
+}
+#https://stackoverflow.com/questions/1795976/can-the-unix-list-command-ls-output-numerical-chmod-permissions
+
+islink()
+{
+	local s
+	if [[ -h $1 ]]
+	then 	echo Soft link
+	elif s=$(stat -c %h -- "$1") ;[[ $s -gt 1 ]]
+	then 	echo Hard links -- $s
+	else 	false
+	fi
+}
+#https://unix.stackexchange.com/questions/167610/determining-if-a-file-is-a-hard-link-or-symbolic-link
+
+#grep media info the correct way
+ffinfo()
+{
+	ffprobe -show_streams -print_format json file:"$1" 2>/dev/null |
+		sed -e 's/^\s*//g' -e 's/[]",}{[]//g' | cat -s
+}
+ffres()
+{
+	ffinfo "$1" | jq -r '[.streams[] | select(.codec_type == "video")][0] | "x=\(.width)  y=\(.height)"'
+}
+#https://www.youtube.com/watch?v=P4cc6beZjVs
+
+#convert video to small file size
+#usage: cvideo input.mp4 [output.mp4]
+#{ ffmpeg -i [infile.ext] -vcodec libx265 -crf 28 [outfile.ext]
+#{ ffmpeg -i 'input.mp4' -vcodec libx265 -crf 29 -filter:v "crop=352:540:0:50" -vf "scale=-1:450" 'output.mp4' ;}
+#https://superuser.com/questions/4244/how-do-i-reduce-the-size-of-a-huge-mp4-video/4252#4252
+#https://trac.ffmpeg.org/wiki/Encode/H.265
+#https://video.stackexchange.com/questions/4563/how-can-i-crop-a-video-with-ffmpeg
+#https://trac.ffmpeg.org/wiki/Scaling
+#
+#scale down mp4
+#{ ffmpeg -i Intro_do_Canal.mp4 -vcodec libx264 -crf 20  Intro_do_Canal_small.mp4 ;}
+#Note that lower CRF values correspond to higher bitrates, and hence produce higher quality videos.
+#{ ffmpeg -i Intro_do_Canal.mp4 -vf "scale=iw/1.8:ih/1.8" Intro_do_Canal_small.mp4 ;}
+#https://unix.stackexchange.com/questions/28803/how-can-i-reduce-a-videos-size-with-ffmpeg
+#
+#pretty good experience with the h265 codec.
+#{ ffmpeg -i input.mkv -c:v libx265 -vtag hvc1 -c:a copy output.mkv ;}
+#{ ffmpeg -i input -c:v libx265 -crf 28 -preset slower -c:a copy output.mp4 ;}
+#https://unix.stackexchange.com/questions/531353/how-to-significantly-lower-a-video-file-size-with-ffmpeg-without-quality-loss
+#
+#reduce video to target size
+#usage: ffmpeg_resize file1.mp4 25  #resize `file1.mp4` to 25 MB
+#usage: ffmpeg_resize file2.mp4 64  #resize `file2.mp4` to 64 MB
+ffmpeg_resize() (
+    file=${1:?file}
+    target_size_mb=${2:?target size}  # target size in MB
+    target_size=$(( $target_size_mb * 1000 * 1000 * 8 )) # target size in bits
+    length=`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$file"` ||return||exit
+    length_round_up=$(( ${length%.*} + 1 ))
+    total_bitrate=$(( $target_size / $length_round_up ))
+    audio_bitrate=$(( 128 * 1000 )) # 128k bit rate
+    video_bitrate=$(( $total_bitrate - $audio_bitrate ))
+    ffmpeg -i "$file" -b:v $video_bitrate -maxrate:v $video_bitrate -bufsize:v $(( $target_size / 20 )) -b:a $audio_bitrate "${file}-${target_size_mb}mb.mp4"
+)
+#https://unix.stackexchange.com/questions/520597/how-to-reduce-the-size-of-a-video-to-a-target-size
+#speech noise removal: -af arnndn=m=cb.rnnn
+
+alias ffmpeg='ffmpeg -hide_banner'
+alias ffprobe='ffprobe -hide_banner'
+
+#dbFS <-> RMS converter
+dbrms()
+{
+	case "${*}" in
+	-*)  bc -l <<<"scale=6; e((${*} / 20) * l(10))";;
+	*)  bc -l <<<"scale=4; 20 * l( ${*} ) / l(10)";;
+	esac
+}
+
+#extract one page from pdf
+#{ pdftk "file.pdf" cat 242 output "page_242.pdf" ;}
+
+tomp3()
+{
+	ffmpeg -i "$1" -acodec libmp3lame -q:a 2 "${foo%.m4a}.mp3"
+}
+#https://superuser.com/questions/704493/ffmpeg-convert-m4a-files-to-mp3-without-significant-loss-of-information-quali
+#https://coderwall.com/p/zbevoq/convert-m4a-to-mp3-with-ffmpeg
+
+#convert image types
+#{ for i in *.jpg; do convert "$i" "${i/.jpg}.png"; done ;}
+
+#sed one-liners
+sedcht()
+{
+	curl -s "http://www.pement.org/sed/sed1line.txt"
+}
+
+#reverse array arg order
+#array=(1 2 3 4 5 6 7)
+#
+#f() { array=("${BASH_ARGV[@]}"); }
+#
+#shopt -s extdebug
+#f "${array[@]}"
+#shopt -u extdebug
+#
+#echo "${array[@]}"
+#
+#7 6 5 4 3 2 1
+#if extdebug is enabled, array BASH_ARGV contains in a function
+#all positional parameters in reverse order.
+#https://unix.stackexchange.com/questions/412868/bash-reverse-an-array
+
+#longest line
+longest()
+{
+	awk ' { if ( length > L ) { L=length ;s=$0 } }END{ print L, s }'
+}
+longest2()
+{
+	awk 'length > max_length { max_length = length; longest_line = $0 } END { print longest_line }'
+}
+#{ wc -L ;}  #GNU wc - prints the length of the longest line
+#{ awk '{ print length }' ;}  #prints lengths of all lines
+
+#remove ansi codes
+rmansi()
+{
+	sed  's/\x1b\[[0-9;]*m//g'
+}
+
+#remove garbage chars (binary chars)
+rmgarbage()
+{
+	tr -cd '\11\12\15\40-\176'
+}
+#https://alvinalexander.com/blog/post/linux-unix/how-remove-non-printable-ascii-characters-file-unix
+
+#trim/remove special chars
+trspecial()
+{
+	tr -cd '[:print:]\t\n\r'
+}
+#[:print:] = [:alnum:], [:punct:] and space
+#https://stackoverflow.com/questions/36926999/removing-all-special-characters-from-a-string-in-bash/36930095
+
+#remove accentuation
+rmaccent()
+{
+	sed 'y/äÄáÁàÀãÃâÂëËéÉèÈẽẼêÊïÏíÍìÌĩĨîÎöÖóÓòÒõÕôÔüÜúÚùÙũŨûÛçÇñÑ/aAaAaAaAaAeEeEeEeEeEiIiIiIiIiIoOoOoOoOoOuUuUuUuUuUcCnN/'
+}
+
+#translte special chars (ex: "\xe7") to utf-8
+#{ iconv -f iso-8859-1 -t utf-8 ;}
+#remove accents and
+#{ iconv -f utf-8 -t ascii//translit ;}
+
+#remove printed text from screen
+clr()
+{
+	printf '\033[2J'
+}
+#{ tput clear ;}  #removes scrollback buffer
+
+#terminal escapes, clear line, clear screen
+#clear from the cursor position to the beginning of the line:
+#{ echo -e "\033[1K" ;}
+#or everything on the line, regardless of cursor position:
+#{ echo -e "\033[2K" ;}
+#https://unix.stackexchange.com/questions/26576/how-to-delete-line-with-echo
+#{ tput cuu1 && tput dl1 ;}
+#{ printf '\e[A\e[K' ;} # to move the cursor up one line and erase the line
+#https://stackoverflow.com/questions/5861428/bash-script-erase-previous-line
+
+#regex to search for non-ascii values
+#ASCII is in range of 0 to 127
+# [^\x00-\x7F]+
+#https://stackoverflow.com/questions/20889996/how-do-i-remove-all-non-ascii-characters-with-regex-and-notepad
+
+# Hex to Decimal Conversion Helper functions
+h2d()
+{
+	str=$(echo $@ | awk '{print toupper($0)}')
+	echo "ibase=16; $str" | bc
+}
+d2h()
+{
+	echo "obase=16; $@" | bc
+}
+#https://www.soroushjp.com/2014/11/21/helpful-bash-scripts-for-working-with-byte-arrays-and-hex-in-bitcoin/
+
+## print hex value of a number
+#hex() {
+#    emulate -L zsh
+#    if [[ -n "$1" ]]; then
+#        printf "%x\n" $1
+#    else
+#        printf '%s\n' 'Usage: hex <number-to-convert>'
+#        return 1
+#    fi
+#}
+
+#base48 array
+B58=( {1..9} {A..H} {J..N} {P..Z} {a..k} {m..z} )
+
+#convert "decimal number" to Base58 in Bash
+toBase58()
+{
+    local a
+    a=( {1..9} {A..H} {J..N} {P..Z} {a..k} {m..z} )
+    # TODO: check that $1 is a valid number
+    local nb=$1 b58= fiftyeight=${#a[@]}
+    while ((nb)); do
+        b58=${a[nb%fiftyeight]}$b58
+        ((nb/=fiftyeight))
+    done
+    printf '%s\n' "$b58"
+}
+#https://stackoverflow.com/questions/30630841/how-to-convert-decimal-number-to-base58-in-bash
+
+#bitcoin-bash-tools
+#https://github.com/grondilu/bitcoin-bash-tools
+
+#andreas antonopoulos' mastering bitcoin
+#https://github.com/bitcoinbook/bitcoinbook
+
+#utilities for bitcoin
+#https://github.com/igorbarinov/awesome-bitcoin#utilities
+#install hal crate (cargo install hal), very useful
+
+#bitcoin blockchain
+#you can just print every string in the blockchain database directly
+#{ strings -n 20 blk0000.dat ;}
+#https://bitcoin.stackexchange.com/questions/18/how-can-one-embed-custom-data-in-block-headers
+#transaction hex to ascii
+#{ echo -n "$hex" | xxd -p -r ;}
+#transaction ascii to hex
+#{ echo -n "$str" | xxd -ps ;}
+
+#see the actual bits of a file
+#{ xxd -b ;}
+
+#print hex dump
+#{ xxd -p ;}
+hxd()
+{
+	hexdump -e '32/1 "%02X" "\n"'
+}
+
+#get coinbase tx from genesisblock with
+#{ bitcoin-cli getblock [GENBLK_HASH] 2 ;}
+#https://ma.ttias.be/retrieving-the-genesis-block-in-bitcoin-with-bitcoin-cli/
+
+#produce a 64 character hexadecimal string (256 bits or 32 bytes,
+#{ openssl rand -hex 32 ;}
+#https://btcleak.com/2020/06/22/three-ways-to-hack-bitcoin/
+
+#get random string
+#{ od -An -N32 -x /dev/urandom ;}
+#{ hexdump -v -e '/1 "%02X"' -n 32 /dev/urandom ;}
+#{ cat /dev/urandom | tr -dc '0-9A-F' | head -c${1:-64} ;}
+
+#make a qr code with google api
+#warning: encode whitespaces to %20
+gqr()
+{
+	local size type string
+	size=250x250 type=qr
+	string="$*"  #"${*// /%20}"
+
+	wget -O "$type".png "https://chart.googleapis.com/chart?chs=${size}&cht=${type}&chl=${string}"
+}
+
+#bitcoin.blk.sh
+alias blk="$HOME/bin/bitcoin.blk.sh"
+#bitcoin.tx.sh
+alias tx="$HOME/bin/bitcoin.tx.sh"
+#bitcoin.hx.sh
+alias hx="$HOME/bin/bitcoin.hx.sh"
+
+#load a wallet
+#{ electrum daemon walletname ;}
+
+#tail bitcoind log
+alias btct='tail -f /media/primary/blockchain/debug.log'
+
+#bitcoin historical price (time series)
+btchist()
+{
+	curl https://nastyfans.org/exchangerate.csv | tr , \\t  | column -et -NDATE,PRICE
+}
+
+halving()
+{
+	local hgt secs tgt
+	tgt=$((840000+210000))
+	hgt=$(curl -s https://blockchain.info/q/getblockcount) || return
+	
+	printf "Bitcoin Halving\\nDays left: %6d\\nHeight   : %6d/%d\\n" $(( ( (tgt-hgt)*(10*60))/(24*60*60) )) "$hgt" "$tgt"
+	secs=$(( (tgt-hgt)*(10*60) ))
+	datediff.sh -vvv ${secs}seconds 2>/dev/null
+	date -R -d"${secs}seconds"
+}
+_halving()
+{
+	{ 	printf '---\n'
+		halving
+		binfo.sh -ii 2>/dev/null | grep EH/s
+	} | tee -a ~/halving.txt
+}
+
+#cryptocurrency greps
+
+#mainnet public addresses
+alias btcgrep="grep -E '\b([Bb][Cc](0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59}|[AC-HJ-NP-Z02-9]{39}|[AC-HJ-NP-Z02-9]{59})|1[ac-hj-np-z02-9]{8,87}|1[AC-HJ-NP-Z02-9]{8,87})|[13][a-km-zA-HJ-NP-Z1-9]{25,34})\b'"
+#https://stackoverflow.com/questions/21683680/regex-to-match-bitcoin-addresses
+#https://bitcointalk.org/index.php?topic=5348947.msg57447220#msg57447220
+#https://en.bitcoin.it/wiki/Invoice_address
+
+#legacy addresses only
+alias btcgrep1="grep -E '\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b'"
+#http://mokagio.github.io/tech-journal/2014/11/21/regex-bitcoin.html
+#https://ihateregex.io/expr/bitcoin-address/
+
+#bech32 v1 and v0 addresses
+alias btcgrep2="grep -E '\bbc(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[ac-hj-np-z02-9]{8,87})\b'"
+
+#bech32 addresses only
+alias btcgrep3="grep -E '\bbc1[ac-hj-np-zAC-HJ-NP-Z02-9]{11,71}\b'"
+
+#both legacy and bech32
+alias btcgrep4="grep -E '\b([13][a-km-zA-HJ-NP-Z1-9]{25,34}|bc1[ac-hj-np-zAC-HJ-NP-Z02-9]{11,71})\b'"
+#http://mokagio.github.io/tech-journal/2014/11/21/regex-bitcoin.html
+#https://bitcointalk.org/index.php?topic=1262694.0
+
+#testnet public addresses
+alias btcgrep4a="grep -E '\b(tb(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[ac-hj-np-z02-9]{8,87})|[mn2][a-km-zA-HJ-NP-Z1-9]{25,39})\b'"
+#https://stackoverflow.com/questions/21683680/regex-to-match-bitcoin-addresses
+#https://stackoverflow.com/questions/21683680/regex-to-match-bitcoin-addresses/50391800#50391800
+
+
+#private keys (mainet and testnet)
+alias btcgrep5="grep -E '\b[59KLc][1-9A-HJ-NP-Za-km-z]{50,51}\b'"
+#word boundary: '\b'
+#https://bitcoin.stackexchange.com/questions/56737/how-can-i-find-a-bitcoin-private-key-that-i-saved-in-a-text-file
+
+#transaction hashes
+alias btcgrep6="grep -E '\b[a-fA-F0-9]{64}\b'"
+#https://stackoverflow.com/questions/46255833/bitcoin-block-and-transaction-regex
+#https://bitcoin.stackexchange.com/questions/70261/recognize-bitcoin-address-from-block-hash-and-transaction-hash
+
+#block hashes
+alias btcgrep7="grep -E '\b[0]{8}[a-fA-F0-9]{56}\b'"
+#https://stackoverflow.com/questions/46255833/bitcoin-block-and-transaction-regex
+
+#ethereum address hash
+#test for 'plausibility'
+alias ethgrep="grep -E '\b(0x)?[0-9a-fA-F]{40}\b'"
+#https://ethereum.stackexchange.com/questions/1374/how-can-i-check-if-an-ethereum-address-is-valid
+
+#ethereum transaction hash
+alias ethgrep2="grep -E '\b(0x)?([A-Fa-f0-9]{64})\b'"
+#https://ethereum.stackexchange.com/questions/34285/what-is-the-regex-to-validate-an-ethereum-transaction-hash/34286
+
+
+#fire on term
+fire()
+{
+	aafire -driver curses -bold -reverse -dim -eight -gamma 0.5 -floyd_steinberg
+}
+fire2()
+{
+	CACA_DRIVER=ncurses cacafire
+}
+#CACA_DRIVER=[aalib|libcaca|chafa|curses]
+#aalib (b&w), libcaca (colour)
+#img2txt (from libcaca), cacaviewer, aatest, aview, jp2a, pixterm
+
+#xterm escape sequences (windowsops, fontops etc must be on)
+#reset terminal size to 80x24
+xtr()
+{
+	echo -e '\e[8;24;80t'
+}
+
+#reset font
+xtfr()
+{
+	echo -e "\e]50;#0\a"
+}
+
+#change font size and list terminus fonts
+xtfs()
+{
+	if [[ "$1" = [[:digit:]]* ]]
+	then 	echo -e "\e]50;-xos4-terminus-medium-r-*--${1}-*-*-*-*-*-*-*\a"
+	else 	echo -e "\e]50;${1}\a"
+	fi
+
+	xlsfonts | grep xos4 | grep medium
+}
+#also 'resize -s' for xterm
+#http://rtfm.etla.org/xterm/ctlseq.html
+#https://www.jpichon.net/blog/2010/06/xterm-control-sequences/
+#https://docstore.mik.ua/orelly/unix3/upt/ch05_18.htm
+
+#cpu stats
+model()
+{
+	cat /proc/cpuinfo
+}
+cores()
+{
+	grep -H . /sys/devices/system/cpu/cpu*/topology/thread_siblings_list
+}
+
+##check if intel hyperthread is enabled
+##prints 'ht' if enabled
+#ht()
+#{
+#	grep -o ht /proc/cpuinfo #| uniq
+#}
+#
+##disable one of each sibling ht
+#dht()
+#{
+#	#OBS: command may not run under TMUX!
+#	local i
+#	for i in 2 3
+#	do 	echo "Disabling logical HT core $i"
+#		echo 0 > /sys/devices/system/cpu/cpu${i}/online
+#	done
+#}
+#
+##enable hyperthreading
+#eht()
+#{
+#	local i
+#	for i in 2 3
+#	do 	echo "Enabling logical HT core $i"
+#		echo 1 > /sys/devices/system/cpu/cpu${i}/online
+#	done
+#}
+
+#toggle 'caps lock' to 'esc'
+#defaults:
+#xmodmap -e "keycode   9 = Escape NoSymbol Escape"
+#xmodmap -e "keycode  66 = Caps_Lock NoSymbol Caps_Lock"
+#caps() { xmodmap ~/.Xmodmap ;}
+caps()
+{
+	if xmodmap -pk | grep -q "Caps_Lock"
+	then 	xmodmap -e "clear Lock"
+		xmodmap -e "keycode 66 = Escape NoSymbol Escape"
+		printf "Caps Lock set to Escape\n"
+	else 	xmodmap -e "clear Lock"
+		xmodmap -e "keycode 66 = Caps_Lock NoSymbol Caps_Lock"
+		printf "Caps Lock reset\n"
+	fi
+}
+alias CAPS=caps
+#also check 'xcape'
+#and 'showkey -a'
+
+#check which graphics cards are being used
+graphics()
+{
+	optirun glxinfo | grep -E 'OpenGL vendor|OpenGL renderer'
+	glxinfo | grep -E 'OpenGL vendor|OpenGL renderer'
+	lspci -vnnn | perl -lne 'print if /^\d+\:.+(\[\S+\:\S+\])/' | grep VGA
+}
+
+#bbwitch status
+bb()
+{
+	cat /proc/acpi/bbswitch
+}
+
+#bbswicth status monitor
+bbm()
+{
+	printf 'BB Switch Monitor\n'
+	watch -d -t -n1 'cat /proc/acpi/bbswitch'
+}
+
+#turn the card off/on
+bboff()
+{
+	sudo tee /proc/acpi/bbswitch <<<OFF
+}
+bbon()
+{
+	sudo tee /proc/acpi/bbswitch <<<ON
+}
+#https://github.com/Bumblebee-Project/bbswitch
+
+#edit test script
+alias et='vim ~/bin/test.sh'
+#run test script
+alias t='~/bin/test.sh'
+
+#imgur
+alias imgur=imgur.sh
+
+#{ aspell --lang=pt-BR --encoding=utf-8 pipe ;}
+#{ aspell --lang=en-GB --encoding=utf-8 pipe ;}
+#https://pseudoscripter.wordpress.com/2011/05/11/aspell-using-more-than-one-language/
+
+#espeak config speech synthesis
+alias espeak='/bin/espeak -a40 -s150 -p30'  #-v brazil
+alias espeakbr='espeak -v brazil'
+alias espeakng='/bin/espeak-ng -a40 -s150 -p30'
+alias espeakngbr='espeakng -v pt-br'
+
+#make a wav file with text input:
+#{ espeak --stdout -f text.txt > text.wav ;}
+#open with *mplayer or vlc
+
+#mauna loa CO2
+alias maunaloa='curl https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_annmean_mlo.txt'
+
+#University of Alabama in Huntsville Data
+alias uah='curl https://www.nsstc.uah.edu/data/msu/v6.0/tlt/uahncdc_lt_6.0.txt'
+
+
+#misc
+
+#gnu plot simple graphs
+plot()
+{
+	gnuplot -p "$@"  -e 'plot "/dev/stdin" notitle'
+}
+
+plot_date()
+{
+	gnuplot -p -e 'set xdata time' -e 'set timefmt "%Y-%m-%dT%H:%M:%S%Z"' -e 'plot "-" using 2:1 with lines notitle'
+}
+
+plot2()
+{
+	gnuplot -p "$@"  -e 'plot "/dev/stdin" with linespoints linestyle 1 notitle'
+		#-e 'plot "-" with linespoints linestyle 1 notitle'
+}
+plot3()
+{
+	plot2 -e 'set logscale y "'${1:-10}'"'
+}
+plot4()
+{
+	plot2 -e 'set term dumb'
+}
+#http://gnuplot.sourceforge.net/demo_5.5/datastrings.html
+#http://www.physics.smu.edu/fattarus/GnuplotTutorial.html
+#https://www.datafix.com.au/BASHing/2019-06-21.html
+
+#Get the list of functions in a script
+#get_functions() {
+#    # Usage: get_functions
+#    IFS=$'\n' read -d "" -ra functions < <(declare -F)
+#    printf '%s\n' "${functions[@]//declare -f }"
+#}
+#https://github.com/dylanaraps/pure-bash-bible
+
+#red display
+#alias goclear='xcalib -clear'
+#alias gored='xcalib -green .1 0 1 -blue .1 0 1 -red 0.5 1 40 -alter'
+#https://blog.ynfonatic.de/2023/02/10/x-org-x11-set-your-monitor-to-monochrome-red-on-black.html
+
+#world population
+#usage: wpop [location|world]
+#usage: wpop [italy|uk|us|saudi-arabia|world]
+wpop()
+{
+	[[ -n "$1" ]] && local country="$1-population/"
+
+	if [[ "$1" = world ]] || [[ "$1" = all ]]
+	then 	curl -s 'https://www.worldometers.info/geography/countries-of-the-world/' |
+			awk 'length > max_length { max_length = length; longest_line = $0 } END { print longest_line }' |
+			sed -e 's/<td>/\n\n&/g' -e 's/<[^>]*>//g' | sed -e 1,2d  -e '$d' |
+			sed -e 'N;N;N;s/\n/ /g' -e 's/Dependenc/\n&/g' | sed -e '/^$/d'
+	else 	curl -s --compressed "https://www.worldometers.info/world-population/$country" |
+			sed -e 's/<[^>]*>//g' -ne '/[:[]new Date/p' |
+			sed -Ee 's/([A-Za-z])\s+([A-Za-z])/\1\2/' |
+			awk -F' ' '$4 > 50 { print $2" "$4}'
+	fi
+	echo "${1:-world historical}" >&2
+}
+#https://www.worldometers.info/world-population/
+
+#area by countries
+warea()
+{
+	local cutcols=-c1-25,35-
+	w3m -dump -cols 100 'https://www.worldometers.info/geography/largest-countries-in-the-world/' \
+		| tee >( grep '^\s*#' | cut $cutcols >&2 ) \
+		| sed -n '/List of countries/,/^\[INS/p' | sed '$d' | tac | cut $cutcols
+}
+
+
+#ibge -- ids de localidades
+#uso: localidade ["Nome da Cidade|Estado|Região"]
+localidade()
+{
+	local args data
+	args=$( tr A-Z a-z <<< "$*" )
+	data=$(curl --compressed 'http://servicodados.ibge.gov.br/api/v1/localidades/distritos')
+
+	jq -er '.. | select( .nome? | ascii_downcase == "'$args'")' <<<"$data" \
+		|| jq -r . <<<"$data"
+}
+#https://servicodados.ibge.gov.br/api/docs/localidades
+
+#ibge - frequência de nomes
+#uso: nomefreq [adriano]
+nomef()
+{
+	local json
+	if [[ -z "$1" ]]
+	then 	json=$( curl -s 'http://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking' )
+		jq -r '.[]|"Localidade: \(.localidade)"' <<<"$json"
+		jq -r '.[]|.res[]|"\(.nome)\t\(.frequencia)\t\(.ranking)"' <<<"$json" \
+			| column -et -NNOME,FREQ,RNK
+	else 	set -- "$( tr A-Z a-z <<< "$1" )"
+		json=$(curl -s "http://servicodados.ibge.gov.br/api/v2/censos/nomes/$1")
+		jq -r '.[]|"Local: \(.localidade)","Nome_: \(.nome)"' <<<"$json"
+		jq -r '.[].res[]|"\(.periodo)\t\(.frequencia)"' <<<"$json" \
+			| tr -d '][' | tr ',' '-' | column -et -NPERIODO,FREQ
+	fi
+}
+#https://servicodados.ibge.gov.br/api/docs/censos/nomes?versao=2
+
+
+#sort  01,1,A,a..
+#{ LC_COLLATE=POSIX sort -Vf ;}
+#{ LC_COLLATE=C sort -Vf ;}
+#https://www.vivaolinux.com.br/topico/Iniciantes-no-Linux/Comando-Sort-como-usar
+
+# ruler - print an 80-character ruler
+# Steve Kinzler, steve@kinzler.com, Oct 93
+# http://kinzler.com/me/home.html#unix
+ruler()
+{
+	cat<<!
+T...:...T1....:.T..2....T....3..T.:....4T...:...T5....:.T..6....T....7..T.:....8
+!
+}
+
+#mandelbrot set
+mandelbrot()
+{
+	echo '9k[l:l;s<s=0l>x]s"[1+l<dd*l=d*-l;+ds<rl=2**l:+ds=d*rd*+4<-d15>>] s>[q]s-[d77/3*2-s;47l"x-P1+d78>`]s`0[d23/.5-3*s:0l`xr10P1+d24>$]ds$x' | dc
+}
+
+mandelbrot2()
+{
+	export COLUMNS
+	sh <<<'d(){ [ $[$1*$1+$2*$2] -gt 5000000 ]||[ $5 -ge $6 ]&&echo $5||{ r=$[($1*$1)/100-($2*$2)/100+$3];i=$[($1*$2)/100*2+$4];c=$[$5+1];d $r $i $3 $4 $c $6;};};g=( 00 11 ,, .. ·· -- ++ "**" %% ^^);for y in {-25..25};do for x in $(eval "echo {-$[(${COLUMNS:-80}/4)+4]..$[(${COLUMNS:-80}/4)-6]}");do j=$[x*5];k=$[y*5];v=$(d j k j k 1 10);[ $v -eq 10 ]&&echo -n "  "||echo -n "${g[v]}";done;echo;done'
+}
+#https://www.reddit.com/r/linux/comments/ajvwj/the_mandelbrot_set_in_pure_bash/
+
+mandelbrot3()
+{
+	bash <<<'
+	p=\>\>14 e=echo\ -ne\  S=(S H E L L) I=-16384 t=/tmp/m$$; for x in {1..13}; do \
+	 R=-32768; for y in {1..80}; do B=0 r=0 s=0 j=0 i=0; while [ $((B++)) -lt 32 -a \
+	  $(($s*$j)) -le 1073741824 ];do s=$(($r*$r$p)) j=$(($i*$i$p)) t=$(($s-$j+$R));
+	   i=$(((($r*$i)$p-1)+$I)) r=$t;done;if [ $B -ge 32 ];then $e\ ;else #---::BruXy::-
+	    $e"\E[01;$(((B+3)%8+30))m${S[$((C++%5))]}"; fi;R=$((R+512));done;#----:::(c):::-
+	     $e "\E[m\E(\r\n";I=$((I+1311)); done|tee $t;head -n 12 $t| tac  #-----:2 O 1 O:-
+	     '
+}
+#https://bruxy.regnet.cz/web/linux/EN/mandelbrot-set-in-bash/
+
+#ncdu for disk and folder usage
+#for a feh alternative, check sxiv
+
+#du only files in current level
+#{ du -d 1 ;}
+
+#du with more decimals
+#{ du -Lsbc ;}
+
+#arch's 'wifi-menu' script ships with 'netctl' and doesn't need further wireless_tools
+#if you have got the 'network manager', then yse 'nmtui'
+#https://www.vivaolinux.com.br/dica/Arch-Linux-Configurando-Wi-Fi-com-wifi-menu
+
+#comment inside a command
+#${IFS#comment}
+#IFS default value is <space><tab><newline>
+#check IFS with:
+#{ cat -etv <<< "$IFS" ;}
+
+# copy with progress using rsync
+#rsync --progress -ah
+
+# detect double words (eg. "hello my   my friend")
+# Arguments: $1 -> the file(s) to be checked
+dword()
+{
+    if [ $# -ne 1 ]
+    then
+        echo "dword file" >&2
+        return 1
+    fi
+
+    awk '
+    FILENAME != prev {
+        NR = 1
+        prev = FILENAME
+    }
+    NF > 0 {
+        if ($1 == lastword)
+	    printf "%s:%d:`%s`\n", FILENAME, NR, $1
+        for (i = 2; i <= NF; i++)
+	    if ($i == $(i-1) )
+	    printf "%s:%d:`%s`\n", FILENAME, NR, $i
+	if (NF > 0)
+	    lastword = $NF
+    }' "$@"
+}
+
+# count word frequencies
+# Arguments: $1 -> the file(s) to use while counting
+wfreq()
+{
+    if [ $# -ne 1 ]
+    then
+        echo "wfreq file" 2>&2
+        return 1
+    fi
+
+    awk '
+    {
+        for (i = 1; i <= NF; i++)
+            cnt[$i]++
+    }
+    END {
+        for (w in cnt)
+            print w, cnt[w]
+    }' "$@"
+}
+#https://github.com/faif/shell-utils/blob/master/shell-utils.sh
+
+#fun
+
+#add box outside text
+border()
+{
+	str="| $1 |"
+	bordas=$(echo "$str" | sed 's/./-/g')
+	echo -e "$bordas\n$str\n$bordas"
+}
+#https://www.vivaolinux.com.br/topico/Shell-Script/Texto-com-bordas-usando-Shell-Script
+
+#make it snow!
+#usage: snow [CHAR] [SLEEPTIME]
+#make it rain!        ->  snow .
+#make it rain fast!   ->  snow . 0
+#make it rain money!  ->  snow '$'
+snow() { clear;while :;do echo $LINES $COLUMNS $(($RANDOM%$COLUMNS));sleep ${2:-0.1};done|gawk '{a[$3]=0;for(x in a) {o=a[x];a[x]=a[x]+1;printf "\033[%s;%sH ",o,x;printf "\033[%s;%sH'"${1:-*}"'\033[0;0H",a[x],x ;}}' ;}
+#https://www.youtube.com/watch?v=0HsE4RRhLQ0
+
+#alias emoji_shrug='echo -n "¯\_(ツ)_/¯" | xclip -selection clipboard'
+#alias emoji_run='echo -n "ᕕ( ᐛ )ᕗ" | xclip -selection clipboard'
+#https://github.com/charnley/dotfiles/blob/master/bash_aliases
+
+#bash key mappings that are available
+#  The 2 unused keystrokes with Ctrl are
+#  the rather awkward:
+#  Ctrl+\
+#  Ctrl+^
+#
+#  But there are 15 letters available for
+#  use with Meta, namely:
+#  Meta+A, Meta+E, Meta+G, Meta+H, Meta+I,
+#  Meta+J, Meta+K, Meta+M, Meta+O, Meta+Q,
+#  Meta+S, Meta+V, Meta+W, Meta+X, and Meta
+
+#nvidia
+#{ LD_PRELOAD=/usr/lib/libGL.so optirun %command% ;}
+#{ LD_PRELOAD=/usr/lib32/libGL.so optirun %command% ;}
+#https://bbs.archlinux.org/viewtopic.php?id=233888
+
+##turn to lower case
+#lcase()
+#{
+#    word=$1
+#    while [ -n "$word" ]
+#    do
+#      temp=${word#?}
+#      case ${word%"$temp"} in
+#          A*) _LWR=a ;;        B*) _LWR=b ;;
+#          C*) _LWR=c ;;        D*) _LWR=d ;;
+#          E*) _LWR=e ;;        F*) _LWR=f ;;
+#          G*) _LWR=g ;;        H*) _LWR=h ;;
+#          I*) _LWR=i ;;        J*) _LWR=j ;;
+#          K*) _LWR=k ;;        L*) _LWR=l ;;
+#          M*) _LWR=m ;;        N*) _LWR=n ;;
+#          O*) _LWR=o ;;        P*) _LWR=p ;;
+#          Q*) _LWR=q ;;        R*) _LWR=r ;;
+#          S*) _LWR=s ;;        T*) _LWR=t ;;
+#          U*) _LWR=u ;;        V*) _LWR=v ;;
+#          W*) _LWR=w ;;        X*) _LWR=x ;;
+#          Y*) _LWR=y ;;        Z*) _LWR=z ;;
+#          *) _LWR=${1%${1#?}} ;;
+#      esac
+#      printf "%s" "$_LWR"
+#      word=$temp
+#    done
+#}
+##https://www.drdobbs.com/shell-corner-bash-dynamically-loadable-b/199102950?pgno=1
+
+#useful one-liners
+#commands
+
+#vim, list all ed builtin commands:
+#:h ex-cmd-index
+
+#text between two lines
+#sed -n '/StartPattern/,/EndPattern/p' FileName
+#awk '/StartPattern/,/EndPattern/' FileName
+#https://www.shellhacks.com/sed-awk-print-lines-between-two-patterns/
+#
+#between pattern in the same line
+#ex: abc:string"def
+#sed -e 's/\(^.*:\)\(.*\)\(".*$\)/\2/' file
+
+#sed '/./{:a;N;s/\n\(.\)/ \1/;ta}' file
+#If the line is not empty read the following line and if that is not empty
+#replace the newline by a space and repeat, otherwise print the pattern space.
+#If the line was empty in the first place print the empty line: this caters for
+#an empty first line, if this is not the case then and there is only one empty
+#line between non-blank lines that is suffice:
+#sed ':a;N;s/\n\(.\)/ \1/;ta' file
+#https://stackoverflow.com/questions/39734125/sed-to-combine-n-text-lines-separated-by-blank-lines
+
+#sed join two/three lines
+#sed 'N;N;s/\n/ /g'  #two lines
+#sed 'N;N;N;s/\n/ /g'  #three lines
+#awk 'NR%3{printf "%s ",$0;next}1'  #two lines
+
+#print everything except the first line
+#{ awk 'NR>1' "${1:-/dev/stdin}" ;}
+
+#sum all numbers in column 1
+SUM()
+{
+	perl -M'List::Util qw(sum max min)' -MPOSIX -0777 -a -ne 'printf "%-7s : %'".${1:-4}"'f\n"x6, "Sum", sum(@F), "Min", min(@F), "Max", max(@F), "Average", sum(@F)/@F,  "Median", sum( (sort {$a<=>$b} @F)[ int( $#F/2 ), ceil( $#F/2 ) ] )/2, "Values", scalar(@F);'
+}
+SUM2()
+{
+	datamash --header-out -R "${1:-4}" \
+	sum 1 min 1 max 1 mean 1 q1 1 median 1 mad 1 madraw 1 q3 1 iqr 1 \
+	sstdev 1 pstdev 1 jarque 1 sskew 1 pskew 1 svar 1 pvar 1 \
+	range 1 count 1 \
+		| datamash transpose \
+		| perl -pe 's/\([^)]*\)//g'
+}
+#{ Rscript -e 'summary(as.numeric(read.table(file("stdin"))[,1]))' ;}
+#{ paste -sd+ | bc ;}
+#{ awk '{sum += $1 } END { print sum }' ;}
+#https://unix.stackexchange.com/questions/13731/is-there-a-way-to-get-the-min-max-median-and-average-of-a-list-of-numbers-in
+#https://www.gnu.org/software/datamash/examples/
+#https://www.programmersought.com/article/92546043400/
+
+#add numbers
+#adds newline-separated numbers from stdin
+#until eof then output the total to stdout.
+#{ awk '{s+=$1} END {printf "%.'${1:-2}'f\n", s}' ;}
+#{ echo $(( $( tr '\n' +  < /dev/stdin) 0 )) ;}
+#https://stackoverflow.com/questions/450799/shell-command-to-sum-integers-one-per-line
+
+#sum same elements of the same column of different lines
+#{ datamash -t, sum 1-"$cols" ;}  #-t sets separator
+#{ awk '{s1+=$1;s2+=$2;s3+=$3;s4+=$4;s5+=$5}END{print s1,s2,s3,s4,s5}' ;}
+#{ awk '{s1+=$1;s2+=$2;s3+=$3;s4+=$4;s5+=$5}{print;}END{print "----------\n"s1,s2,s3,s4,s5}' ;}
+#https://www.vivaolinux.com.br/topico/Algoritmos-e-resolucao-de-problemas/somar-linhas-em-bash
+
+#print first 3 lines
+#{ head -n+3 ;}
+#{ head -3 ;}
+
+#print last 3 lines
+#{ tail -3 ;}
+
+#remove the last four lines
+#{ head -n-4 ;}
+#{ sed -e :a -e '$d;N;1,4ba' -e 'P;D' ;}
+#{ sed ':a;$!N;1,4ba;P;$d;D' ;}  #gnu sed
+#{ sed '$d' file | sed '$d' | sed '$d' | sed '$d' ;}
+#{ ed -s sometextfile <<< $'-2,$d\nwq' ;}  #edit in-file
+
+#remove first 2 lines
+#{ tail +4 ;}
+
+#standard head: the application shall ensure that the number option-argument
+#is a positive decimal integer.
+#tac may not be in osx, run `tail -r`, or
+#{ awk '{line[NR]=$0} END {for (i=NR; i>=1; i--) print line[i]}' "$@" ;}
+
+#!#different ways to print the next few lines after pattern match
+#https://www.theunixschool.com/2012/05/different-ways-to-print-next-few-lines.html?m=1
+
+#print last fiel
+#{ awk '{print $NF}' ;}
+
+#add columns in only one line with a separator
+#{ awk -F":" '{ORS=",";print $1}' ;}
+
+#remove single blank line only - keep multiple blank lines
+#awk -v RS='\n+' '{printf "%s", $0 (length(RT) != 2 ? RT : "\n")}'
+#awk -v RS='\n{3,}' '{gsub(/\n{2}/, "\n", $0); printf "%s", $0 RT}'
+#sed -E ':a; N; $!ba; :b; s/([^\n])\n\n([^\n])/\1\n\2/g; tb'
+#https://stackoverflow.com/questions/37954091/how-to-remove-single-blank-line-only-keep-multiple-blank-lines
+
+#remove duplicate lines
+#{ awk '!visited[$0]++' ;}
+#{ cat -n | sort -uk2 | sort -nk1 | cut -f2- ;}
+#https://opensource.com/article/19/10/remove-duplicate-lines-files-awk
+
+#case #1: that would remove more than two (3 or more) consecutive blank lines,
+#and replace them with just two blank lines. though it would be nice if it
+#also could be tweaked to remove more than one line (2 or more) and/or replace
+#multiple blank lines with just one blank line.
+#
+#remove more than two blank lines (leaves 2 blank lines)
+#sed -r ':a; /^\s*$/ {N;ba}; s/( *\n *){2,}/\n\n/'
+#awk '!NF {if (++n <= 2) print; next}; {n=0;print}'
+#
+#remove more than two blank lines (leaves 1 blank lines)
+#sed -r ':a; /^\s*$/ {N;ba}; s/( *\n *){2,}/\n/'
+#awk '!NF {if (++n <= 1) print; next}; {n=0;print}'
+
+# Remove all consecutive blank lines, leaving just one
+#  perl -00 -pe ''
+#  perl -00pe0
+
+#binary to visible text
+#https://unix.stackexchange.com/questions/98948/ascii-to-binary-and-binary-to-ascii-conversion-tools
+#0100000101000010 <=> AB
+bintext()
+{
+	perl -lpe '$_=unpack"B*"' <<<"$*"
+	perl -lpe '$_=pack"B*",$_' <<<"$*"
+}
+
+#case #2: that would remove a single blank line between two lines of text,
+#but leave multiple blank lines as is (though removing one of the blank lines
+#would also be acceptable).
+#join single-spaced lines
+#sed -r '/^ *\S/!b; N; /\n *$/!b; N; /\S *$/!b; s/\n *\n/\n/'
+#awk '!NF {s = s $0 "\n"; n++; next}
+#     {if (n>1) printf "%s", s; n=0; s=""; print}
+#     END {if (n>1) printf "%s", s}'
+#https://unix.stackexchange.com/questions/72739/how-to-remove-multiple-blank-lines-from-a-file
+
+#awk print column if it is numbers
+#awk -F ' *' '$19 ~ /^[0-9]+$/ { print "Number of connections: " $19 }'
+#if you're looking for a particular string, put quotes around it:
+#awk '$1 == "findtext" {print $3}'
+#otherwise, awk will assume it's a variable name.
+
+#se campo 1 == campo 2, printa a linha completa, senão printa somente campo 1.
+#{ awk -F";" '{if($1==$2) print $0;else print $1}' arq ;}
+
+#remove last column of text
+#{ awk 'NF{NF-=1};1' ;}
+#{ awk 'NF{NF--};1' ;}
+#{ awk 'NF{--NF};1' ;}
+#the first is nf, which is a precondition for the second part. nf is a variable
+#containing the number of fields in a line. in awk, things are true if they're
+#not 0 or empty string "". hence, the second part (where nf is decremented) only
+#happens if nf is not 0.
+#the second part (either nf-=1 nf-- or --nf) is just subtracting one from the
+#nf variable. this prevent the last field from being printed, because when you
+#change a field (removing the last field in this case), awk re-construct $0,
+#concatenate all fields separated by space by default. $0 didn't contain the
+#last field anymore.
+#the final part is 1. it's not magical, it's just used as a expression means
+#true. if an awk expression evaluates to true without any associated action,
+#awk default action is print $0.
+#https://unix.stackexchange.com/questions/234432/how-to-delete-the-last-column-of-a-file-in-linux
+
+#regex ip validation
+#IPREGEX='^([1-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.([0-9][0-9]?\.|1[0-9]{2}\.|2[0-4][0-9]\.|25[0-5]\.){2}([0-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-4])'
+alias grepip='grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"'
+#https://www.shellhacks.com/regex-find-ip-addresses-file-grep/
+
+#extract zip files to stdout
+#{ bsdtar -xvf - -O ;}
+#{ gzip -dc ;}
+
+#ultra compress
+zultra()
+{
+	 7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "${1}.7z" "${@:?file required}"
+
+}
+
+#exif
+#identify -verbose <file> | grep Orientation
+#exiftran -i9 %f #change orientation in exif only
+
+#unix hacks
+#<http://www.iwar.org.uk/hackers/resources/digital%20rebels/articles/unixtips.txt>
+#<http://www.lib.ru/SECURITY/hackalot.txt>
+
+#learn regex
+#{ perldoc perlretut ;}
+#{ perldoc perlrequick ;}
+#{ info sed ;}
+
+#"if there's one thing everyone should learn in perl, this is it"
+#Perl Pie: Replace String in Files
+#{ perl -p -i -e 's/SOME_NAME/Kris/gi' ./*.txt ;}
+#http://perlpie.com/
+#> What is the advantage of [perl -pi -e 's///'] over sed?
+#PCRE and /e flag.
+
+#use perl instead of sed
+#sed '/delete this line/ d' || perl -ne 'print unless /delete this line/'
+#sed with PCRE
+#you can use the pathological eclectic rubbish lister:
+#perl -pe 's/../../g' file
+#or inline replace:
+#perl -pie 's/../../g' file
+#https://askubuntu.com/questions/1050693/sed-with-pcre-like-grep-p
+
+#Modulus on Negative Numbers
+#in C/C++ language we always find remainder as (a%b + b)%b ,
+#i.e. add quotient to remainder and again take remainder,
+#to avoid negative remainder.
+#https://www.geeksforgeeks.org/modulus-on-negative-numbers/
+
+#all array elements but the last
+#"${@:1:${#@}-1}"
+#${a[@]::${#a[@]}-1}
+#https://stackoverflow.com/questions/44939747/bash-all-of-array-except-last-element
+
+#create new file
+#: > filename
+
+#extract [MEMBER] from tar.gz from stdin to stdout
+#curl -o - url.file.tar.gz |
+#wget -O - url.file.tar.gz |
+#tar -Ozf - --extract --wildcards [MEMBER]
+#bsdtar -xf - -O [MEMBER]
+
+#random
+#cat /dev/urandom | base64
+#head -500 /dev/urandom
+#od -vAn -N4 -tu4 < /dev/urandom  #unsigned decimal 4 bytes random numbers
+#od -vAn -N1 -td1 < /dev/urandom #1 byte signed decimal integer
+#A program reading from /dev/random blocks until the value in
+#/proc/sys/kernel/random/entropy_avail becomes larger
+#than /proc/sys/kernel/random/read_wakeup_threshold.
+#reading from /dev/random consumes entropy at the rate of 8 bits per byte.
+
+#convert multiple files to html with vim
+#for i in *.ext; do vim -c TOhtml -c wqa $i ; done
+#https://superuser.com/questions/565050/export-file-syntax-highlighting-to-html-using-vim
+
+#vim cmds:
+#:TOhtml
+#:let g:html_use_css = 0  #old html without css
+#select range of lines, type :MyToHtml
+#https://vim.fandom.com/wiki/Pasting_code_with_syntax_coloring_in_emails
+
+#make a table in vim
+#:!sed 's/[- ]*\([+|]\)/'$'\x01''\1/g' | column -ts $'\x01' | sed '/^[-+ ]*$/s/ /-/g'
+#:0f=20i<Space><Esc>020lvf=hx
+#vim-table-mode
+#https://vi.stackexchange.com/questions/363/how-can-i-easily-create-and-maintain-tables
+#*https://vim.fandom.com/wiki/Simple_text_alignment
+
+#vim
+#switch between return and new line
+#:set ff=unix
+#:set ff=dos
+
+#emmets tutorial
+emmets()
+{
+	curl https://raw.githubusercontent.com/mattn/emmet-vim/master/TUTORIAL \
+		| vim - +set\ ft=html +set\ bt=nofile
+}
+
+
+#Arch maintenance
+# pacman aliases (if desired, adapt for your favourite AUR helper)
+#alias pac="sudo /usr/bin/pacman -S"		# default action	- install one or more packages
+#alias pacu="sudo /usr/bin/pacman -Syu"		# '[u]pdate'		- upgrade all packages to their newest version
+alias pacr="sudo /usr/bin/pacman -Rns"		# '[r]emove'		- uninstall one or more packages
+#alias pacs="/usr/bin/pacman -Ss"		# '[s]earch'		- search for a package using one or more keywords
+#alias paci="/usr/bin/pacman -Si"		# '[i]nfo'		- show information about a package
+alias paclo="/usr/bin/pacman -Qdt"		# '[l]ist [o]rphans'	- list all packages which are orphaned
+#alias pacc="sudo /usr/bin/pacman -Scc"		# '[c]lean cache'	- delete all not currently installed package files
+alias paclf="/usr/bin/pacman -Ql"		# '[l]ist [f]iles'	- list all files installed by a given package
+alias pacexpl="sudo /usr/bin/pacman -D --asexp"	# 'mark as [expl]icit'	- mark one or more packages as explicitly installed
+alias pacimpl="sudo /usr/bin/pacman -D --asdep"	# 'mark as [impl]icit'	- mark one or more packages as non explicitly installed
+alias pacaur='pacman -Qqm'                      # list all installed packages from AUR
+#acman -Qqen  -- all explicitly installed packages
+# '[r]emove [o]rphans' - recursively remove ALL orphaned packages
+#alias pacro="/usr/bin/pacman -Qtdq > /dev/null && sudo /usr/bin/pacman -Rns \$(/usr/bin/pacman -Qtdq | sed -e ':a;N;$!ba;s/\n/ /g')"
+#https://github.com/midfingr
+
+#Gksu alternative
+alias gsu='pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS'
+#https://dev.to/logix2/another-gksu-alternative-for-ubuntu-xorg-2356
+
+#centralise text
+#colunas=$(tput cols)
+#texto='Hello, world!'
+#printf "%*s\n" $(((${#texto} + $colunas) / 2)) "$texto"
+#https://www.vivaolinux.com.br/topico/Shell-Script/Como-centralizar-texto-do-script
+
+#its job is to highlight plain whitespaces and
+#mark each one with a dot for easy counting:
+spacevis()
+{
+	sed 's|\x20|\x1b[103m\xc2\xb7\x1b[0m|g'
+}
+#https://www.datafix.com.au/BASHing/2020-09-09.html
+
+#awk
+#field $N exists, is non-empty and is non-zero
+#test:printf "a\n\n\x00\n\x20\n0\n00\n" | nl -ba -w1 |
+#{ awk -F"\t" '$2 != ""' ;}
+
+#virtualbox compact command
+#{ vboxmanage  modifymedium --compact '/Vbox_machines/Win10.vdi' ;}
+
+#to safely minify html code
+#check community/htmlmin
+
+#why doesn't free -ht show all my RAM?
+#estimate how much memory the kernel is using:
+#{ cat /proc/meminfo | grep Slab ;}
+#https://askubuntu.com/questions/743649/new-16gb-of-ram-installed-yet-i-see-15-3-on-my-system-why
+#https://www.linuxatemyram.com/
+
+#RAM stress test
+#{ /usr/bin/yes 00000000000 |head -c 3000m | pv | tail ;}  #3GB
+#https://unix.stackexchange.com/questions/99334/how-to-fill-90-of-the-free-memory
+
+#If it seems that rustup did not successfully install and
+#configure the stable toolchain, you can do it manually:
+#rustup install stable
+#rustup default stable
+#rust: error: no override and no default toolchain set
+#https://stackoverflow.com/questions/44303915/no-default-toolchain-configured-after-installing-rustup
+
+#Swap stdout and stderr
+#$ command 3>&1 1>&2 2>&3
+#all about redirections: https://catonmat.net/bash-one-liners-explained-part-three
+
+#unit representations
+#k=K=kiB=KiB=1024
+#kb=KB=1000
+#M=MiB=10242
+#MB=10002
+#https://www.pixelbeat.org/docs/coreutils-gotchas.html#units
+
+#bash matrix
+shmatrix()
+{
+	tr -c "[:xdigit:]" " " < /dev/urandom | dd cbs=$COLUMNS conv=unblock \
+		| GREP_COLOR="1;32" grep --color "[^ ]"
+}
+#https://www.pixelbeat.org/docs/terminal_colours/
+
+#simple timer
+#usage: tmr NUM UNIT [[+-] [NUM UNIT]]..
+#usage: tmr NUM UNIT [[*/] [NUM]]..
+#usage: NUM must be an integer and UNIT may be: `d' (day),
+#usage: `h' (hour) and `m' (min)
+#e.g.:  tmr 1m+22s
+#e.g.:  tmr (1m*5)+22s
+tmr()
+(
+	SECONDS=0 max=${1:-999999}
+	max=${max//d/*86400} max=${max//h/*3600}
+	max=${max//m/*60} max=${max//s} max=$((max)) || exit
+	[[ -z "$1" ]] || printf "max: %ss\n" $max ;trap break INT
+	while ((SECONDS<max))
+	do 	t=$SECONDS ;printf '\r%*d' 0 $t ;sleep 1
+	done ;printf '\a\n%dh ~ %dm ~ %ds\n' $((t/3600)) $((t/60)) $t
+)
+
+#get relatove date (now -1 hour)
+#sqlite3 /dev/null <<<'SELECT strftime("%m/%d/%Y-%H:%M:%S", "now", "-1 hour")'
+#https://community.unix.com/t/generating-dates-with-bash/381693/2
+
+#useful logs
+#how all messages from this boot:
+#{ less /var/log/Xorg.0.log ;}
+#{ journalctl -b ;}
+#{ journalctl --since "20 min ago" ;}
+#{ journalctl -b -0 ;}
+#-b -0 shows messages from the current boot, journalctl -b -1 from the previous boot..
+#out of the box almost everything on arch logs to journald.
+#https://wiki.archlinux.org/index.php/Systemd/Journal#Filtering_output
+#Are your filesystems okay? fsck?
+#Use Windows chkdsk to correct errors on ntfs data partition.
+
+#image sizes:
+#file serguei.webp| grep -Eow '[0-9]+x[0-9]+'
+#php -r "print_r(getimagesize('https://mountaineerbr.github.io/gfx/sherlockb_w.png'));"
+
+#scp doesn't work but ssh does
+#Check the target user's .bashrc or equivalent file. ~/.bashrc is sourced
+#for non-interactive logins. If there's an echo or command that outputs
+#anything, it will break the SCP protocol. (spoulson)
+#https://superuser.com/questions/395356/scp-doesnt-work-but-ssh-does
+
+#regex for string that is only numbers
+# ^[+-]?[0-9]+([.][0-9]+)?$
+#https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
+
+#https://guides.wp-bullet.com/batch-resize-images-using-linux-command-line-and-imagemagick/
+
+#check if a var is set
+#: "${hostname:?"Missing hostname"}"
+
+#format list in three columns
+#{ pr -aT3 ;}
+#{ paste - - - ;}
+
+#csv to tsv
+#{ sed -E 's/("([^"]*)")?,/\2\t/g' ;}
+#https://unix.stackexchange.com/questions/359832/converting-csv-to-tsv
+
+#text processing examples
+#https://tldp.org/LDP/abs/html/textproc.html
+#https://learnbyexample.gitbooks.io/linux-command-line/content/Text_Processing.html  #pr
+
+#remove leading & trailing whitespace
+#space characters include: tab, newline, vertical tab, form feed, carriage return, and space.
+trim()
+{
+	local var="${*:-$([[ -t 0 ]] || </dev/stdin)}"
+	var="${var#"${var%%[![:space:]]*}"}"  #rm leading ws
+	var="${var%"${var##*[![:space:]]}"}"  #rm trailing ws
+	echo "${var:?empty}"
+}
+#compatible with all posix shells
+#https://web.archive.org/web/20121022051228/http://codesnippets.joyent.com/posts/show/1816
+#bash:
+#{ shopt -s extglob ;var="${var#*( )}" var="${var%*( )}" ;}
+#https://linuxhint.com/trim_string_bash/
+#{ read -r foo <<<"$foo" ;}  #from usenet
+#{ read -r -d$'\04' foo <<<"$foo" ;}
+
+#trim traling zeroes with sed
+#{ sed '/\./ s/\.\{0,1\}0\{1,\}$//' ;}
+
+#tip: sed `//d' removes last expression
+
+#eval trick to redefine variables by indirection
+#{ eval "$var=\"\${!var#\$lead}\"" "$var=\"\${!var%\$trail}\"" ;}
+#bash:
+#{ declare "$var=${!var#$lead}" ;declare "$var=${!var%$trail}" ;}
+
+#simple http server
+#Python 2
+#{ python -m SimpleHTTPServer 8000 ;}
+#Python 3
+#{ python3 -m http.server 8000 --directory /tmp/ ;}
+hserv()  { 	python3 -m http.server ${1:-8000} ;}  #local network: --bind 0.0.0.0
+#https://stackoverflow.com/questions/4139170/bind-httserver-to-local-ipport-so-that-others-in-lan-can-see-it
+hserv2() { 	php -S localhost:${1:-8000} ;}
+checkports() { 	sudo ss -tulpn | sed -nE '/LISTEN/ s/.*:([0-9]+)\s*.*/\1/ p' ;}
+
+#Perl - Insert lines after a match is found in a file
+#{ perl -pi -e '/module some_1/ and $_.="APPLY DELAY xx \nAPPLY LOADS  ld\n"' ;}
+#https://stackoverflow.com/questions/3422268/perl-insert-lines-after-a-match-is-found-in-a-file
+#Insert before a match
+#{ perl -0pe 's/#tmux/NEW_NEW_NEW\n$&/s' ;}
+#https://www.unix.com/shell-programming-and-scripting/111762-perl-insert-lines-before-lines.html
+
+#How to fill free memory? (testing)
+#{ </dev/zero head -c 2000m | tail ;}
+#https://unix.stackexchange.com/questions/99334/how-to-fill-90-of-the-free-memory/254976#254976?newreg=a01b8116518e4ba2a9b6786d3d6cd1ef
+
+#{ yes 0000000000000000 | head -c 2G >data.txt ;}
+#https://www.reddit.com/r/unix/comments/6gxduc/how_is_gnu_yes_so_fast/
+
+#How to remove one line from a file using Perl?
+#{ perl -ni -e 'print unless /whatever/' filename ;}
+#https://stackoverflow.com/questions/10166932/how-to-remove-one-line-from-a-file-using-perl/10167042
+
+#perl: how to remove particular word or pattern in between two patterns
+#{ perl -n -e 'print unless /pattern2/ .. /pattern2/' ;}
+#https://stackoverflow.com/questions/55845906/perl-how-to-remove-particular-word-or-pattern-in-between-two-patterns
+
+#grep for line and field (TSV) of pattern
+#usage: fldgrep PATTERN FILE.TSV
+fldgrep()
+{
+	awk -F"\t" -v target="$1" -v blue="\x1b[1;34m" -v red="\x1b[1;31m" -v reset="\x1b[0m" 'NR==1 {for (i=1;i<=NF;i++) a[i]=$i} NR>1 {for (j=1;j<=NF;j++) if ($j ~ target) {n=split($j,m,target,sep); printf("%s","line " blue NR reset ", field " blue j reset " (" blue a[j] reset "): "); for (k=1;k<=n;k++) printf("%s", m[k] red sep[k] reset); print ""}}' "$2"
+}
+#https://www.datafix.com.au/BASHing/2022-03-09.html
+
+#reduce pdf size
+reducepdf() {
+	gs -sDEVICE=pdfwrite \
+	-dCompatibilityLevel=1.4 \
+	-dPDFSETTINGS=/screen \
+	-dNOPAUSE \
+	-dQUIET \
+	-dBATCH \
+	-sOutputFile="${1%.pdf}_SMALL.pdf" \
+	"$1"
+}
+#The various tweaks to the -dPDFSETTINGS option are provided in the table below.
+#-dPDFSETTINGS Option	Description
+#-dPDFSETTINGS=/screen	Has a lower quality and smaller size. (72 dpi)
+#-dPDFSETTINGS=/ebook	Has a better quality, but has a slightly larger size (150 dpi)
+#-dPDFSETTINGS=/prepress	Output is of a higher size and quality (300 dpi)
+#-dPDFSETTINGS=/printer	Output is of a printer type quality (300 dpi)
+#-dPDFSETTINGS=/default	Selects the output which is useful for multiple purposes. Can cause large PDFS.
+#https://www.journaldev.com/34668/reduce-pdf-file-size-in-linux
+
+#libinput
+#{ xinput-list ;}
+#{ xinput set-prop 13 322 0.2 ;}
+#{ xinput set-prop 13 341 0 ;}
+
+#send quick mail (mutt hack)
+#usage: mail "[EMAIL].." [TEXT|ASCII FILE]               #simple message
+#usage: mail "[EMAIL].." [-a FILE].. [-s SUBJECT]        #attach (binary) files
+#usage: vipe | mail "[EMAIL].." SUBJECT                  #stdin
+mail()
+{ 	local text size subj
+	if [[ $1 = *\@* ]]         #e-mail address
+	then 	local EMAIL="$1" ;set -- "${@:2}"
+	fi
+	[[ $1 != \-\a ]] && [[ -e ${@:$#} ]] && set -- "${@:$#}" "${@:1:$# -1}" 
+        if [[ $1 = \-\a || $(file --mime "$1") = *charset=binary* ]]  #opt -a or binary
+	then 	[[ -e $1 ]] && set -- -a "$@"
+		size=$(wc -c <"$2")  subj="${3:-$2}" ;set -- "${@:1:2}" --
+	else 	[[ -t 0 ]] || subj="$*"
+		if [[ -f $1 ]]     #ascii file
+		then 	text=$(<"$1")  subj="${@:2} ${1##*/}"
+		elif [[ ! -t 0 ]]  #stdin
+		then 	text=$(cat)
+		else 	text="${*:?nothing to send}"
+		fi
+		size=$(LC_ALL=C ;echo "${#text}") ;set --
+	fi
+	subj="$subj ${text:0:100}" subj="${subj//[$IFS]/ }" subj="${subj:0:50}"
+	echo $size B \| $((size/(2**10) )) KB \| $((size/(2**20) )) MB $'\n'${EMAIL:?e-mail address required} - $subj
+	mutt -s "$subj" "$@" $(echo $EMAIL) <<<"$text"
+}
+alias m=mail
+#also see: xdg-email
+alias mailv='chatgpt.sh -w pt | mail'
+
+#xfce4 numlock keyboard
+#{ xfconf-query -c keyboards -lv | grep -i numlock ;}
+#{ xfconf-query -c keyboards -p /Default/Numlock -t bool -s true --create ;}
+#https://forum.xfce.org/viewtopic.php?id=13109
+
+#welcome message
+[[ -f ~/bin/welcome_message.sh ]] && . ~/bin/welcome_message.sh
+#{ fortune | cowsay | cowthink -sn | repo-elephant ;}
+
+#showerthoughts=$(curl -s --connect-timeout 5 -A '/u/<<<SEU USERNAME AQUI>>>>' \
+#'https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100' | \
+#python2.7 -c 'import sys, random, json; randnum = random.randint(0,99); response = json.load(sys.stdin)["data"]["children"][randnum]["data"]; print "\n\"" + response["title"] + "\""; print "    -" + response["author"] + "\n";')
+#echo $showerthoughts | cowsay | lolcat
+
+#ibge projeções população do brasil
+#ibgepop [id_estado]
+ibgepop()
+{
+	local localidade
+	localidade="$1"
+	[[ $localidade = *[a-zA-Z]* ]] && localidade=$(ibgepop_helperf "$1")
+	curl --header "$UAG" --compressed -L http://servicodados.ibge.gov.br/api/v1/projecoes/populacao/$localidade | jq .
+}
+ibgepop_helperf()
+{
+	local string
+	typeset -l string
+	string="$1"
+	curl --header "$UAG" --compressed -L http://servicodados.ibge.gov.br/api/v1/localidades/estados |
+	tr '[:upper:]' '[:lower:]' |
+	jq ".[] | (select(.sigla==\"${string}\") // select(.nome==\"${string}\")) | .id"
+}
+#https://servicodados.ibge.gov.br/api/docs/projecoes
+#https://servicodados.ibge.gov.br/api/docs/localidades
+	
+#reuters covid19
+#https://graphics.thomsonreuters.com/data/2020/coronavirus/tracking/global/data.json
+#CSSE covid19 archive repo
+#https://github.com/CSSEGISandData/COVID-19
+
+
+seed()
+{
+	cdump https://concursos.ibfc.org.br/informacoes/421/ 2>/dev/null | hf |
+	grep -i 'convocação .* posse'
+}
+
+####################
+ #####markets######
+####################
+alias binfo='~/bin/binfo.sh'
+alias cgk='~/bin/markets/cgk.sh -3'
+alias cmc='~/bin/markets/cmc.sh -3'
+alias myc='~/bin/markets/myc.sh -3'
+alias uol='~/bin/markets/uol.sh'
+alias cointop='/bin/cointop --cache-dir ~/.cache'
+alias ctop=cointop
+alias usd='cmc usd brl ;cgk usd brl ;uol.sh|sed -n 8p\;17p'
+
+#gold rate from UOL
+ouro()
+{
+	curl --compressed -sL -H"$UAG" "https://economia.uol.com.br/cotacoes/" |
+	sed -e 's/<[^>]*>//g' -e 's/\s\s*/ /g' |
+	grep -m1 -Eo 'Ouro.{25}' |
+	grep -Eo '.*[^- ][0-9][0-9][0-9]+,[0-9]+'
+}
+
+#mop - stocks the hacker way
+mop()
+{
+	go run ~/go/src/github.com/mop-tracker/mop/cmd/mop/main.go
+}
+#wallet and trading monitors
+#alias W=walletmonitor.sh
+#alias T=tradingview.sh
+
+
+##################################################
+############### FINANCIAL MARKETS ################
+##################################################
+
+#loss/gain reciprocal or symetrical ratio
+#usage: loss [+|-]VAL[%] [SCALE]
+#usage: VAL is an integer. Negative values are read as gains.
+loss()
+{
+	local u g
+	u=${1##+} u=${u%%%}
+	g=$(bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100")
+	if [[ -n $g ]] && [[ $u = *[0-9]* ]]
+	then 	if [[ $u = -* ]]
+		then 	printf "%4s: %6.${2:-4}f %%\n" gain ${u#-} loss ${g#-}
+		else 	printf "%4s  %6.${2:-4}f %%\n" loss $u gain $g
+		fi
+	else 	! printf 'err\nusage: loss [+|-]VAL[%%] [SCALE]\nexamp: loss 10%%; loss -2.30%%\n' >&2
+	fi
+}
+#fausto botelho: https://www.youtube.com/watch?v=yY7d6gOIynU
+#formula: 100/(100-loss)
+
+#lista de ações da bovespa b3
+blist()
+{
+	local i
+	if [[ -n "$*" ]]
+	then 	set -- $( tr '[:lower:]' '[:upper:]' <<< "$*" )
+	else 	printf 'uso: blist [LETRA|NUM]\n\n' >&2 ;set -- {A..Z} {0..9}
+	fi
+
+	for i
+	do 	printf 'Puxando %s..\r' "$i" 1>&2
+		curl -s "https://br.advfn.com/bolsa-de-valores/bovespa/$i" |
+			sed 's/<[^>]*>//g' | sed -n '/Ação/,/var ZD_USER/p' |
+			sed -e '1d' -e '$d' -e '/^\s*$/d' -Ee 's/[a-z ]([A-Z0-9]+)$/\t\1/' |
+			column -et -s$'\t' -NNOME,SIMBOLO -TNOME
+	done
+}
+
+
+#tesouro direto -- precos e taxas dos titulos
+tesouro()
+{
+	local url data
+	url=https://www.tesourodireto.com.br/json/br/com/b3/tesourodireto/service/api/treasurybondsinfo.json
+	data="$(curlu -L --compressed --insecure "$url" )"
+
+	jq '.response.TrsrBondMkt' <<<"$data"
+	jq -r '.response.TrsrBdTradgList[].TrsrBd |
+		"\(.nm)\t\(.FinIndxs| if .nm == "PREFIXADO" then "" else .nm end)+\(if .anulInvstmtRate == 0 then empty else .anulInvstmtRate end)%\t\(.minInvstmtAmt)\t\(.untrInvstmtVal)\t\(.mtrtyDt|.[:10])"' <<<"$data" |
+		sort | column -et -s$'\t'  -NTÍTULO,RENT/ANO,INVEST/MIN,PREÇO,VENCIMENTO -RRENT/ANO,INVEST/MIN,PREÇO
+	echo "<https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm>"
+
+}
+#url=https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm
+#url=http://www.tesouro.fazenda.gov.br/tesouro-direto-precos-e-taxas-dos-titulos
+#https://stackoverflow.com/questions/47593807/how-to-scrape-a-html-table-and-print-it-on-terminal-using-bash
+
+
+#ibge inflação brasileira IPCA - Variação mensal
+ipcab()
+{
+	local data mes ano v
+	(($#)) || printf %s\\n\\n 'uso: ipcab  ANO/MES  # >= 1980/01' >&2
+	
+	set -- "${@//[\/.-]}" ;[[ -n "$2" ]] && set -- "$1$2"
+	((${#1} == 4 && ${1:-0} >= 1980)) && set -- "${1}01" #ano+janeiro
+	((${#1} != 6 || ${1:-0} < 198001)) && set -- 199501  #199407 começo do plano real
+
+
+	data=$(curl --compressed -s "http://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=63&p=${1}-203701&ng=1(1)&c=")
+	set -- 1
+
+	#inflação variação mensal #cod:63
+	jq -er '.[0].var' <<<"$data" || return
+
+	jq -r '.[]|"\(.p)\t\(.v)"' <<<"$data" |
+	while read mes ano v
+	do 	set -- $(bc <<<"scale=16;
+			tval = (1 + ($v /100) ) * $1;
+			tvalp= (tval -1) * 100;
+			tval; tvalp ")
+		printf "%s\t%d\t%.2f%%\t%'.2f%%\t%.6f\n" "$mes" "$ano" "$v" "$2" "$1"
+	done | column -et -NMes,Ano,Var%Mes,Acu%Total,Fator -OAno,Mes,Var%Mes,Acu%Total,Fator -RVar%Mes,Acu%Total,Fator
+}
+#inflação variação mensal #cod:63
+#calculadora: https://www3.bcb.gov.br/CALCIDADAO/publico/corrigirPorIndice.do?method=corrigirPorIndice
+
+
+#ibge inflação brasileira IPCA - Variação acumulada no ano
+#uso: %s [ANO]  #ANO>=1980 e calcula de jan/ANO a DEZ/ANO_ATUAL-1 
+ipcab2()
+{
+	local data year yearend
+	#print usage if user did not supply any argument
+	(($#)) || printf %s\\n\\n 'uso: ipcab2 ANO  #ANO >= 1980' >&2
+	((${#1} == 4 && ${1:-0} >= 1980)) && set -- "${1}01" #ano+janeiro
+	((${#1} != 6 || ${1:-0} < 1980)) && set -- 199501  #199407 começo do plano real
+	
+	#inflação acumulada por ano #cod:69
+	data=$(curl -sLb non-existing "http://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=69&p=${1}-203012&ng=1(1)&c=") || return
+
+	jq -er '.[0].var' <<<"$data"
+	jq -r '.[]|"\(.p) \(.v)"' <<<"$data" | column -ets' ' -NMes,Ano,Acu%Ano -OAno,Mes,Acu%Ano
+	
+	#inflação acumulada a partir de ano especifico
+	yearend=$(($( date +%Y ) - 1))
+	year="${1:0:4}"
+	set -- 1 1 1
+
+	printf '\nPeríodo %s/jan - %s/dez\n' "$year" "$yearend"
+	for ((year=year;year<=yearend;++year))
+	do 	set -- $(bc <<<"scale=16;
+			val = $(jq -r ".[]|select(.p == \"dezembro ${year}\")|.v" <<<"$data");
+			tval = (1 + (val /100) ) * $2;
+			tvalp = (tval - 1) * 100;
+			val ;tval ;tvalp")
+		printf "%d\tdez\t%.2f%%\t%'.2f%%\t%.6f\n" "$year" "$1" "$3" "$2"
+	done | column -et -NAno,Mes,Ac%Ano,Acu%Total,Fator -RAc%Ano,Acu%Total,Fator 
+}
+#https://www.ibge.gov.br/estatisticas/economicas/precos-e-custos/9256-indice-nacional-de-precos-ao-consumidor-amplo.html?t=series-historicas&utm_source=landing&utm_medium=explica&utm_campaign=inflacao#plano-real-mes
+
+
+#american inflation
+ipca()
+{
+	if ((!$#))
+	then 	printf 'usage: ipca [series_id]\n' >&2
+		printf 'usage: ipca  .           #all series\n\n' >&2
+		set -- CUUR0000SA0
+	fi
+	curl 'https://download.bls.gov/pub/time.series/cu/cu.data.1.AllItems' | grep "$1" | column -t
+}
+#??Daily query limit Version 1.0 (Unregistered) 25
+#https://www.bls.gov/
+#also good:https://download.bls.gov/pub/time.series/cu/cu.data.0.Current
+
+
+#american inflation
+ipca2()
+{
+	curl -sL 'https://www.usinflationcalculator.com/inflation/consumer-price-index-and-annual-percent-changes-from-1913-to-2008/' | 
+		sed -n '/<tbody>/,/<\/tbody>/p' | sed -e 's/<[^>]*>//g' -e 's/&.*;//g' -e 's/^\s*//g' |
+		sed -n '/Year/,$p' | sed ':a;N;s/\n\(.\)/ \1/;ta' | sed 's/^\s//g' | column -ts' ' -o' '
+}
+#https://www.usinflationcalculator.com
+
+#stats from <xe.com>
+#30 and 60-day hig, low and avg
+#{ curl -sL 'https://www.xe.com/api/stats.php?fromCurrency=GBP&toCurrency=USD';}
+
+#metal rates from kitco
+kitco()
+{
+	local colconf c
+	#parse options
+	while getopts hn c
+	do 	case $c in
+			h*) cat <<-!
+			usage: kitco [CURRENCY] [UNIT]   #convert opts
+			usage: kitco -n NUM              #kitco news
+			usage: kitco -h                  #help page
+			currs: USD, AUD, CAD, EUR, GBP, JPY, CHF, CNY,
+			       HKD, BRL, INR, MXN, RUB and ZAR
+			units: ounce, gram, kilo or tola
+			defts: USD ounce'
+			!
+			return ;;
+			n*) #news
+			curl -s "https://proxy.kitco.com/getvnews?type=json&df=2&max=${2:-8}" -H 'Origin: https://www.kitco.com' \
+				| jq  -r '.News.videoNews|reverse[]|.fullHeadline,.publishDate,.description,""' \
+				| sed 's/<br\/>//g'
+			return ;;
+			\?) return 1
+		esac
+	done
+	shift $((OPTIND - 1))
+
+	#arrange parameters
+	set -- $( tr A-Z a-z <<< "$*" )
+	case "$1" in 	ounce|gram|kilo|tola) set -- "$2" "$1" ;;esac
+	case "$2" in 	ounce|gram|kilo|tola) false;; 	*) set -- "$1" ounce;; esac
+	
+	#check if $1 is empty
+	#set default currency
+	if [[ -z "$1" ]]
+	then 	set -- USD "$2"
+	#set all uppercase
+	else 	set -- "$(tr a-z A-Z <<< "$1")" "$2"
+	fi
+	if ((${#1} - 3))
+	then echo 'Err: invalid currency symbol' >&2 ;return 1
+	fi
+
+	#set columns
+	(( COLUMNS < 102 )) && colconf=( -TTIME -HUNIT,CUR )
+	
+	#ny spot
+	printf 'New York Spot Price\n'
+	#mkt status
+	curl -Ls 'https://proxy.kitco.com/getMarketStatus?market=1' -H 'Origin: https://www.kitco.com'
+	#table
+	curl -Ls "https://proxy.kitco.com/getPM?symbol=AU,AG,PT,PD,RH&currency=${1}&unit=${2}&market=1" -H 'Origin: https://www.kitco.com' | sed -e 's/\s/T/' -e 's/\r//g' | column -ts, -NX,CUR,UNIT,TIME,BID,MID,ASK,CHG,CHG%,LOW,HIGH -RCUR,UNIT,BID,MID,ASK,CHG,CHG%,LOW,HIGH -OX,BID,MID,ASK,CHG,CHG%,LOW,HIGH,CUR,UNIT,TIME ${colconf[@]}
+
+	#world prices
+	printf '\nThe World Spot Price - Asia/Europe/NY markets\n'
+	#mkt status
+	curl -Ls 'https://proxy.kitco.com/getMarketStatus?market=4' -H 'Origin: https://www.kitco.com'
+	#table
+	curl -Ls "https://proxy.kitco.com/getPM?symbol=AU,AG,PT,PD,RH&currency=${1}&unit=${2}&market=4" -H 'Origin: https://www.kitco.com' | sed -e 's/\s/T/' -e 's/\r//g' | column -ts, -NX,CUR,UNIT,TIME,BID,MID,ASK,CHG,CHG%,LOW,HIGH -RCUR,UNIT,BID,MID,ASK,CHG,CHG%,LOW,HIGH -OX,BID,MID,ASK,CHG,CHG%,LOW,HIGH,CUR,UNIT,TIME ${colconf[@]}
+	
+	echo '<https://www.kitco.com/market/>'
+}
+#<<Exchange rates displayed are the middle point between bid and ask.>>
+
+
+#metal rates from infomine
+metals()
+{
+        curl -sL https://www.mining.com/markets/ |
+                grep "class='commodity-name'" |
+                sed 's/<div/\n&/g ;s/<[^>]*>//g'
+        echo '<https://www.mining.com/markets/>' >&2
+}
+#https://www.mining.com/markets/
+
+#yahoo finance hack -- long ticker
+#https://query1.finance.yahoo.com/v7/finance/quote?symbols=${SYMBOL:-TSLA}&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance
+
+#currency, language, triggerable, region, tradeable, priceHint, messageBoardId
+#shortName -- symbol short name; gmtOffSetMilliseconds
+#https://query1.finance.yahoo.com/v7/finance/quote?symbols=DANSKE.CO,ERIC-B.ST,FPKPEN.CO,SSO.OL,VWS.CO&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance
+
+
+#yahoo finance hack -- data from chart api
+#usage: yfin2 [-jh] 'symbol' [range] [granularity]
+yfin2()
+(
+	#parse some opts
+	if [[ "$1" = -h ]]
+	then 	printf 'usage: yfin2 [-jh] SYMBOL [RANGE] [GRANULARITY]\n'
+		return
+	elif [[ "$1" = -j ]]
+	then 	PJSON=1
+		set -- "${@:2:4}"
+	fi
+	
+	#set symbol to uppercase (POSIX-compatible)
+	SYMBOL="$( tr '[:lower:]' '[:upper:]' <<< "${1:-TSLA}" )"
+
+	#get json
+	YJSON="$( curl -s "https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOL}?region=US&lang=en-US&includePrePost=true&interval=${2:-1d}&range=${3:-1d}&corsDomain=finance.yahoo.com&.tsrc=finance" --compressed )"
+
+	#print json?
+	if [[ -n "$PJSON" ]]
+	then
+		printf '%s\n' "$YJSON"
+		return
+	#check for error response
+	elif jq -er '.chart.error' <<< "$YJSON" >/dev/null 2>&1
+	then
+		jq -r '.chart.error.description' <<< "$YJSON"
+		return 1
+	fi
+
+	#set timezone for displaying times
+	#TZ="GMT"
+	#set timezone according to info from yahoo
+	TZ="$(jq -r '.chart.result[].meta.exchangeTimezoneName//.timezone' <<< "$YJSON")"
+	export TZ
+	
+	#print ticker config
+	jq -r '.chart.result[]|
+	 		(.meta|
+				"Ticker configuration",
+				"Granularity and range",
+				"Available ranges:",
+				(.validRanges| @sh),
+				"Range___: \(.range)  Grain___: \(.dataGranularity)",
+				"",
+				"Current trading period",
+				(.currentTradingPeriod|
+					(.pre|
+					"PreMkt_T: \(.start//empty|tonumber|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))  \(.end//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))"
+					),
+					(.regular|
+					"RegMkt_T: \(.start//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))  \(.end//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))"
+					),
+					(.post|
+					"PostMktT: \(.start//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))  \(.end//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))"
+					)
+				),
+				""
+			)' <<<"$YJSON"
+
+	#tickers and indicators
+	jq -r '.chart.result[]|
+		"Symbol information",
+		"StartTim: \(.timestamp[0]//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
+		"EndTime_: \(.timestamp[1]//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
+		(.meta|
+			"Symbol__: \(.symbol)  Currency: \(.currency//empty)",
+			"InstType: \(.instrumentType//empty)  Exchange: \(.exchangeName//empty)",
+			"Timezone: \(.exchangeTimezoneName//empty)  \(.timezone)",
+			"1stTrade: \(.firstTradeDate//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))"
+		),
+		"",
+		"Indicators",
+		(.indicators.quote[]|
+			"Volume__: \(if .volume[1] != null and .volume[1] != 0 then .volume[1] else .volume[0]//"??" end)",
+			"High____: \(.high[0]//empty)",
+			"Low_____: \(.low[0]//empty)",
+			"Open ___: \(.open[0]//empty)",
+			"Close __: \(.close[0]//empty)"
+		),
+		"",
+		"Ticker",
+		(.meta|
+			"Mkt_Time: \(.regularMarketTime|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
+			"MktT_UTC: \(.regularMarketTime//empty|strftime("%Y-%m-%dT%H:%M:%SZ"))",
+			"PrevClse: \(.chartPreviousClose//empty)",
+			"MktPrice: \(.regularMarketPrice//empty)"
+			#"PriceHnt: \(.priceHint//empty)"
+		)
+		' <<<"$YJSON"
+)
+
+
+#yahoo finance symbol list
+ylist()
+{
+	#assign local vars
+	local LISTF TMPF
+	#local file?
+	LISTF="$HOME/arq/docs/yahooFinanceSymbols/yahooFinanceSymbols.txt" 
+	#temp file for download
+	TMPF='${TMPDIR:-/tmp}/yahooFinanceSymbols.txt'
+
+	#if there is no local copy, try to download it
+	if [[ ! -e "$LISTF" ]]
+	then 	#check for downloaded temp file
+		if [[ ! -e "$TMPF" ]]
+		then 	curl -L -o "$TMPF" 'https://github.com/mountaineerbr/extra/raw/master/yahooFinanceSymbols/yahooFinanceSymbols.txt' || return
+			printf 'File at %s\n' "$TMPF" >&2
+		fi
+		#set new path
+		LISTF="$TMPF"
+	fi
+	column -et -s $'\t' -N'TICKER,NAME,EXCHANGE,CATEGORY,COUNTRY' -T'CATEGORY,NAME' "$LISTF"
+}
+
+#nasdaq stock symbols
+nlist()
+{
+	local line
+	curl --compressed 'ftp://ftp.nasdaqtrader.com/symboldirectory/'|
+		sed 's/<[^>]*>//g' | sort -nk3 | awk '$4{print $4}' |
+		while read line
+		do 	#for line in nasdaqlisted.txt otherlisted.txt
+			printf 'Fetching %s\r' "$line" >&2
+			curl --compressed "ftp://ftp.nasdaqtrader.com/symboldirectory/$line"
+		done
+}
+#https://quant.stackexchange.com/questions/1640/where-to-download-list-of-all-common-stocks-traded-on-nyse-nasdaq-and-amex
+
+#slightly ugly bash one-liner for a sorted json array
+#of nasdaq stock symbols
+nlistjson()
+{
+	echo "[\"$(echo -n "$(echo -en "$(curl -s --compressed 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt' | tail -n+2 | head -n-1 | perl -pe 's/ //g' | tr '|' ' ' | awk '{printf $1" "} {print $4}')\n$(curl -s --compressed 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt' | tail -n+2 | head -n-1 | perl -pe 's/ //g' | tr '|' ' ' | awk '{printf $1" "} {print $7}')" | grep -v 'Y$' | awk '{print $1}' | grep -v '[^a-zA-Z]' | sort)" | perl -pe 's/\n/","/g')\"]"
+}
+#ref:?
+
+#curl cryptocurrencies exchange rates
+#follow igor_chbin at <twitter.com/igor_chubin>
+#multiple symbols table
+rates()
+{
+	case "${*}" in
+		-h|help|:help)
+			curl -s 'rate.sx/:help';;
+		*)
+			curl -s 'rate.sx/?TFq' | sed -e '1,6d' -e '$d';;
+	esac
+}
+
+#single symbol graph
+#usage: rate [from_currency] [to_currency] [@date|?T|..]
+rate()
+{
+	if [[ -z "$2" ]] || [[ "$2" = [0-9]* ]]
+	then 	set -- "$1" usd "$2"
+	else 	case "${*}" in
+			-h|help|:help)
+				curl -s 'rate.sx/:help'
+				printf '\nusage: rate [from_currency] [to_currency] [@date|?T|..]\n' 
+				return;;
+		esac
+	fi
+	curl -s "${2:-usd}.rate.sx/${1:-btc}${3}" | awk NF
+}
+
+
+#fun with <datahub.io>
+#time series
+gold()
+{
+	case "$1" in
+		a*) #annual
+			curl -sL 'https://datahub.io/core/gold-prices/r/0.json'
+			;;
+		*)  #monthly
+			curl -sL 'https://datahub.io/core/gold-prices/r/1.json'
+			;;
+	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
+}
+
+#oil brent 
+brent()
+{
+	case "$1" in
+		a*) #annual
+			curl -sL 'https://datahub.io/core/oil-prices/r/3.json'
+			;;
+		m*) #monthly
+			curl -sL 'https://datahub.io/core/oil-prices/r/2.json'
+			;;
+		w*) #weekly
+			curl -sL 'https://datahub.io/core/oil-prices/r/1.json'
+			;;
+		*)  #daily
+			curl -sL 'https://datahub.io/core/oil-prices/r/0.json'
+			;;
+	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
+}
+alias brenty=brent
+
+#oil wti 
+wti()
+{
+	case "$1" in
+		a*) #annual
+			curl -sL 'https://datahub.io/core/oil-prices/r/7.json'
+			;;
+		m*) #monthly
+			curl -sL 'https://datahub.io/core/oil-prices/r/6.json'
+			;;
+		w*) #weekly
+			curl -sL 'https://datahub.io/core/oil-prices/r/5.json'
+			;;
+		*)  #daily
+			curl -sL 'https://datahub.io/core/oil-prices/r/4.json'
+			;;
+	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
+}
+
+#gas
+gas()
+{
+	case "$1" in 
+		m*) #monthly
+			curl -sL 'https://datahub.io/core/natural-gas/r/1.json'
+			;;
+		*)  #daily
+			curl -sL 'https://datahub.io/core/natural-gas/r/0.json'
+			;;
+	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
+}
+
+#consumer price index
+cpi()
+{ 
+	curl -sLb non-existing 'https://datahub.io/core/cpi/r/0.json' |
+		jq -r '.[]|"\(.Year)=\(.CPI)=\(.["Country Name"])"' | 
+		column -ets= -NYEAR,CPI,COUNTRY
+}
+
+#corruption perception
+corruption()
+{ 
+	curl -sL 'https://datahub.io/core/corruption-perceptions-index/r/0.json' |
+		jq -r '.[]|keys[] as $k | "\($k) \(.[$k])"' | sed 's/^Jurisdiction.*/&\n/'
+}
+
+#world population
+wpop2()
+{ 
+	curl -sL 'https://pkgstore.datahub.io/core/population-growth-estimates-and-projections/population-estimates_json/data/1d29be418daf875533c4bd4b5d0a5963/population-estimates_json.json' |
+		jq -r '.[]|"\(.Year)\t\(.Population)\t\(.Region)"' |
+		sort -t$'\t' -k3 |column -ets$'\t' -NYEAR,POPULATION,REGION
+}
+
+
+#btc halving/supply tables
+btcsupply()
+{
+	w3m -dump https://en.bitcoin.it/wiki/Controlled_supply | sed -En '/^Projected/,/^(\*|Note)/p'
+}
+
+#coin market cap stats
+cmcstats()
+{
+	{ 	curl -sL "https://web-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=10&start=1"
+		curl -sL "https://web-api.coinmarketcap.com/v1/global-metrics/quotes/latest"
+	} | jq
+}
+
+#btc historical prices
+#usage: cmcbtchist VS_CURRENCY CRYPTO_SLUG START_TIME END_TIME
+cmcbtchist()
+{
+	local vscur slug start end
+	vscur="${1:-USD}"
+	slug="${2:-bitcoin}"
+	start="${3:-1367020800}"  #Sat 27 Apr 00:00:00 UTC 2013
+	end="${4:-$( date -udtomorrow0 +%s )}"
+
+	curl -sL "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical?convert=${vscur}&slug=${slug}&time_end=${end}&time_start=${start}" | jq
+
+	#if no positional argument, print usage
+	if [[ -z "$1" ]]
+	then 	echo 'usage: cmcbtchist VS_CURRENCY CRYPTO_SLUG START_TIME END_TIME' >&2
+		echo 'usage: cmcbtchist USD bitcoin' >&2
+	fi
+}
+
+
+#sochain api
+sochain()
+{
+	local uri
+	case "$1" in
+		balance | bal* | a*)
+			uri="get_address_balance/${3:-bitcoin}/${2:?address required}/${4:-1}" ;;
+		received | rec*)
+			uri="get_address_received/${3:-bitcoin}/${2:?address required}" ;;
+		spent | sp*)
+			uri="get_address_spent/${3:-bitcoin}/${2:?address required}" ;;
+		valid | val*)
+			uri="is_address_valid/${3:-bitcoin}/${2:?address required}" ;;
+		txin | in)
+			uri="get_tx_inputs/${3:-bitcoin}/${2:?transaction required}" ;;
+		txout | out)
+			uri="get_tx_outputs/${3:-bitcoin}/${2:?transaction required}" ;;
+		txconfirmed | t*c*)
+			uri="is_tx_confirmed/${3:-bitcoin}/${2:?transaction required}" ;;
+		txspent | t*s*)
+			uri="is_tx_spent/${3:-bitcoin}/${2:?transaction required}" ;;
+		tx | t*)
+			uri="get_tx/${3:-bitcoin}/${2:?transaction required}" ;;
+		blkhash | b*h*)
+			uri="get_blockhash/${3:-bitcoin}/${2:?block required}" ;;
+		blk | b*)
+			uri="get_block/${3:-bitcoin}/${2:?block required}" ;;
+		price | p*)
+			uri="get_price/${2:?coin required}/${3:-USD}" ;;
+		info | i*)
+			uri="get_info/${2:-bitcoin}" ;;
+		help | h*)
+			printf '%s\n' options: balance addrreceived addrspent isvalid txin txout txconfirmed txspent blkhash blk price info
+			return 0
+			;;
+	esac
+	[[ -z "$uri" ]] && echo "option required" >&2 && return 1
+	curl -s "https://sochain.com/api/v2/$uri"
+	echo
+}
+#https://sochain.com/api
+#SoChain allows 300 requests/minute free-of-charge
+
+#shell cat-like function
+catf() { 	printf '%s\n' "$(</dev/stdin )" ;}
+
+##################################################
+############# END FINANCIAL MARKETS ##############
+##################################################
+
+#cursor position (row)
+#{ __clr_ttystf; printf '\e[6n' >&2; IFS= read -rsdR CUR_ROW; CUR_ROW="${CUR_ROW##*;}" ;}
+#https://stackoverflow.com/questions/2575037/how-to-get-the-cursor-position-in-bash
+
+#return from a script if it is sourced
+#{ [[ ${BASH_SOURCE[0]} != "${0}" ]] && return 0; }
+
+alias pver='curl -\# https://github.com/yshui/picom/releases | grep -F '"'"'class="Link--primary Link"'"'"' | hf | sed "s/ /\n/g"'
