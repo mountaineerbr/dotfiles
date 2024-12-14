@@ -529,6 +529,10 @@ set undofile
 " ( Default: 1000 for Unix )
 set undolevels=3000
 
+"TIP: move through history branches!
+" type g- and g+
+
+
 
 " BACKUP
 

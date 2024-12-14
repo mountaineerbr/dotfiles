@@ -1234,6 +1234,7 @@ upchatall()
 	gitup;
 }
 
+alias ch='chatgpt.sh -cc'
 alias chat='chatgpt.sh -cc --google'
 alias unix="chatgpt.sh -..unix -cc -4000 --md --goo"
 alias unix2="chatgpt.sh -..unix -cc -4000 --mistral -mcodestral-latest"
@@ -3375,6 +3376,23 @@ plot4()
 #http://www.physics.smu.edu/fattarus/GnuplotTutorial.html
 #https://www.datafix.com.au/BASHing/2019-06-21.html
 
+plot_stddev()
+{
+    awk '
+    {sum+=$1; sumsq+=$1*$1; data[NR]=$1}
+    END {
+        mean=sum/NR
+        stddev=sqrt(sumsq/NR - mean*mean)
+        for(i=1;i<=NR;i++)
+            print (data[i]-mean)/stddev
+    }' | gnuplot -p -e '
+set title "Normalized Distribution";
+set ylabel "Density Estimate";
+set xlabel "Standard Deviations";
+plot "-" using 1:(1.0) smooth kdensity title "Density"'
+}
+
+
 #Get the list of functions in a script
 #get_functions() {
 #    # Usage: get_functions
@@ -3684,6 +3702,17 @@ SUM2()
 #https://unix.stackexchange.com/questions/13731/is-there-a-way-to-get-the-min-max-median-and-average-of-a-list-of-numbers-in
 #https://www.gnu.org/software/datamash/examples/
 #https://www.programmersought.com/article/92546043400/
+
+#std deviation
+SUM3()
+{
+	perl -M'List::Util qw(sum max min)' -M'Statistics::Descriptive' -MPOSIX -0777 -a -ne '
+        $stats = Statistics::Descriptive::Full->new();
+        $stats->add_data(@F);
+        printf "%-7s : %'".${1:-4}"'f\n", "Sum", $stats->sum, "Min", $stats->min, "Max", $stats->max, "Average", $stats->mean, "Median", $stats->median,  "Values",
+scalar(@F);
+        printf "%-7s : %'".${1:-4}"'f\n", "StdDev", $stats->standard_deviation, "Skewness", $stats->skewness();'
+}
 
 #add numbers
 #adds newline-separated numbers from stdin
@@ -4174,7 +4203,7 @@ mail()
 	subj="$subj ${text:0:100}" subj="${subj//[$IFS]/ }" subj="${subj:0:50}"
 	echo $size B \| $((size/(2**10) )) KB \| $((size/(2**20) )) MB $'\n'${EMAIL:?e-mail address required} - $subj
 	mutt -s "$subj" "$@" $EMAIL <<<"$text" >/dev/null 2>&1 &
-	echo pid=$! >&2;
+	#echo pid=$! >&2;
 }
 alias m=mail
 #also see: xdg-email

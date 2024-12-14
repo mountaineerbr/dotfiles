@@ -1,5 +1,5 @@
 # XScreenSaver Preferences File
-# Written by xscreensaver-settings 6.06 for jsn on Tue Mar  7 20:01:26 2023.
+# Written by xscreensaver-settings 6.09 for jsn on Mon Sep 23 10:32:37 2024.
 # https://www.jwz.org/xscreensaver/
 
 timeout:	0:10:00
@@ -26,12 +26,12 @@ dpmsOff:	4:00:00
 grabDesktopImages:  False
 grabVideoFrames:    False
 chooseRandomImages: True
-imageDirectory:	~/Documents/Pictures/
+imageDirectory:	~/Documents/Pictures/SDO/
 
 mode:		random
-selected:	-1
+selected:	156
 
-textMode:	file
+textMode:	literal
 textLiteral:	XScreenSaver
 textFile:	
 textProgram:	fortune
@@ -290,6 +290,12 @@ programs:								      \
   GL: 				nakagin --root				    \n\
   GL: 				squirtorus --root			    \n\
   GL: 				hextrail --root				    \n\
+  GL: 				cubocteversion --root			    \n\
+				droste --root				    \n\
+  GL: 				papercube --root			    \n\
+  GL: 				skulloop --root				    \n\
+  GL: 				highvoltage --root			    \n\
+  GL: 				kallisti --root				    \n\
 
 
 pointerHysteresis:  10
