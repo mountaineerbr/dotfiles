@@ -1239,7 +1239,7 @@ alias chat='chatgpt.sh -cc --google'
 alias unix="chatgpt.sh -..unix -cc -4000 --md --goo"
 alias unix2="chatgpt.sh -..unix -cc -4000 --mistral -mcodestral-latest"
 alias pt='chatgpt.sh -cc..pt'
-alias marv="chat -60 -cc --frequency-penalty=0.5 --temp=0.5 --top_p=0.3 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
+alias marv="chat --time -256- -cc --frequency-penalty=0.7 --temp=0.8 --top_p=0.4 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
 alias dchat=$HOME/bin/openai/debug.chatgpt.sh
 alias chatd='vimdiff ~/bin/chatgpt.sh ~/www/lab-shellchatgpt/chatgpt.sh'
 
