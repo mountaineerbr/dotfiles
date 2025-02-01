@@ -379,7 +379,7 @@ alias ag='/usr/bin/ag --nofollow --hidden --smart-case'
 #user agent
 #usage: curl/wget --header "$UAG"
 #chrome on windows 10
-UAG='user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36'
+UAG='user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 #simple
 UAG2='user-agent: Mozilla/5.0 Gecko'
 
@@ -1166,11 +1166,11 @@ upchat()
 	cd ~/www/lab-shellchatgpt/man || return
 
 	~/bin/openai/chatgpt-test.sh || return 1
-	((1+SKIP)) ||
+	((SKIP)) ||
 	/usr/bin/diff -q $f1 $f2 &>/dev/null ||
 	local msg=$( { 	/usr/bin/diff ~/www/lab-shellchatgpt/chatgpt.sh ~/bin/chatgpt.sh ;
 			/bin/diff ~/www/lab-shellchatgpt/README.md <(gd fenixdragao shellChatGPT README.md 2>/dev/null);
-		} | ~/bin/chatgpt.sh -mgpt-4o -mgpt-4-0125-preview -Ecc..unix -512 $'Please, create a simple commit message for bash chatgpt.sh script update. The commit message is very concise. Always comment when there are very important changes in code unmentioned. Do not repeat developer comments or diff output because these will already be available in the commit head itself. Explain what effects the update may have that have not been explicitly mentioned as far as you can see. Be succinct.' "${@:+$'\n\n'Developer comments: $*$'\n\n'}" $'\n\nDIFF OUTPUT:\n\n')  #git diff --cached
+		} | ~/bin/chatgpt.sh --git -Ecc..unix -512 $'Please, create a simple commit message for bash chatgpt.sh script update. The commit message is very concise. Always comment when there are very important changes in code unmentioned. Do not repeat developer comments or diff output because these will already be available in the commit head itself. Be succinct.' "${@:+$'\n\n'Developer comments: $*$'\n\n'}" $'\n\nDIFF OUTPUT:\n\n')  #git diff --cached
 	printf 'Diff %%%f\n' $(bc <<<"scale=8; ($(diff -y --suppress-common-lines $f1 $f2 | wc -l)/$(wc -l <$f2))*100");
 
 	printf 'press\r' >&2; (read);
@@ -1234,14 +1234,13 @@ upchatall()
 	gitup;
 }
 
-alias ch='chatgpt.sh -cc'
-alias chat='chatgpt.sh -cc --google'
-alias unix="chatgpt.sh -..unix -cc -4000 --md --goo"
-alias unix2="chatgpt.sh -..unix -cc -4000 --mistral -mcodestral-latest"
+alias chat='chatgpt.sh -cc --git --time'
+alias goo='chat --goo -m gemini-2.0-flash-thinking-exp-01-21  -8000'
+alias unix="chatgpt.sh -..unix -cc -4000 --md --goo -m gemini-2.0-flash-thinking-exp-01-21"
 alias pt='chatgpt.sh -cc..pt'
 alias marv="chat --time -256- -cc --frequency-penalty=0.7 --temp=0.8 --top_p=0.4 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
+alias learn='chatgpt.sh -cc -6000 --goo --top-p 0.95 --top-k 64 -m learnlm-1.5-pro-experimental'
 alias dchat=$HOME/bin/openai/debug.chatgpt.sh
-alias chatd='vimdiff ~/bin/chatgpt.sh ~/www/lab-shellchatgpt/chatgpt.sh'
 
 lchat()
 {
@@ -1573,6 +1572,14 @@ piponly()
 	       	echo pip-only: $x;
        	done;
 }
+
+#create and use python env
+activate()
+{
+	#python -m venv ~/venv
+	source ~/venv/bin/activate 
+}
+#exit: deactivate
 
 #list aur packages
 alias aurl='curl https://aur.archlinux.org/packages.gz'
@@ -2037,7 +2044,7 @@ alias ff=firefox
 
 #URL lists (from ugrep.sh)
 #firefox user database
-FFUSER="$HOME/.mozilla/firefox/sdqosrgm.jsn_firefox/places.sqlite"
+FFUSER="$HOME/.mozilla/firefox/pkh1bv9w.jsn_new/places.sqlite"
 #google chrome user database
 GCUSER="$HOME/.config/google-chrome/Default/History"
 #temp file

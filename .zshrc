@@ -503,7 +503,7 @@ up-history-hack()
 		((CURSOR==${#BUFFER})) && CURSORLAST=;
 		CURSOR=${CURSORLAST:-${#BUFFER}};
 	else
-		zle .${1:-up}-line-or-search ${LBUFFER%% *}; #${LBUFFER%% *}
+		zle .${1:-up}-line-or-search ${LBUFFER};
 		CURSOR=${cursor:-${#BUFFER}};
 		CURSORLAST=;
 	fi
