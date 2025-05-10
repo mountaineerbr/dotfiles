@@ -380,6 +380,7 @@ alias ag='/usr/bin/ag --nofollow --hidden --smart-case'
 #usage: curl/wget --header "$UAG"
 #chrome on windows 10
 UAG='user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+#User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0
 #simple
 UAG2='user-agent: Mozilla/5.0 Gecko'
 
@@ -1168,11 +1169,11 @@ upchat()
 	~/bin/openai/chatgpt-test.sh || return 1
 	((SKIP)) ||
 	/usr/bin/diff -q $f1 $f2 &>/dev/null ||
-	local msg=$( { 	/usr/bin/diff ~/www/lab-shellchatgpt/chatgpt.sh ~/bin/chatgpt.sh ;
+	: || local msg=$( { 	/usr/bin/diff ~/www/lab-shellchatgpt/chatgpt.sh ~/bin/chatgpt.sh ;
 			/bin/diff ~/www/lab-shellchatgpt/README.md <(gd fenixdragao shellChatGPT README.md 2>/dev/null);
 		} | ~/bin/chatgpt.sh --git -Ecc..unix -512 $'Please, create a simple commit message for bash chatgpt.sh script update. The commit message is very concise. Always comment when there are very important changes in code unmentioned. Do not repeat developer comments or diff output because these will already be available in the commit head itself. Be succinct.' "${@:+$'\n\n'Developer comments: $*$'\n\n'}" $'\n\nDIFF OUTPUT:\n\n')  #git diff --cached
-	printf 'Diff %%%f\n' $(bc <<<"scale=8; ($(diff -y --suppress-common-lines $f1 $f2 | wc -l)/$(wc -l <$f2))*100");
 
+	printf 'Diff %%%f\n' $(bc <<<"scale=8; ($(diff -y --suppress-common-lines $f1 $f2 | wc -l)/$(wc -l <$f2))*100");
 	printf 'press\r' >&2; (read);
 
 	~/bin/md2man.sh chatgpt.sh.1.md
@@ -1236,7 +1237,7 @@ upchatall()
 
 alias chat='chatgpt.sh -cc --git --time'
 alias goo='chat --goo -m gemini-2.0-flash-thinking-exp-01-21  -8000'
-alias unix="chatgpt.sh -..unix -cc -4000 --md --goo -m gemini-2.0-flash-thinking-exp-01-21"
+alias unix="chatgpt.sh -..unix -cc -4000 --md --goo"
 alias pt='chatgpt.sh -cc..pt'
 alias marv="chat --time -256- -cc --frequency-penalty=0.7 --temp=0.8 --top_p=0.4 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
 alias learn='chatgpt.sh -cc -6000 --goo --top-p 0.95 --top-k 64 -m learnlm-1.5-pro-experimental'
@@ -2167,24 +2168,13 @@ gsitemap()
 #https://bbs.archlinux.org/viewtopic.php?id=271469
 
 #weather forecast
-#google 
-wf()
-{
-	local location
-	location="${*:-sao paulo}" location="${location// /%20}"
-	curl -fsL --header "$UAG" "https://www.google.com/search?q=weather+${location}" |
-		sed 's|<[^/]*>[^>]*>|&\n|g' |
-		grep -E -e '"wob_(wc|loc|dts|dcp|dc|pp|hm|ws)"' -e id=\"wob_t\" -e \"wob_t\?tm\" |
-		sed -e 's/<[^>]*>//g' -e '1d' -e'2s/$/ °C/' -e '3s/$/ °F/'
-}
-
 #requires the script 'ansiweather'
-wf2() { 	ansiweather -l "${*:-${CITY:-londrina}}" ;}
+wf() { 	ansiweather -l "${*:-${CITY:-londrina}}" ;}
 
 #weather forecast (previsão do tempo)
 #and moon phase forecast
 #type :help to see options summary
-wf3()
+wf2()
 {
     local request="wttr.in/${1}"  #it chooses location automatically
     [[ "$COLUMNS" -lt 125 ]] && request+='?nMAFqT'
@@ -2713,10 +2703,12 @@ alias chessonline='telnet freechess.org 5000'
 #aria2
 alias a2='aria2c'
 
+#webcam adjustments: guvcview
 
 #youtube download fun
 #command:
 YTDL_CMD=yt-dlp
+#yt-dlp --proxy socks5://127.0.0.1:9050  #tor
 
 #YOUTUBE-DL WRAPPERS
 #	yt  [URL..]     -- download wrapper, restrict filenames
@@ -3128,7 +3120,7 @@ halving()
 	
 	printf "Bitcoin Halving\\nDays left: %6d\\nHeight   : %6d/%d\\n" $(( ( (tgt-hgt)*(10*60))/(24*60*60) )) "$hgt" "$tgt"
 	secs=$(( (tgt-hgt)*(10*60) ))
-	datediff.sh -vvv ${secs}seconds 2>/dev/null
+	datediff.sh -vv ${secs}seconds 2>/dev/null
 	date -R -d"${secs}seconds"
 }
 _halving()
