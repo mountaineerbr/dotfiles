@@ -1,7 +1,7 @@
 #
 # ~/.rc
 # shell functions
-# 2024  by mountaineerbr
+# 2025  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 #                        __       _                  ___
 #  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
@@ -69,7 +69,19 @@ fi
 
 #sources
 [[ -e ~/.apikeys ]] && . ~/.apikeys
-[[ -e ~/.rc_xtra ]] && . ~/.rc_xtra
+
+#welcome message
+[[ -e ~/bin/welcome_message.sh ]] && . ~/bin/welcome_message.sh
+#{ fortune | cowsay | cowthink -sn | repo-elephant ;}
+
+#showerthoughts=$(curl -s --connect-timeout 5 -A '/u/<<<SEU USERNAME AQUI>>>>' \
+#'https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100' | \
+#python2.7 -c 'import sys, random, json; randnum = random.randint(0,99); response = json.load(sys.stdin)["data"]["children"][randnum]["data"]; print "\n\"" + response["title"] + "\""; print "    -" + response["author"] + "\n";')
+#echo $showerthoughts | cowsay | lolcat
+
+#return from a script if it is sourced
+#{ [[ ${BASH_SOURCE[0]} != "${0}" ]] && return; }
+
 
 # Set colorful PS1 only on colorful terminals.
 # dircolors --print-database uses its own built-in database
@@ -228,6 +240,17 @@ extract()
 }
 #also check 'unp' script
 
+#extract zip files to stdout
+#{ bsdtar -xvf - -O ;}
+#{ gzip -dc ;}
+
+#ultra compress
+zultra()
+{
+	7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "${1}.7z" "${@:?file required}"
+
+}
+
 #bigger font for terminal
 alias bigger='echo "setfont iso02-12x22" ;setfont iso02-12x2'
 
@@ -378,15 +401,19 @@ alias ag='/usr/bin/ag --nofollow --hidden --smart-case'
 
 #user agent
 #usage: curl/wget --header "$UAG"
-#chrome on windows 10
-UAG='user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
-#User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0
-#simple
+UAG='User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0'
 UAG2='user-agent: Mozilla/5.0 Gecko'
 
 #ask for compressed data
 alias curl='curl -f --compressed'
-alias curlu='curl -f -L --compressed --insecure --cookie non-existing --header "$UAG"'
+curlu()
+{
+	\curl -L -f --compressed --insecure --cookie 'non-existing' -H "$UAG" \
+	-H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
+	-H 'Accept-Language: en-GB,pt-BR;q=0.8,pt;q=0.6,en-US;q=0.4,en;q=0.2' \
+	-H 'Accept-Encoding: gzip, deflate, br, zstd' \
+	-H 'Referer: https://www.google.com/' "$@";
+}
 
 #html filter
 htmlfilter()
@@ -613,7 +640,7 @@ out()
 alias tls='tmux ls'
 alias ta='tmux attach-session -t'
 
-#kill dettached tmux sessions
+#kill detached tmux sessions
 tdk()
 {
 	local line
@@ -695,7 +722,6 @@ alias diff='/usr/bin/diff -W$(tput cols) -y --suppress-common-lines'
 #https://www.reddit.com/r/git/comments/6mnnag/view_modified_files_in_the_last_n_commits_in_git/
 
 #vim
-alias v=vim
 alias e=vim
 #vim -u NONE         <-- starts Vim without any vimrc
 #vim -u NORC         <-- starts Vim without any vimrc, but with plugins
@@ -985,6 +1011,9 @@ gdate()
 	git log -1 --format="%ad" "${@:?Commit hashes required}"
 }
 
+#misc
+#{ git show d6d850a2ea04f4ebdfddb59421252dd27098f0ee:chatgpt.sh ;}
+
 #test if inside a git dir
 #{ git rev-parse --is-inside-work-tree ;}
 #{ git -C DIR rev-parse --is-inside-work-tree ;}
@@ -1228,21 +1257,21 @@ upchataur()
 #https://wiki.archlinux.org/title/Creating_packages
 
 upchatall()
-{
+(
 	upchat "$1" &&
 	upchataur '' "$2" &&
 	(echo press.. >&2; read) &&
 	gitup;
-}
+)
 
 alias chat='chatgpt.sh -cc --git --time'
-alias goo='chat --goo -m gemini-2.0-flash-thinking-exp-01-21  -8000'
-alias unix="chatgpt.sh -..unix -cc -4000 --md --goo"
+alias unix="chatgpt.sh -..unix -cc  --md --goo"
 alias pt='chatgpt.sh -cc..pt'
 alias marv="chat --time -256- -cc --frequency-penalty=0.7 --temp=0.8 --top_p=0.4 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
 alias learn='chatgpt.sh -cc -6000 --goo --top-p 0.95 --top-k 64 -m learnlm-1.5-pro-experimental'
 alias dchat=$HOME/bin/openai/debug.chatgpt.sh
 
+#local-ai
 lchat()
 {
 	local model
@@ -1257,17 +1286,19 @@ llchat()
 	~/bin/chatgpt.sh -r'\n### User: ' -R'\n### Response:' -s'### User:' -s'### Response:' -s'### Instruction:' "$@"
 }
 
+#ollama
 ochat()
 {
 	~/bin/chatgpt.sh -O -m llama2-uncensored:latest -R'\n### RESPONSE:' -r'\n### HUMAN: ' -s'### RESPONSE:' -s'### HUMAN:' "$@"
 }
 
-mchat()
-{
-	~/bin/chatgpt.sh --mistral "$@"
-}
-
 alias lai=/home/LocalAI/local-ai.sh
+
+#concursos:
+#% bin/pciconcursos.sh
+#% cd Downloads/pciconcursos/centrooeste
+#% cat -- $(grep -i -e bi.logo -e biologia -e biol.gicas -e ambiente -e ambiental -e zool.gico -e conserva..o -e preserva..o -e molecular -e celular -e bioquim -- *txt | cut -f1 -d: | uniq) | chatgpt.sh --goo --markdown -m gemini-2.5-pro -0 -t 0.23 -cc -S.concurso
+
 
 tts()
 {
@@ -2204,7 +2235,7 @@ gps()
 }
 
 #by gps coordinates
-gspc()
+gpsc()
 {
 	curl -fsL -H "$UAG" "https://nominatim.openstreetmap.org/reverse?lat=${1:?lat: not set}&lon=${2:?lon: not set}&format=json&addressdetails=0" | jq .
 }
@@ -2366,13 +2397,9 @@ moon()
 	datediff.sh -m "$@";
 	moonbrt "$@";
 }
-alias mbrt=moonbrt; alias mphase=moonphase;
 
 #ascii world
-aworld()
-{
-	while asciiworld -soT -t MUNDO ;do sleep 30 ;done
-}
+#{ while asciiworld -soT -t MUNDO ;do sleep 30 ;done ;}
 #https://www.uninformativ.de/git/asciiworld/file/README.html
 
 #check interfaces (wlan or eth0)
@@ -2700,9 +2727,6 @@ alias parrot='curl parrot.live'
 alias chessonline='telnet freechess.org 5000'
 #you may log in as 'guest'
 
-#aria2
-alias a2='aria2c'
-
 #webcam adjustments: guvcview
 
 #youtube download fun
@@ -2754,26 +2778,10 @@ alias yta='noglob _yta'
 alias ytm='noglob _ytm'
 alias yt='noglob _yt'
 
-#https://github.com/xeronull/dotfiles/blob/master/.bashrc
-# search and play youtube audio with preferred player
-# how to use --- yt search_term_here
-yts()
-{
-	$YTDL_CMD -q -f bestaudio --max-downloads 1 --no-playlist --default-search ${2:-ytsearch} "$1" -o - |
-		mpv -vo null /dev/fd/3 3<&0 </dev/tty
-}
-
-ytcap()
-{
-	curl -s "${1?video_url}"|grep -o '"baseUrl":"https://www.youtube.com/api/timedtext[^"]*lang=en'|cut -d \" -f4|sed 's/\\u0026/\&/g'|xargs curl -Ls|grep -o '<text[^<]*</text>'|sed -E 's/<text start="([^"]*)".*>(.*)<.*/\1 \2/'|sed 's/\xc2\xa0/ /g;s/&amp;/\&/g'|recode xml|awk '{$1=sprintf("%02d:%02d:%02d",$1/3600,$1%3600/60,$1%60)}1'|awk 'NR%n==1{printf"%s ",$1}{sub(/^[^ ]* /,"");printf"%s"(NR%n?FS:RS),$0}' n=2|awk 1
-}
+#youtube caption subtitiles
 #https://stackoverflow.com/questions/9611397/how-to-extract-closed-caption-transcript-from-youtube-video
+#does not work anymore as of june/2025
 
-yt_url()
-{
-	grep -Eo -e "https://www\.youtube\.com/watch\?v=[0-9a-zA-Z_-]{8,20}" -e "https://youtu\.be/[0-9a-zA-Z_-]{8,20}"
-}
-#https://forums.mirc.com/ubbthreads.php/topics/269390/youtube-link-to-title-for-mirc
 
 ##shell globbing
 ##Z-SHELL has built-in `noglob' cmd
@@ -2808,7 +2816,7 @@ umoto()
 }
 
 
-#find files not owned by user in $HOM
+#find files not owned by user in $HOME
 homesudo()
 {
 	find "$HOME" ! -uid "$( id -u )" ! -gid "$( id -g )"
@@ -2911,6 +2919,11 @@ tomp3()
 #convert image types
 #{ for i in *.jpg; do convert "$i" "${i/.jpg}.png"; done ;}
 
+#image exif
+#identify -verbose <file> | grep Orientation
+#exiftran -i9 %f #change orientation in exif only
+
+
 #sed one-liners
 sedcht()
 {
@@ -2965,6 +2978,12 @@ trspecial()
 }
 #[:print:] = [:alnum:], [:punct:] and space
 #https://stackoverflow.com/questions/36926999/removing-all-special-characters-from-a-string-in-bash/36930095
+
+#print non-C locale chars
+nonc()
+{
+	grep -P '[^\t\n\x20-\x7E]' "$@";
+}
 
 #remove accentuation
 rmaccent()
@@ -3082,17 +3101,6 @@ hxd()
 #{ hexdump -v -e '/1 "%02X"' -n 32 /dev/urandom ;}
 #{ cat /dev/urandom | tr -dc '0-9A-F' | head -c${1:-64} ;}
 
-#make a qr code with google api
-#warning: encode whitespaces to %20
-gqr()
-{
-	local size type string
-	size=250x250 type=qr
-	string="$*"  #"${*// /%20}"
-
-	wget -O "$type".png "https://chart.googleapis.com/chart?chs=${size}&cht=${type}&chl=${string}"
-}
-
 #bitcoin.blk.sh
 alias blk="$HOME/bin/bitcoin.blk.sh"
 #bitcoin.tx.sh
@@ -3183,6 +3191,12 @@ alias ethgrep="grep -E '\b(0x)?[0-9a-fA-F]{40}\b'"
 #ethereum transaction hash
 alias ethgrep2="grep -E '\b(0x)?([A-Fa-f0-9]{64})\b'"
 #https://ethereum.stackexchange.com/questions/34285/what-is-the-regex-to-validate-an-ethereum-transaction-hash/34286
+
+
+#ip regex
+alias grepip='grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"'
+#'^([1-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.([0-9][0-9]?\.|1[0-9]{2}\.|2[0-4][0-9]\.|25[0-5]\.){2}([0-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-4])'
+#https://www.shellhacks.com/regex-find-ip-addresses-file-grep/
 
 
 #fire on term
@@ -3404,37 +3418,6 @@ plot "-" using 1:(1.0) smooth kdensity title "Density"'
 #alias goclear='xcalib -clear'
 #alias gored='xcalib -green .1 0 1 -blue .1 0 1 -red 0.5 1 40 -alter'
 #https://blog.ynfonatic.de/2023/02/10/x-org-x11-set-your-monitor-to-monochrome-red-on-black.html
-
-#world population
-#usage: wpop [location|world]
-#usage: wpop [italy|uk|us|saudi-arabia|world]
-wpop()
-{
-	[[ -n "$1" ]] && local country="$1-population/"
-
-	if [[ "$1" = world ]] || [[ "$1" = all ]]
-	then 	curl -s 'https://www.worldometers.info/geography/countries-of-the-world/' |
-			awk 'length > max_length { max_length = length; longest_line = $0 } END { print longest_line }' |
-			sed -e 's/<td>/\n\n&/g' -e 's/<[^>]*>//g' | sed -e 1,2d  -e '$d' |
-			sed -e 'N;N;N;s/\n/ /g' -e 's/Dependenc/\n&/g' | sed -e '/^$/d'
-	else 	curl -s --compressed "https://www.worldometers.info/world-population/$country" |
-			sed -e 's/<[^>]*>//g' -ne '/[:[]new Date/p' |
-			sed -Ee 's/([A-Za-z])\s+([A-Za-z])/\1\2/' |
-			awk -F' ' '$4 > 50 { print $2" "$4}'
-	fi
-	echo "${1:-world historical}" >&2
-}
-#https://www.worldometers.info/world-population/
-
-#area by countries
-warea()
-{
-	local cutcols=-c1-25,35-
-	w3m -dump -cols 100 'https://www.worldometers.info/geography/largest-countries-in-the-world/' \
-		| tee >( grep '^\s*#' | cut $cutcols >&2 ) \
-		| sed -n '/List of countries/,/^\[INS/p' | sed '$d' | tac | cut $cutcols
-}
-
 
 #ibge -- ids de localidades
 #uso: localidade ["Nome da Cidade|Estado|Região"]
@@ -3713,6 +3696,12 @@ scalar(@F);
         printf "%-7s : %'".${1:-4}"'f\n", "StdDev", $stats->standard_deviation, "Skewness", $stats->skewness();'
 }
 
+#calculate r-squared from a list of numbers
+rsq()
+{
+	awk '{print NR,$1}' | Rscript -e 'd <- read.table("stdin");cat(summary(lm(V2~V1,d))$r.squared, "\n")';
+}
+
 #add numbers
 #adds newline-separated numbers from stdin
 #until eof then output the total to stdout.
@@ -3830,26 +3819,6 @@ bintext()
 #true. if an awk expression evaluates to true without any associated action,
 #awk default action is print $0.
 #https://unix.stackexchange.com/questions/234432/how-to-delete-the-last-column-of-a-file-in-linux
-
-#regex ip validation
-#IPREGEX='^([1-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.([0-9][0-9]?\.|1[0-9]{2}\.|2[0-4][0-9]\.|25[0-5]\.){2}([0-9][0-9]?|1[0-9]{2}|2[0-4][0-9]|25[0-4])'
-alias grepip='grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"'
-#https://www.shellhacks.com/regex-find-ip-addresses-file-grep/
-
-#extract zip files to stdout
-#{ bsdtar -xvf - -O ;}
-#{ gzip -dc ;}
-
-#ultra compress
-zultra()
-{
-	 7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "${1}.7z" "${@:?file required}"
-
-}
-
-#exif
-#identify -verbose <file> | grep Orientation
-#exiftran -i9 %f #change orientation in exif only
 
 #unix hacks
 #<http://www.iwar.org.uk/hackers/resources/digital%20rebels/articles/unixtips.txt>
@@ -4086,7 +4055,7 @@ tmr()
 
 #remove leading & trailing whitespace
 #space characters include: tab, newline, vertical tab, form feed, carriage return, and space.
-trim()
+trimf()
 {
 	local var="${*:-$([[ -t 0 ]] || </dev/stdin)}"
 	var="${var#"${var%%[![:space:]]*}"}"  #rm leading ws
@@ -4176,6 +4145,15 @@ reducepdf() {
 #{ xinput set-prop 13 322 0.2 ;}
 #{ xinput set-prop 13 341 0 ;}
 
+#cursor position (row)
+#{ printf '\e[6n' >&2; IFS= read -rsdR CUR_ROW; CUR_ROW="${CUR_ROW##*;}" ;}
+#https://stackoverflow.com/questions/2575037/how-to-get-the-cursor-position-in-bash
+
+#xfce4 numlock keyboard
+#{ xfconf-query -c keyboards -lv | grep -i numlock ;}
+#{ xfconf-query -c keyboards -p /Default/Numlock -t bool -s true --create ;}
+#https://forum.xfce.org/viewtopic.php?id=13109
+
 #send quick mail (mutt hack)
 #usage: mail "[EMAIL].." [TEXT|ASCII FILE]               #simple message
 #usage: mail "[EMAIL].." [-a FILE].. [-s SUBJECT]        #attach (binary) files
@@ -4204,42 +4182,10 @@ mail()
 	mutt -s "$subj" "$@" $EMAIL <<<"$text" >/dev/null 2>&1 &
 	#echo pid=$! >&2;
 }
-alias m=mail
 #also see: xdg-email
 alias mailv='chatgpt.sh -w pt | mail'
 
-#xfce4 numlock keyboard
-#{ xfconf-query -c keyboards -lv | grep -i numlock ;}
-#{ xfconf-query -c keyboards -p /Default/Numlock -t bool -s true --create ;}
-#https://forum.xfce.org/viewtopic.php?id=13109
-
-#welcome message
-[[ -f ~/bin/welcome_message.sh ]] && . ~/bin/welcome_message.sh
-#{ fortune | cowsay | cowthink -sn | repo-elephant ;}
-
-#showerthoughts=$(curl -s --connect-timeout 5 -A '/u/<<<SEU USERNAME AQUI>>>>' \
-#'https://www.reddit.com/r/showerthoughts/top.json?sort=top&t=week&limit=100' | \
-#python2.7 -c 'import sys, random, json; randnum = random.randint(0,99); response = json.load(sys.stdin)["data"]["children"][randnum]["data"]; print "\n\"" + response["title"] + "\""; print "    -" + response["author"] + "\n";')
-#echo $showerthoughts | cowsay | lolcat
-
 #ibge projeções população do brasil
-#ibgepop [id_estado]
-ibgepop()
-{
-	local localidade
-	localidade="$1"
-	[[ $localidade = *[a-zA-Z]* ]] && localidade=$(ibgepop_helperf "$1")
-	curl --header "$UAG" --compressed -L http://servicodados.ibge.gov.br/api/v1/projecoes/populacao/$localidade | jq .
-}
-ibgepop_helperf()
-{
-	local string
-	typeset -l string
-	string="$1"
-	curl --header "$UAG" --compressed -L http://servicodados.ibge.gov.br/api/v1/localidades/estados |
-	tr '[:upper:]' '[:lower:]' |
-	jq ".[] | (select(.sigla==\"${string}\") // select(.nome==\"${string}\")) | .id"
-}
 #https://servicodados.ibge.gov.br/api/docs/projecoes
 #https://servicodados.ibge.gov.br/api/docs/localidades
 	
@@ -4249,23 +4195,27 @@ ibgepop_helperf()
 #https://github.com/CSSEGISandData/COVID-19
 
 
-seed()
-{
-	cdump https://concursos.ibfc.org.br/informacoes/421/ 2>/dev/null | hf |
-	grep -i 'convocação .* posse'
-}
-
 ####################
  #####markets######
 ####################
-alias binfo='~/bin/binfo.sh'
-alias cgk='~/bin/markets/cgk.sh -3'
-alias cmc='~/bin/markets/cmc.sh -3'
-alias myc='~/bin/markets/myc.sh -3'
-alias uol='~/bin/markets/uol.sh'
-alias cointop='/bin/cointop --cache-dir ~/.cache'
+alias binfo='noglob binfo.sh'
+alias bcalc.sh='noglob bcalc.sh'
+alias cgk.sh='noglob cgk.sh -3'
+alias cmc.sh='noglob cmc.sh -3'
+alias cgk=cgk.sh
+alias cmc=cmc.sh
+alias uol='uol.sh'
+alias cointop='cointop --cache-dir ~/.cache'
 alias ctop=cointop
 alias usd='cmc usd brl ;cgk usd brl ;uol.sh|sed -n 8p\;17p'
+alias fee='~/bin/mempoolfee.sh'
+
+#mop - stocks the hacker way
+alias mop='go run ~/go/src/github.com/mop-tracker/mop/cmd/mop/main.go'
+
+#wallet and trading monitors
+#alias W=walletmonitor.sh
+#alias T=tradingview.sh
 
 #gold rate from UOL
 ouro()
@@ -4275,15 +4225,6 @@ ouro()
 	grep -m1 -Eo 'Ouro.{25}' |
 	grep -Eo '.*[^- ][0-9][0-9][0-9]+,[0-9]+'
 }
-
-#mop - stocks the hacker way
-mop()
-{
-	go run ~/go/src/github.com/mop-tracker/mop/cmd/mop/main.go
-}
-#wallet and trading monitors
-#alias W=walletmonitor.sh
-#alias T=tradingview.sh
 
 
 ##################################################
@@ -4419,12 +4360,12 @@ ipca()
 		printf 'usage: ipca  .           #all series\n\n' >&2
 		set -- CUUR0000SA0
 	fi
-	curl 'https://download.bls.gov/pub/time.series/cu/cu.data.1.AllItems' | grep "$1" | column -t
+	curlu 'https://download.bls.gov/pub/time.series/cu/cu.data.1.AllItems' | grep "$1" | column -t
 }
 #??Daily query limit Version 1.0 (Unregistered) 25
 #https://www.bls.gov/
+#https://download.bls.gov/pub/time.series/cu/
 #also good:https://download.bls.gov/pub/time.series/cu/cu.data.0.Current
-
 
 #american inflation
 ipca2()
@@ -4521,101 +4462,6 @@ metals()
 #shortName -- symbol short name; gmtOffSetMilliseconds
 #https://query1.finance.yahoo.com/v7/finance/quote?symbols=DANSKE.CO,ERIC-B.ST,FPKPEN.CO,SSO.OL,VWS.CO&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance
 
-
-#yahoo finance hack -- data from chart api
-#usage: yfin2 [-jh] 'symbol' [range] [granularity]
-yfin2()
-(
-	#parse some opts
-	if [[ "$1" = -h ]]
-	then 	printf 'usage: yfin2 [-jh] SYMBOL [RANGE] [GRANULARITY]\n'
-		return
-	elif [[ "$1" = -j ]]
-	then 	PJSON=1
-		set -- "${@:2:4}"
-	fi
-	
-	#set symbol to uppercase (POSIX-compatible)
-	SYMBOL="$( tr '[:lower:]' '[:upper:]' <<< "${1:-TSLA}" )"
-
-	#get json
-	YJSON="$( curl -s "https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOL}?region=US&lang=en-US&includePrePost=true&interval=${2:-1d}&range=${3:-1d}&corsDomain=finance.yahoo.com&.tsrc=finance" --compressed )"
-
-	#print json?
-	if [[ -n "$PJSON" ]]
-	then
-		printf '%s\n' "$YJSON"
-		return
-	#check for error response
-	elif jq -er '.chart.error' <<< "$YJSON" >/dev/null 2>&1
-	then
-		jq -r '.chart.error.description' <<< "$YJSON"
-		return 1
-	fi
-
-	#set timezone for displaying times
-	#TZ="GMT"
-	#set timezone according to info from yahoo
-	TZ="$(jq -r '.chart.result[].meta.exchangeTimezoneName//.timezone' <<< "$YJSON")"
-	export TZ
-	
-	#print ticker config
-	jq -r '.chart.result[]|
-	 		(.meta|
-				"Ticker configuration",
-				"Granularity and range",
-				"Available ranges:",
-				(.validRanges| @sh),
-				"Range___: \(.range)  Grain___: \(.dataGranularity)",
-				"",
-				"Current trading period",
-				(.currentTradingPeriod|
-					(.pre|
-					"PreMkt_T: \(.start//empty|tonumber|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))  \(.end//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))"
-					),
-					(.regular|
-					"RegMkt_T: \(.start//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))  \(.end//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))"
-					),
-					(.post|
-					"PostMktT: \(.start//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))  \(.end//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))"
-					)
-				),
-				""
-			)' <<<"$YJSON"
-
-	#tickers and indicators
-	jq -r '.chart.result[]|
-		"Symbol information",
-		"StartTim: \(.timestamp[0]//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
-		"EndTime_: \(.timestamp[1]//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
-		(.meta|
-			"Symbol__: \(.symbol)  Currency: \(.currency//empty)",
-			"InstType: \(.instrumentType//empty)  Exchange: \(.exchangeName//empty)",
-			"Timezone: \(.exchangeTimezoneName//empty)  \(.timezone)",
-			"1stTrade: \(.firstTradeDate//empty|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))"
-		),
-		"",
-		"Indicators",
-		(.indicators.quote[]|
-			"Volume__: \(if .volume[1] != null and .volume[1] != 0 then .volume[1] else .volume[0]//"??" end)",
-			"High____: \(.high[0]//empty)",
-			"Low_____: \(.low[0]//empty)",
-			"Open ___: \(.open[0]//empty)",
-			"Close __: \(.close[0]//empty)"
-		),
-		"",
-		"Ticker",
-		(.meta|
-			"Mkt_Time: \(.regularMarketTime|strflocaltime("%Y-%m-%dT%H:%M:%S%Z"))",
-			"MktT_UTC: \(.regularMarketTime//empty|strftime("%Y-%m-%dT%H:%M:%SZ"))",
-			"PrevClse: \(.chartPreviousClose//empty)",
-			"MktPrice: \(.regularMarketPrice//empty)"
-			#"PriceHnt: \(.priceHint//empty)"
-		)
-		' <<<"$YJSON"
-)
-
-
 #yahoo finance symbol list
 ylist()
 {
@@ -4659,7 +4505,6 @@ nlistjson()
 {
 	echo "[\"$(echo -n "$(echo -en "$(curl -s --compressed 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt' | tail -n+2 | head -n-1 | perl -pe 's/ //g' | tr '|' ' ' | awk '{printf $1" "} {print $4}')\n$(curl -s --compressed 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt' | tail -n+2 | head -n-1 | perl -pe 's/ //g' | tr '|' ' ' | awk '{printf $1" "} {print $7}')" | grep -v 'Y$' | awk '{print $1}' | grep -v '[^a-zA-Z]' | sort)" | perl -pe 's/\n/","/g')\"]"
 }
-#ref:?
 
 #curl cryptocurrencies exchange rates
 #follow igor_chbin at <twitter.com/igor_chubin>
@@ -4697,12 +4542,12 @@ gold()
 {
 	case "$1" in
 		a*) #annual
-			curl -sL 'https://datahub.io/core/gold-prices/r/0.json'
+			curl -sL "https://datahub.io/core/gold-prices/_r/-/data/anual.csv"
 			;;
 		*)  #monthly
-			curl -sL 'https://datahub.io/core/gold-prices/r/1.json'
+			curl -sL "https://datahub.io/core/gold-prices/_r/-/data/monthly.csv"
 			;;
-	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
+	esac
 }
 
 #oil brent 
@@ -4710,18 +4555,18 @@ brent()
 {
 	case "$1" in
 		a*) #annual
-			curl -sL 'https://datahub.io/core/oil-prices/r/3.json'
+			curl -sL https://datahub.io/core/oil-prices/_r/-/data/brent-year.csv
 			;;
 		m*) #monthly
-			curl -sL 'https://datahub.io/core/oil-prices/r/2.json'
+			curl -sL https://datahub.io/core/oil-prices/_r/-/data/brent-monthly.csv
 			;;
 		w*) #weekly
-			curl -sL 'https://datahub.io/core/oil-prices/r/1.json'
+			curl -sL https://datahub.io/core/oil-prices/_r/-/data/brent-weekly.csv
 			;;
 		*)  #daily
-			curl -sL 'https://datahub.io/core/oil-prices/r/0.json'
+			curl -sL https://datahub.io/core/oil-prices/_r/-/data/brent-daily.csv
 			;;
-	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
+	esac
 }
 alias brenty=brent
 
@@ -4730,46 +4575,24 @@ wti()
 {
 	case "$1" in
 		a*) #annual
-			curl -sL 'https://datahub.io/core/oil-prices/r/7.json'
+			curl -sL https://datahub.io/core/oil-prices/_r/-/data/wti-year.csv
 			;;
 		m*) #monthly
-			curl -sL 'https://datahub.io/core/oil-prices/r/6.json'
+			curl -sL https://datahub.io/core/oil-prices/_r/-/data/wti-monthly.csv
 			;;
 		w*) #weekly
-			curl -sL 'https://datahub.io/core/oil-prices/r/5.json'
+			curl -sL https://datahub.io/core/oil-prices/_r/-/data/wti-weekly.csv
 			;;
 		*)  #daily
-			curl -sL 'https://datahub.io/core/oil-prices/r/4.json'
+			curl -sL https://datahub.io/core/oil-prices/_r/-/data/wti-daily.csv
 			;;
-	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
-}
-
-#gas
-gas()
-{
-	case "$1" in 
-		m*) #monthly
-			curl -sL 'https://datahub.io/core/natural-gas/r/1.json'
-			;;
-		*)  #daily
-			curl -sL 'https://datahub.io/core/natural-gas/r/0.json'
-			;;
-	esac | jq -r '.[]|"\(.Date)\t\(.Price)"'
+	esac
 }
 
 #consumer price index
 cpi()
 { 
-	curl -sLb non-existing 'https://datahub.io/core/cpi/r/0.json' |
-		jq -r '.[]|"\(.Year)=\(.CPI)=\(.["Country Name"])"' | 
-		column -ets= -NYEAR,CPI,COUNTRY
-}
-
-#corruption perception
-corruption()
-{ 
-	curl -sL 'https://datahub.io/core/corruption-perceptions-index/r/0.json' |
-		jq -r '.[]|keys[] as $k | "\($k) \(.[$k])"' | sed 's/^Jurisdiction.*/&\n/'
+	curl -sLb non-existing https://datahub.io/core/cpi/_r/-/data/cpi.csv
 }
 
 #world population
@@ -4787,88 +4610,47 @@ btcsupply()
 	w3m -dump https://en.bitcoin.it/wiki/Controlled_supply | sed -En '/^Projected/,/^(\*|Note)/p'
 }
 
-#coin market cap stats
-cmcstats()
-{
-	{ 	curl -sL "https://web-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=10&start=1"
-		curl -sL "https://web-api.coinmarketcap.com/v1/global-metrics/quotes/latest"
-	} | jq
-}
-
-#btc historical prices
-#usage: cmcbtchist VS_CURRENCY CRYPTO_SLUG START_TIME END_TIME
-cmcbtchist()
-{
-	local vscur slug start end
-	vscur="${1:-USD}"
-	slug="${2:-bitcoin}"
-	start="${3:-1367020800}"  #Sat 27 Apr 00:00:00 UTC 2013
-	end="${4:-$( date -udtomorrow0 +%s )}"
-
-	curl -sL "https://web-api.coinmarketcap.com/v1/cryptocurrency/ohlcv/historical?convert=${vscur}&slug=${slug}&time_end=${end}&time_start=${start}" | jq
-
-	#if no positional argument, print usage
-	if [[ -z "$1" ]]
-	then 	echo 'usage: cmcbtchist VS_CURRENCY CRYPTO_SLUG START_TIME END_TIME' >&2
-		echo 'usage: cmcbtchist USD bitcoin' >&2
-	fi
-}
-
-
-#sochain api
-sochain()
-{
-	local uri
-	case "$1" in
-		balance | bal* | a*)
-			uri="get_address_balance/${3:-bitcoin}/${2:?address required}/${4:-1}" ;;
-		received | rec*)
-			uri="get_address_received/${3:-bitcoin}/${2:?address required}" ;;
-		spent | sp*)
-			uri="get_address_spent/${3:-bitcoin}/${2:?address required}" ;;
-		valid | val*)
-			uri="is_address_valid/${3:-bitcoin}/${2:?address required}" ;;
-		txin | in)
-			uri="get_tx_inputs/${3:-bitcoin}/${2:?transaction required}" ;;
-		txout | out)
-			uri="get_tx_outputs/${3:-bitcoin}/${2:?transaction required}" ;;
-		txconfirmed | t*c*)
-			uri="is_tx_confirmed/${3:-bitcoin}/${2:?transaction required}" ;;
-		txspent | t*s*)
-			uri="is_tx_spent/${3:-bitcoin}/${2:?transaction required}" ;;
-		tx | t*)
-			uri="get_tx/${3:-bitcoin}/${2:?transaction required}" ;;
-		blkhash | b*h*)
-			uri="get_blockhash/${3:-bitcoin}/${2:?block required}" ;;
-		blk | b*)
-			uri="get_block/${3:-bitcoin}/${2:?block required}" ;;
-		price | p*)
-			uri="get_price/${2:?coin required}/${3:-USD}" ;;
-		info | i*)
-			uri="get_info/${2:-bitcoin}" ;;
-		help | h*)
-			printf '%s\n' options: balance addrreceived addrspent isvalid txin txout txconfirmed txspent blkhash blk price info
-			return 0
-			;;
-	esac
-	[[ -z "$uri" ]] && echo "option required" >&2 && return 1
-	curl -s "https://sochain.com/api/v2/$uri"
-	echo
-}
 #https://sochain.com/api
 #SoChain allows 300 requests/minute free-of-charge
-
-#shell cat-like function
-catf() { 	printf '%s\n' "$(</dev/stdin )" ;}
 
 ##################################################
 ############# END FINANCIAL MARKETS ##############
 ##################################################
 
-#cursor position (row)
-#{ __clr_ttystf; printf '\e[6n' >&2; IFS= read -rsdR CUR_ROW; CUR_ROW="${CUR_ROW##*;}" ;}
-#https://stackoverflow.com/questions/2575037/how-to-get-the-cursor-position-in-bash
 
-#return from a script if it is sourced
-#{ [[ ${BASH_SOURCE[0]} != "${0}" ]] && return 0; }
+## TERMUX Android
+#
+#Termux stdin and stderr filepaths
+#STDIN='/proc/self/fd/0'  #/dev/stdin
+#STDERR='/proc/self/fd/2'  #/dev/stderr
+
+#alias db=dropbear
+#alias kd='killall dropbear'
+#alias ksshd='pkill sshd'
+#
+#alias open=termux-open
+#alias o=open
+#alias lock=termux-wake-lock
+#alias unlock=termux-wake-unlock
+#alias upchat='cd ~/www/shellchatgpt; gres; cd -'
+#alias pac='pkg install'
+#alias pacr='pkg uninstall'
+#alias s='pkg search'
+#alias vim=nvim
+#
+#
+#alias cointop='TERM=screen-256color cointop'
+##https://github.com/cointop-sh/cointop/issues/315
+#
+#clip() { termux-clipboard-set "$@" ;}
+
+
+#temporary
+#conferir convocação seed-pr (rotina)
+seedpr()
+{
+	cdump https://concursos.ibfc.org.br/informacoes/421/ 2>/dev/null | hf |
+	grep -A 2 -i -e 'convocação .* posse';
+}
+
 
