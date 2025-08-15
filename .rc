@@ -1199,19 +1199,12 @@ iplist()
 
 upchat()
 {
-	echo 'NEXT BIG VERSION NUMBERING CHANGES -- v0.114 ==> v14' >&2
 	typeset f1 f2
 	f1=$HOME/www/lab-shellchatgpt/chatgpt.sh 
 	f2=$HOME/bin/chatgpt.sh 
 	cd ~/www/lab-shellchatgpt/man || return
 
 	~/bin/openai/chatgpt-test.sh || return 1
-	((SKIP)) ||
-	/usr/bin/diff -q $f1 $f2 &>/dev/null ||
-	: || local msg=$( { 	/usr/bin/diff ~/www/lab-shellchatgpt/chatgpt.sh ~/bin/chatgpt.sh ;
-			/bin/diff ~/www/lab-shellchatgpt/README.md <(gd fenixdragao shellChatGPT README.md 2>/dev/null);
-		} | ~/bin/chatgpt.sh --git -Ecc..unix -1024 $'Please, create a simple commit message for bash chatgpt.sh script update. The commit message is very concise. Always comment when there are very important changes in code unmentioned. Do not repeat developer comments or diff output because these will already be available in the commit head itself. Be succinct.' "${@:+$'\n\n'Developer comments: $*$'\n\n'}" $'\n\nDIFF OUTPUT:\n\n')  #git diff --cached
-
 	printf 'Diff %%%f\n' $(bc <<<"scale=8; ($(diff -y --suppress-common-lines $f1 $f2 | wc -l)/$(wc -l <$f2))*100");
 	printf 'press\r' >&2; (read);
 
