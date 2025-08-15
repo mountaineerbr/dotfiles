@@ -408,7 +408,8 @@ UAG2='user-agent: Mozilla/5.0 Gecko'
 alias curl='curl -f --compressed'
 curlu()
 {
-	\curl -L -f --compressed --insecure --cookie 'non-existing' -H "$UAG" \
+	\curl -L -R -f --compressed --insecure \
+	--cookie 'non-existing' --retry '2' -H "$UAG" \
 	-H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
 	-H 'Accept-Language: en-GB,pt-BR;q=0.8,pt;q=0.6,en-US;q=0.4,en;q=0.2' \
 	-H 'Accept-Encoding: gzip, deflate, br, zstd' \
@@ -758,6 +759,14 @@ vman()
 {
 	COLUMNS=$((COLUMNS-5)) /usr/bin/man ${@-man} | col -bpx | iconv -c | vim -c 'set ft=man nomod' -c 'set noeb vb t_vb=' -c 'map q <Esc>:q!<cr>' -c 'map i <nop>' -
 } 
+
+#vim cmds:
+#:TOhtml
+#:let g:html_use_css = 0  #old html without css
+#select range of lines, type :MyToHtml
+#https://vim.fandom.com/wiki/Pasting_code_with_syntax_coloring_in_emails
+# modeline to avoid file backups: 
+# ex: set nobackup nowritebackup noundofile noswapfile readonly:
 
 #copy less buffer
 #in less --help:
@@ -1190,6 +1199,7 @@ iplist()
 
 upchat()
 {
+	echo 'NEXT BIG VERSION NUMBERING CHANGES -- v0.114 ==> v14' >&2
 	typeset f1 f2
 	f1=$HOME/www/lab-shellchatgpt/chatgpt.sh 
 	f2=$HOME/bin/chatgpt.sh 
@@ -1200,15 +1210,15 @@ upchat()
 	/usr/bin/diff -q $f1 $f2 &>/dev/null ||
 	: || local msg=$( { 	/usr/bin/diff ~/www/lab-shellchatgpt/chatgpt.sh ~/bin/chatgpt.sh ;
 			/bin/diff ~/www/lab-shellchatgpt/README.md <(gd fenixdragao shellChatGPT README.md 2>/dev/null);
-		} | ~/bin/chatgpt.sh --git -Ecc..unix -512 $'Please, create a simple commit message for bash chatgpt.sh script update. The commit message is very concise. Always comment when there are very important changes in code unmentioned. Do not repeat developer comments or diff output because these will already be available in the commit head itself. Be succinct.' "${@:+$'\n\n'Developer comments: $*$'\n\n'}" $'\n\nDIFF OUTPUT:\n\n')  #git diff --cached
+		} | ~/bin/chatgpt.sh --git -Ecc..unix -1024 $'Please, create a simple commit message for bash chatgpt.sh script update. The commit message is very concise. Always comment when there are very important changes in code unmentioned. Do not repeat developer comments or diff output because these will already be available in the commit head itself. Be succinct.' "${@:+$'\n\n'Developer comments: $*$'\n\n'}" $'\n\nDIFF OUTPUT:\n\n')  #git diff --cached
 
 	printf 'Diff %%%f\n' $(bc <<<"scale=8; ($(diff -y --suppress-common-lines $f1 $f2 | wc -l)/$(wc -l <$f2))*100");
 	printf 'press\r' >&2; (read);
 
 	~/bin/md2man.sh chatgpt.sh.1.md
-	\cp -fv ~/bin/chatgpt.sh ../ && gitup "${@}" ${@:+$'\n\n\n---\n'}"$msg"
+	\cp -fv ~/bin/chatgpt.sh ../ && gitup "$msg"${msg:+$'\n\n\n---\n'} "${@}"
 	if cd ~/www/hub-shellChatGPT/  #hard-links
-	then 	gitup "${@}" ${@:+$'\n\n\n---\n'}"$msg"
+	then 	gitup "$msg"${msg:+$'\n\n\n---\n'} "${@}"
 	fi
 }
 upchataur()
@@ -1264,12 +1274,13 @@ upchatall()
 	gitup;
 )
 
-alias chat='chatgpt.sh -cc --git --time'
+alias chat='chatgpt.sh -cc --git --time --md'
 alias unix="chatgpt.sh -..unix -cc  --md --goo"
-alias pt='chatgpt.sh -cc..pt'
-alias marv="chat --time -256- -cc --frequency-penalty=0.7 --temp=0.8 --top_p=0.4 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
+alias pt='chatgpt.sh -cc..pt --md'
+alias marv="chat --md --time -256- -cc --frequency-penalty=0.7 --temp=0.8 --top_p=0.4 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
 alias learn='chatgpt.sh -cc -6000 --goo --top-p 0.95 --top-k 64 -m learnlm-1.5-pro-experimental'
-alias dchat=$HOME/bin/openai/debug.chatgpt.sh
+alias dchatgpt.sh=$HOME/bin/openai/debug.chatgpt.sh
+alias dchat=dchatgpt.sh
 
 #local-ai
 lchat()
@@ -2173,6 +2184,12 @@ urldecode()
 #x='a%20%25%e3%81%82';printf "${x//\%/\\x}"
 #In zsh ${x//%/a} adds a to the end but ${x//\%/a} replaces % with a.
 #https://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
+
+#encode URL with UTF-8 chars
+urlencode()
+{
+	jq --slurp --raw-input --raw-output @uri <<<$*;
+}
 
 #submit sitemap to google
 #usage: gsitemap "https://your.website.com/sitemap.xml"
@@ -3878,12 +3895,6 @@ bintext()
 #convert multiple files to html with vim
 #for i in *.ext; do vim -c TOhtml -c wqa $i ; done
 #https://superuser.com/questions/565050/export-file-syntax-highlighting-to-html-using-vim
-
-#vim cmds:
-#:TOhtml
-#:let g:html_use_css = 0  #old html without css
-#select range of lines, type :MyToHtml
-#https://vim.fandom.com/wiki/Pasting_code_with_syntax_coloring_in_emails
 
 #make a table in vim
 #:!sed 's/[- ]*\([+|]\)/'$'\x01''\1/g' | column -ts $'\x01' | sed '/^[-+ ]*$/s/ /-/g'
