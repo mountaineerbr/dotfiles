@@ -102,6 +102,7 @@ export BAT_STYLE="numbers"
 #`ls -l` date format
 export TIME_STYLE="long-iso"
 
+#set up for a better xfce4 session
 export QT_QPA_PLATFORMTHEME="qt5ct"
 #export QT_SELECT=4  #qt4 is deprecated
 export QT_AUTO_SCREEN_SCALE_FACTOR=0
