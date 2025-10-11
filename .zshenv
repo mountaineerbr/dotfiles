@@ -18,10 +18,10 @@
 #exist with auto_cd, then the name is looked up in the directory hash table
 #https://unix.stackexchange.com/questions/284105/zsh-hash-directory-completion
 
+
 #Tmux DBUS (non-interactive)
 if [[ $- != *i* && -n $TMUX && -z $DBUS_SESSION_BUS_ADDRESS ]] && pidof -q xfce4-session
 then
 	eval "$(xargs --null --max-args=1 < /proc/$(pidof xfce4-session)/environ | grep -e DBUS_SESSION_BUS_ADDRESS)"
 fi
-
 

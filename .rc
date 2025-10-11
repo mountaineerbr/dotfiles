@@ -14,7 +14,7 @@
 #{ echo -e "\e]50;-xos4-terminus-medium-r-*--18-*-*-*-*-*-*-*\a" ;}
 
 #sources
-[[ -e ~/.rc.tmux ]] && . ~/.rc.tmux
+[[ -e ~/.rc_tmux ]] && . ~/.rc_tmux
 
 #welcome message
 [[ -e ~/bin/welcome_message.sh ]] && . ~/bin/welcome_message.sh
@@ -563,7 +563,7 @@ out()
 	echo '[nothing to do]' >&2
 	return 1
 }
-#OBS: ``$_TMUXSIG'' is defined at ~/.rc.tmux!
+#OBS: ``$_TMUXSIG'' is defined at ~/.rc_tmux!
 
 
 #startx
