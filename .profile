@@ -100,10 +100,10 @@ export BAT_STYLE="numbers"
 #export FBFONT=/usr/share/kbd/consolefonts/ter-216n.psf.gz
 
 #`ls -l` date format
-export TIME_STYLE=long-iso
+export TIME_STYLE="long-iso"
 
-export QT_QPA_PLATFORMTHEME=qt5ct
-export QT_SELECT=4
+export QT_QPA_PLATFORMTHEME="qt5ct"
+#export QT_SELECT=4  #qt4 is deprecated
 export QT_AUTO_SCREEN_SCALE_FACTOR=0
 #export QT_SCALE_FACTOR=1  #for hi dpi
 export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
@@ -130,11 +130,8 @@ export GTK_OVERLAY_SCROLLING=0
 #user set environment variable $DEFALAREPO ?
 #export DEFALAREPO=month
 
-#set temporary directory for gs.sh
-export GSTMPDIR="$HOME/www"
-
 #$BROWSER contains the path to the web browser
-export BROWSER=w3m
+export BROWSER="w3m"
 #if [ -n "$DISPLAY" ]
 #then export BROWSER=firefox
 #else export BROWSER=links
@@ -189,14 +186,6 @@ export BCEXTFILE="$HOME/bin/bcalc_ext.bc"
 
 #config for bitcoin.{blk,tx}.sh
 export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
-
-#chatgpt.sh conf
-#export CHATGPTRC="$HOME/.chatgpt.conf"
-
-#cgk.sh
-#expiration of cache files in seconds
-#set to 0 or unset to disable expiration
-#export CGKEXPIRATION=259200  #(3 days)
 
 #wf.sh -- norway institute of meteorology
 export WFAV="
