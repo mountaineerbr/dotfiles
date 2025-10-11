@@ -1,6 +1,6 @@
 #
 # ~/.bashrc
-# 2024  by mountaineerbr
+# 2025-October  by mountaineerbr
 #                         _        _                      ___      
 # ._ _ _  ___  _ _ ._ _ _| |_ ___ <_>._ _  ___  ___  _ _ | . > _ _ 
 # | ' ' |/ . \| | || ' | | | <_> || || ' |/ ._>/ ._>| '_>| . \| '_>
@@ -70,6 +70,7 @@ _set_xterm_title()
 {
 	[[ -t 1 ]] || return
 	[[ -z "$TMUX" ]] || return
+
 	case $TERM in
 		(sun-cmd)
 			printf "\e]l%s\e\\" "${PWD/#$HOME/\~}"

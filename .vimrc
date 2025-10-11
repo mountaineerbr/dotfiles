@@ -294,7 +294,7 @@ if &diff
   set nohls
   syntax off
   colo 0x7A69_dark
-  set diffopt+=iwhite
+  "set diffopt+=iwhite
   au VimEnter * RainbowParenthesesToggle
 endif
 "https://odd.blog/2016/11/24/howto-disable-syntax-highlighting-in-vimdiff/

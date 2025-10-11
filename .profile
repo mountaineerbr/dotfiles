@@ -1,5 +1,5 @@
 # ~/.profile
-# 2024  by mountaineerbr
+# 2025-October  by mountaineerbr
 #                                                                      
 #     ,o888888o.           .8.            d888888o. 8888888 8888888888 
 #    8888     `88.        .888.         .`8888:' `88.     8 8888       
@@ -42,6 +42,9 @@
 #unset LANG && source /etc/profile.d/locale.sh
 
 #sourced by my ~/.zhenv, too.
+
+#personal api keys
+[[ -e ~/.apikeys ]] && . ~/.apikeys
 
 #if running bash
 #source from .bashrc if it exists
@@ -231,7 +234,7 @@ cascavel:-24.9554996:-53.4560544:781
 foz do igua[cç][uú]:-25.5401479:-54.5858139:164
 general carneiro:-26.422982:-51.3146691:983
 gramado:-29.3924265:-50.912571:850
-guaratuba:-25.8806192:-48.5750905:0 
+guaratuba:-25.8806192:-48.5750905:0
 porto alegre:-30.0324999:-51.2303767:10
 "
 

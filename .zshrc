@@ -1,6 +1,6 @@
 #
 # ~/.zshrc
-# 2024  by mountaineerbr
+# 2025-October  by mountaineerbr
 #               __  ___
 # _______ ____ / /_/ _ |_    _____ ___ __
 #/ __/ _ `(_-</ __/ __ | |/|/ / _ `/ // /
@@ -388,9 +388,12 @@ unset c0 c1 prompt_ssl_max
 #GRML-zsh-pony
 #https://grml.org/zsh-pony/
 #Completion System
+
 zmodload zsh/complist
 autoload -Uz compinit
 compinit
+# Use default dump file location, but check if it's stale and re-dump if necessary
+#compinit -d "${ZDOTDIR:-$HOME}/.zcompdump"
 
 #Menu Selection
 zstyle ':completion:*' menu select
@@ -495,7 +498,7 @@ zle -N accept-line accept-line-hack
 up-history-hack()
 {
 	local cursor=${CURSOR-${#BUFFER}};
-	
+
 	if ((! CURSOR || CURSOR==${#BUFFER} || CURSOR==CURSORLAST))
 	then
 		[[ $BUFFER == *$'\n'* ]] && BUFFER=;
@@ -675,167 +678,193 @@ bindkey - '\e'$key[Left]  backward-word
 
 #GRML-zshrc
 # completion system
+# note: use 'zstyle' for getting current settings
+#         press ^xh (control-x h) for getting tags in context; ^x? (control-x ?) to run complete_debug with trace output
 
-# A newly added command may not be found or will cause false
-# correction attempts, if you got auto-correction set.
-#zstyle ':completion:*' rehash true
+# Make sure the completion system is initialised
+(( ${+_comps} )) &&
+{
+	# A newly added command may not be found or will cause false
+	# correction attempts, if you got auto-correction set.
+	#zstyle ':completion:*' rehash true
 
-# case insensitivity
-zstyle ":completion:*" matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
-# case-insensitive -> partial-word (cs) -> substring completion:
-zstyle ':completion:*' matcher-list 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'  
-#https://github.com/seebi/zshrc/blob/master/completion.zsh
+	# case insensitivity
+	zstyle ":completion:*" matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
+	# case-insensitive -> partial-word (cs) -> substring completion:
+	zstyle ':completion:*' matcher-list 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'  
+	#https://github.com/seebi/zshrc/blob/master/completion.zsh
 
-# allow one error for every three characters typed in approximate completer
-zstyle ':completion:*:approximate:'    max-errors 'reply=( $((($#PREFIX+$#SUFFIX)/3 )) numeric )'
+	# allow one error for every three characters typed in approximate completer
+	zstyle ':completion:*:approximate:'    max-errors 'reply=( $((($#PREFIX+$#SUFFIX)/3 )) numeric )'
 
-# start menu completion only if it could find no unambiguous initial string
-zstyle ':completion:*:correct:*'       insert-unambiguous true
-zstyle ':completion:*:corrections'     format $'%{\e[0;31m%}%d (errors: %e)%{\e[0m%}'
-zstyle ':completion:*:correct:*'       original true
+	# don't complete backup files as executables
+	zstyle ':completion:*:complete:-command-::commands' ignored-patterns '(aptitude-*|*\~)'
 
-# activate color-completion
-zstyle ':completion:*:default'         list-colors ${(s.:.)LS_COLORS}
+	# start menu completion only if it could find no unambiguous initial string
+	zstyle ':completion:*:correct:*'       insert-unambiguous true
+	zstyle ':completion:*:corrections'     format $'%{\e[0;31m%}%d (errors: %e)%{\e[0m%}'
+	zstyle ':completion:*:correct:*'       original true
 
-# format on completion
-zstyle ':completion:*:descriptions'    format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'
+	# activate color-completion
+	zstyle ':completion:*:default'         list-colors ${(s.:.)LS_COLORS}
 
-# automatically complete 'cd -<tab>' and 'cd -<ctrl-d>' with menu
-# zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
+	# format on completion
+	zstyle ':completion:*:descriptions'    format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'
 
-# insert all expansions for expand completer
-zstyle ':completion:*:expand:*'        tag-order all-expansions
-zstyle ':completion:*:history-words'   list false
+	# automatically complete 'cd -<tab>' and 'cd -<ctrl-d>' with menu
+	# zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
 
-# activate menu
-zstyle ':completion:*:history-words'   menu yes
+	# insert all expansions for expand completer
+	zstyle ':completion:*:expand:*'        tag-order all-expansions
+	zstyle ':completion:*:history-words'   list false
 
-# ignore duplicate entries
-zstyle ':completion:*:history-words'   remove-all-dups yes
-zstyle ':completion:*:history-words'   stop yes
+	# activate menu
+	zstyle ':completion:*:history-words'   menu yes
 
-# match uppercase from lowercase
-zstyle ':completion:*'                 matcher-list 'm:{a-z}={A-Z}'
+	# ignore duplicate entries
+	zstyle ':completion:*:history-words'   remove-all-dups yes
+	zstyle ':completion:*:history-words'   stop yes
 
-# separate matches into groups
-zstyle ':completion:*:matches'         group 'yes'
-zstyle ':completion:*'                 group-name ''
+	# match uppercase from lowercase
+	zstyle ':completion:*'                 matcher-list 'm:{a-z}={A-Z}'
 
-# if there are more than 5 options allow selecting from a menu
-zstyle ':completion:*'               menu select=5
-#OR# don't use any menus at all
-#setopt NO_AUTO_MENU
+	# separate matches into groups
+	zstyle ':completion:*:matches'         group 'yes'
+	zstyle ':completion:*'                 group-name ''
 
-zstyle ':completion:*:messages'        format '%d'
-zstyle ':completion:*:options'         auto-description '%d'
+	# if there are more than 5 options allow selecting from a menu
+	zstyle ':completion:*' menu select=5
+	#OR# don't use any menus at all
+	#setopt NO_AUTO_MENU
 
-# describe options in full
-zstyle ':completion:*:options'         description 'yes'
+	zstyle ':completion:*:messages'        format '%d'
+	zstyle ':completion:*:options'         auto-description '%d'
 
-# on processes completion complete all user processes
-zstyle ':completion:*:processes'       command 'ps -au$USER'
+	# describe options in full
+	zstyle ':completion:*:options'         description 'yes'
 
-# offer indexes before parameters in subscripts
-zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
+	# on processes completion complete all user processes
+	zstyle ':completion:*:processes'       command 'ps -au$USER'
 
-# provide verbose completion information
-zstyle ':completion:*'                 verbose true
+	# offer indexes before parameters in subscripts
+	zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
 
-# recent (as of Dec 2007) zsh versions are able to provide descriptions
-# for commands (read: 1st word in the line) that it will list for the user
-# to choose from. The following disables that, because it's not exactly fast.
-zstyle ':completion:*:-command-:*:'    verbose false
+	# provide verbose completion information
+	zstyle ':completion:*'                 verbose true
 
-# set format for warnings
-zstyle ':completion:*:warnings'        format $'%{\e[0;31m%}No matches for:%{\e[0m%} %d'
+	# recent (as of Dec 2007) zsh versions are able to provide descriptions
+	# for commands (read: 1st word in the line) that it will list for the user
+	# to choose from. The following disables that, because it's not exactly fast.
+	zstyle ':completion:*:-command-:*:'    verbose false
 
-# define files to ignore for zcompile
-zstyle ':completion:*:*:zcompile:*'    ignored-patterns '(*~|*.zwc)'
-zstyle ':completion:correct:'          prompt 'correct to: %e'
+	# set format for warnings
+	zstyle ':completion:*:warnings'        format $'%{\e[0;31m%}No matches for:%{\e[0m%} %d'
 
-# Ignore completion functions for commands you don't have:
-#zstyle ':completion::(^approximate*):*:functions' ignored-patterns '_*'
+	# define files to ignore for zcompile
+	zstyle ':completion:*:*:zcompile:*'    ignored-patterns '(*~|*.zwc)'
+	zstyle ':completion:correct:'          prompt 'correct to: %e'
 
-# Provide more processes in completion of programs like killall:
-zstyle ':completion:*:processes-names' command 'ps c -u ${USER} -o command | uniq'
+	# ignore completion functions for commands you don't have:
+	zstyle ':completion::(^approximate*):*:functions' ignored-patterns '_*'
 
-# complete manual by their section
-zstyle ':completion:*:manuals'    separate-sections true
-#zstyle ':completion:*:manuals.*'  insert-sections   true
-zstyle ':completion:*:man:*'      menu yes select
+	# Provide more processes in completion of programs like killall:
+	zstyle ':completion:*:processes-names' command 'ps c -u ${USER} -o command | uniq'
 
-# Search path for sudo completion
-zstyle ':completion:*:sudo:*' command-path /usr/local/sbin \
-                                           /usr/local/bin  \
-                                           /usr/sbin       \
-                                           /usr/bin        \
-                                           /sbin           \
-                                           /bin
-                                           #/usr/X11R6/bin
+	# complete manual by their section
+	zstyle ':completion:*:manuals'    separate-sections true
+	#zstyle ':completion:*:manuals.*'  insert-sections   true
+	zstyle ':completion:*:man:*'      menu yes select
 
-## compsys related snippets ##
-# provide .. as a completion
-zstyle ':completion:*' special-dirs ..
-## the default grml setup provides '..' as a completion. it does not provide
-## '.' though. If you want that too, use the following line:
-#zstyle ':completion:*' special-dirs true
+	# search path for sudo completion
+	zstyle ':completion:*:sudo:*' command-path /usr/local/sbin \
+	                                           /usr/local/bin  \
+	                                           /usr/sbin       \
+	                                           /usr/bin        \
+	                                           /sbin           \
+	                                           /bin
+	                                           #/usr/X11R6/bin
 
-# command for process lists, the local web server details and host completion
-zstyle ':completion:*:urls' local 'www' '/var/www/' 'public_html'
+	## compsys related snippets ##
+	# provide .. as a completion
+	zstyle ':completion:*' special-dirs ..
+	## the default grml setup provides '..' as a completion. it does not provide
+	## '.' though. If you want that too, use the following line:
+	#zstyle ':completion:*' special-dirs true
 
-# host completion
-[[ -r ~/.ssh/config ]] \
-&& _ssh_config_hosts=(${${(s: :)${(ps:\t:)${${(@M)${(f)"$(<$HOME/.ssh/config)"}:#Host *}#Host }}}:#*[*?]*}) || _ssh_config_hosts=()
-[[ -r ~/.ssh/known_hosts ]] \
-&& _ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
-[[ -r /etc/hosts ]] \
-&& : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
+        # run rehash on completion so new installed program are found automatically:
+        _force_rehash() {
+		(( CURRENT == 1 )) && rehash
+		return 1
+	}
 
-if [[ -n $HOST ]]
-then
-  localname=$HOST
-elif command -v hostname ; then
-  localname=$(hostname)
-elif command -v hostnamectl ; then
-  localname=$(hostnamectl --static)
-else
-  localname=$(uname -n)
-fi
+	## correction
+	# some people don't like the automatic correction - so run 'NOCOR=1 zsh' to deactivate it
+	if [[ "$NOCOR" -gt 0 ]] ; then
+		zstyle ':completion:*' completer _oldlist _expand _force_rehash _complete _files _ignored
+		setopt nocorrect
+	else
+		# try to be smart about when to use what completer...
+		setopt correct
+		zstyle -e ':completion:*' completer '
+                   if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]] ; then
+                       _last_try="$HISTNO$BUFFER$CURSOR"
+                       reply=(_complete _match _ignored _prefix _files)
+                   else
+                       if [[ $words[1] == (rm|mv) ]] ; then
+                           reply=(_complete _files)
+                       else
+                           reply=(_oldlist _expand _force_rehash _complete _ignored _correct _approximate _files)
+                       fi
+                   fi'
+	fi
 
-hosts=(
-    "${localname}"
-    "$_ssh_config_hosts[@]"
-    "$_ssh_hosts[@]"
-    "$_etc_hosts[@]"
-    localhost
-)
-unset localname _ssh_config_hosts _ssh_hosts _etc_hosts
-zstyle ':completion:*:hosts' hosts $hosts
-# TODO: so, why is this here?
-#  zstyle '*' hosts $hosts
+	# command for process lists, the local web server details and host completion
+	zstyle ':completion:*:urls' local 'www' '/var/www/' 'public_html'
 
+	# Some functions, like _apt and _dpkg, are very slow. We can use a cache in
+	# order to speed things up
+	if [[ ${GRML_COMP_CACHING:-yes} == yes ]]; then
+		GRML_COMP_CACHE_DIR=${GRML_COMP_CACHE_DIR:-${ZDOTDIR:-$HOME}/.cache}
+		if [[ ! -d ${GRML_COMP_CACHE_DIR} ]]; then
+			command mkdir -p "${GRML_COMP_CACHE_DIR}"
+		fi
+		zstyle ':completion:*' use-cache  yes
+		zstyle ':completion:*:complete:*' cache-path "${GRML_COMP_CACHE_DIR}"
+	fi
 
-## correction
-setopt CORRECT
-# some people don't like the automatic correction - so run 'NOCOR=1 zsh' to deactivate it
-#if [[ "$NOCOR" -gt 0 ]] ; then
-#    zstyle ':completion:*' completer _oldlist _expand _force_rehash _complete _files _ignored
-#    setopt nocorrect
-#else
-#    # try to be smart about when to use what completer...
-#    setopt correct
-#    zstyle -e ':completion:*' completer '
-#        if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]] ; then
-#            _last_try="$HISTNO$BUFFER$CURSOR"
-#            reply=(_complete _match _ignored _prefix _files)
-#        else
-#            if [[ $words[1] == (rm|mv) ]] ; then
-#                reply=(_complete _files)
-#            else
-#                reply=(_oldlist _expand _force_rehash _complete _ignored _correct _approximate _files)
-#            fi
-#        fi'
-#fi
+	# host completion
+	_ssh_config_hosts=()
+	if [[ -r ~/.ssh/config ]] ; then
+		_ssh_config_hosts=(${${(s: :)${(ps:\t:)${${(@M)${(f)"$(<$HOME/.ssh/config)"}:#Host *}#Host }}}:#*[*?]*})
+	fi
+	_ssh_hosts=()
+	if [[ -r ~/.ssh/known_hosts ]] ; then
+		_ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*})
+	fi
+	_etc_hosts=()
+	if [[ -r /etc/hosts ]] && [[ "$NOETCHOSTS" -eq 0 ]] ; then
+		: ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(grep -v '^0\.0\.0\.0\|^127\.0\.0\.1\|^::1 ' /etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+		#: ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+	fi
+
+	hosts=(
+		"$HOST"
+		"$_ssh_config_hosts[@]"
+		"$_ssh_hosts[@]"
+		"$_etc_hosts[@]"
+		localhost
+	)
+	zstyle ':completion:*:hosts' hosts $hosts
+	# TODO: so, why is this here?
+	#  zstyle '*' hosts $hosts
+
+	# use generic completion system for programs not yet defined; (_gnu_generic works
+	# with commands that provide a --help option with "standard" gnu-like output.)
+	for compcom in cp deborphan df feh fetchipac gpasswd head hnb ipacsum mv \
+		pal stow uname ; do
+		[[ -z ${_comps[$compcom]} ]] && compdef _gnu_generic ${compcom}
+	done; unset compcom
+}
 
 
 # global aliases (expand whatever their position)
@@ -1048,7 +1077,7 @@ most_useless_use_of_zsh()
 
 #fun
 #usage:  haha [word] [+interger]
-haha() ( x=.2; y=0.00000002; i=$x; [[ $1 = [0-9+]* ]] && set - "$2" $1; while { i=$(( i ${sign:--} ( i / ${2:-10} ) )) } { print -n "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${1:-haha?}\e[0m"; ((i<y)) && sign=+; ((i>=x)) && sign=- ;sleep $i } )
+haha() ( x=.2; y=0.00000002; i=$x; [[ $1 = [0-9+]* ]] && set - "$2" $1; while { i=$(( i ${sign:--} ( i / ${2:-10} ) )) } { print -n "\e[${RANDOM:1:1};${RANDOM:1:2};${RANDOM:1:2}m${1:-haha?}\e[0m"; ((i<y)) && sign=+; ((i>=x)) && sign=-; read -t $i } )
 
 #print a list of html entities
 htmlentities()
@@ -1195,7 +1224,7 @@ for f in \
 	/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
 	~/.rc
 do [[ -e "$f" ]] && . "$f"
-done ;unset f
+done; unset f
 
 #highlight brackets
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)  #(pattern)

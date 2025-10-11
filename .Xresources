@@ -643,6 +643,8 @@ xterm*charClass: 33:48,36-47:48,58-59:48,61:48,63-64:48,95:48,126:48
 !xterm.vt100.on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
 
 !keybindings
+xterm*vt100.resizeGravity: Center
+
 xterm.vt100.translations: #override \n\
 	Meta <Key>minus:smaller-vt-font() \n\
 	Meta <Key>plus:larger-vt-font() \n\

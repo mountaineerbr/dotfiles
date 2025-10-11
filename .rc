@@ -1,7 +1,7 @@
 #
 # ~/.rc
 # shell functions
-# 2025  by mountaineerbr
+# 2025-October  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 #                        __       _                  ___
 #  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
@@ -10,65 +10,11 @@
 
 # This file is sourced by ~/.bashrc, ~/.kshrc, and ~/.zshrc
 
-#tmux
-#file to hold Tmux signal
-_TMUXSIG="${TMPD:-/tmp}/tmux.exit.$EUID"
-
-#exit tmux, and terminal emulator
-qq() { 	[[ -z $TMUX ]] || echo exit >"$_TMUXSIG"; exit ;}
-
-#start tmux
-if [[ -n $ZSH_VERSION && -z $TMUX$VIFMSET && $EUID -gt 0 ]]
-then
-	# Check if the line contains "attached"
-	unset REPLY session;
-	while IFS= read -r
-	do case "$REPLY" in *[Aa]ttached*) continue;;
-		[0-9]:*|[0-9][0-9]:*) session=${REPLY%%:*}; break;;
-	  esac;
-	done < <(tmux ls)
-	# If attached session is found, attach to it
-	if [[ -n $session ]]
-	then
-		command tmux attach  #attach-session -t $session
-	# If no detached session found, create a new session
-	else
-		command tmux
-	fi &&
-	#is exit signal file present?
-	if [[ -e $_TMUXSIG ]]
-	then
-		#execute a simple command
-		set -- "$(<"$_TMUXSIG")"
-		command rm "$_TMUXSIG"
-		eval "$*"
-		set --
-	fi
-	unset REPLY session;
-	#new-session -n $HOST
-	#tmux attach \; new-window
-#Tmux DBUS (and other envars) on my Arch Linux i7
-elif [[ -n $TMUX && -z $DBUS_SESSION_BUS_ADDRESS ]] && pidof -q xfce4-session
-then
-	while read envar
-	do 	export "$envar"
-	done < <(xargs --null --max-args=1 < /proc/$(pidof xfce4-session)/environ \
-	| grep -e DBUS_SESSION_BUS_ADDRESS -e CDM_SPAWN -e CREDENTIALS_DIRECTORY \
-	-e DEBUGINFOD_URLS -e GTK3_MODULES -e GTK_MODULES -e '^HG' -e LC_ADDRESS \
-	-e LC_MEASUREMENT -e LC_MONETARY -e LC_TIME -e LESSOPEN -e MAIL \
-	-e MOTD_SHOWN -e NVCC_PREPEND_FLAGS -e XDG_RUNTIME_DIR -e XDG_SEAT \
-	-e XDG_SESSION_CLASS -e XDG_SESSION_ID -e XDG_SESSION_TYPE -e XDG_VTNR)
-	unset envar
-	#https://askubuntu.com/questions/772631/how-to-connect-screen-tmux-byobu-to-dbus
-	#dont use: export $(dbus-launch)
-	#https://bbs.archlinux.org/viewtopic.php?id=289375
-fi
-
 #set xterm font
 #{ echo -e "\e]50;-xos4-terminus-medium-r-*--18-*-*-*-*-*-*-*\a" ;}
 
 #sources
-[[ -e ~/.apikeys ]] && . ~/.apikeys
+[[ -e ~/.rc.tmux ]] && . ~/.rc.tmux
 
 #welcome message
 [[ -e ~/bin/welcome_message.sh ]] && . ~/bin/welcome_message.sh
@@ -617,15 +563,8 @@ out()
 	echo '[nothing to do]' >&2
 	return 1
 }
-#OBS: ``$_TMUXSIG'' is defined at ~/.rc file!
+#OBS: ``$_TMUXSIG'' is defined at ~/.rc.tmux!
 
-#exit tmux and rerun last command
-#{
-#	if [[ -n $TMUX ]]
-#	then 	fc -ln -- -1 >"$_TMUXSIG"
-#		exit
-#	else 	fc -s
-#	fi ;}
 
 #startx
 #alias x=startx
@@ -1585,6 +1524,7 @@ missinglibs()
 	END { for (key in list) print key list[key] }
 '
 }
+#check: rebuild-detector -> checkrebuild
 
 # upgrade all outdated python libraries
 # OBS: dangerous if your package manager does this (such as `pacman`)
@@ -4647,14 +4587,4 @@ btcsupply()
 ##https://github.com/cointop-sh/cointop/issues/315
 #
 #clip() { termux-clipboard-set "$@" ;}
-
-
-#temporary
-#conferir convocação seed-pr (rotina)
-seedpr()
-{
-	cdump https://concursos.ibfc.org.br/informacoes/421/ 2>/dev/null | hf |
-	grep -A 2 -i -e 'convocação .* posse';
-}
-
 
