@@ -1,10 +1,10 @@
 # dotfiles
 Shell, terminal, and other configuration files
 
-
----
+<!--
 
 # This repo __[moved to GitLab](https://gitlab.com/mountaineerbr/dotfiles/)__.
+-->
 
 ---
 
