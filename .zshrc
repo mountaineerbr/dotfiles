@@ -7,7 +7,6 @@
 #\__/\_,_/___/\__/_/ |_|__,__/\_,_/\_, /
 #                                 /___/
 
-
 #Global Order: zshenv, zprofile, zshrc, zlogin
 
 #GRML's zshrc
