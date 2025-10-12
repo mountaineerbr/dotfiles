@@ -202,8 +202,6 @@ export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
 
 #wf.sh -- norway institute of meteorology
 export WFAV="
-ponta grossa:-25.0891685:-50.1601812:975
-sapopema:-23.9105099:-50.5791315:759
 apucarana:-23.5525327:-51.4610764:840
 arapongas:-23.4152862:-51.4293961:816
 astorga:-23.2350184:-51.6647074:675
@@ -213,7 +211,9 @@ foz do igua[cç][uú]:-25.5401479:-54.5858139:164
 general carneiro:-26.422982:-51.3146691:983
 gramado:-29.3924265:-50.912571:850
 guaratuba:-25.8806192:-48.5750905:0
+ponta grossa:-25.0891685:-50.1601812:975
 porto alegre:-30.0324999:-51.2303767:10
+sapopema:-23.9105099:-50.5791315:759
 "
 
 
