@@ -1,33 +1,20 @@
+#
 # ~/.profile
-# 2025-October  by mountaineerbr
+# 2025-Oct-11  by mountaineerbr
+# sourced from ~/.bashrc and ~/.zhenv
+#
+# executed by the command interpreter for login shells
+# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login exists
+# see /usr/share/doc/bash/examples/startup-files
 
-# executed by the command interpreter for login shells.
-# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login exists.
-# see /usr/share/doc/bash/examples/startup-files for examples.
-
-# the default umask is set in /etc/profile; for setting the umask
-# for ssh logins, install and configure the libpam-umask package.
-# umask 022
-
-#make sure user locale is loaded (depends on user settings)
-#I don't know of programs that will use ~/.config/locale.conf.
-#Most (if not all) Linux/glibc programs use the LANG and LC_* environment 
-#variables. So to have a working locale in your environment, you have to know
-#how unix environment variables are inherited and from where in your case.
-#https://arch-general.archlinux.narkive.com/XzmUEBIU/where-s-my-locale-gone
-#unset LANG && source /etc/profile.d/locale.sh
-
-#sourced by my ~/.zhenv, too.
-
-#personal api keys
-[[ -e ~/.apikeys ]] && . ~/.apikeys
-
-#if running bash
 #source from .bashrc if it exists
 [[ -n $BASH_VERSION ]] &&
 	[[ -e "$HOME/.bashrc" ]] && . "$HOME/.bashrc"
 
-#go path
+#personal api keys
+[[ -e "$HOME/.apikeys" ]] && . "$HOME/.apikeys"
+
+#golang path
 export GOPATH="$HOME/go"
 
 #set custom $PATH
@@ -48,12 +35,24 @@ unset d
 #set $CDPATH
 CDPATH=".:..:$HOME:$HOME/bin:$CDPATH"
 CDPATH="${CDPATH%:}"
-#ex: % CDPATH=/etc
-#ex: % cd mail
+#eg: % CDPATH=/etc
+#eg: % cd mail
 #pwd: /etc/mail
 #https://linux.101hacks.com/cd-command/cdpath/
 #a . is needed to cd into $PWD dir before any other in $CDPATH
 #https://bosker.wordpress.com/2012/02/12/bash-scripters-beware-of-the-cdpath/
+
+# the default umask is set in /etc/profile; for setting the umask
+# for ssh logins, install and configure the libpam-umask package.
+# umask 022
+
+#make sure user locale is loaded (depends on user settings)
+#I don't know of programs that will use ~/.config/locale.conf.
+#Most (if not all) Linux/glibc programs use the LANG and LC_* environment 
+#variables. So to have a working locale in your environment, you have to know
+#how unix environment variables are inherited and from where in your case.
+#unset LANG && source /etc/profile.d/locale.sh
+#https://arch-general.archlinux.narkive.com/XzmUEBIU/where-s-my-locale-gone
 
 #full-screen text editor
 export VISUAL="${VISUAL:-vim}"
