@@ -1,7 +1,7 @@
 #
 # ~/.rc
 # shell functions
-# 2025-October  by mountaineerbr
+# 2025-Oct-11  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 #                        __       _                  ___
 #  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
@@ -308,7 +308,7 @@ sanitize()
 	chmod -R u=rwX,g=rX,o= "$@"
 }
 
-#(un)archive and gpg file/dir
+#run gpg and (un)archive files/dirs
 gar()
 {
 	#decrypt (sigle file)
@@ -372,7 +372,7 @@ htmlfilter()
 alias htmldump=htmlfilter
 alias hf=htmlfilter
 alias hf2="sed 's/<[^>]*>//g'"
-alias hf3="sed -Ee 's/<\/\?(script|style)[^>]*>/\n&\n/g' | sed -Ee '/^<(script|style)[^>]*>/,/^<\/(script|style)>/ d' -e '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }'"
+alias hf3="sed -e '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }'"
 #https://www.thegeekstuff.com/2009/12/unix-sed-tutorial-6-examples-for-sed-branching-operation/
 
 #filter html from clipboard
@@ -4582,4 +4582,14 @@ btcsupply()
 ##https://github.com/cointop-sh/cointop/issues/315
 #
 #clip() { termux-clipboard-set "$@" ;}
+
+
+
+#temporary
+#conferir convocação seed-pr (rotina)
+seedpr()
+{
+	cdump https://concursos.ibfc.org.br/informacoes/421/ 2>/dev/null | hf |
+	grep -A 2 -i -e 'convocação .* posse';
+}
 
