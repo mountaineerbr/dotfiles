@@ -211,7 +211,7 @@ alias df='df -h'  # human-readable sizes
 #removing files: set -I to interactively ask once
 alias rm='rm --interactive=always'
 #copying: '-i' interactively & recursively on
-alias cp='cp --interactive'
+alias cp='cp -v --interactive'
 #moving
 alias mv='mv --interactive'
 
@@ -2516,6 +2516,7 @@ codepoint()
 #emoji, a little hard on the terminal buffer
 alias emoji='curl https://www.unicode.org/Public/emoji/14.0/emoji-test.txt'
 alias emoji2='htmlentities 129510 8986'
+rj() { 	rofimoji 2>&1 | xsel -b ;}
 
 # Ring the terminal bell, and put a badge on Terminal.app’s Dock icon
 # (useful when executing time-consuming commands)
@@ -4566,12 +4567,10 @@ btcsupply()
 #alias db=dropbear
 #alias kd='killall dropbear'
 #alias ksshd='pkill sshd'
-#
 #alias open=termux-open
 #alias o=open
 #alias lock=termux-wake-lock
 #alias unlock=termux-wake-unlock
-#alias upchat='cd ~/www/shellchatgpt; gres; cd -'
 #alias pac='pkg install'
 #alias pacr='pkg uninstall'
 #alias s='pkg search'
@@ -4582,14 +4581,5 @@ btcsupply()
 ##https://github.com/cointop-sh/cointop/issues/315
 #
 #clip() { termux-clipboard-set "$@" ;}
-
-
-
-#temporary
-#conferir convocação seed-pr (rotina)
-seedpr()
-{
-	cdump https://concursos.ibfc.org.br/informacoes/421/ 2>/dev/null | hf |
-	grep -A 2 -i -e 'convocação .* posse';
-}
+#upchat() { cd ~/www/shellchatgpt; gres; cd - ;}
 

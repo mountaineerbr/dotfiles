@@ -2,3 +2,12 @@
 #
 
 .include /home/jsn/.config/pulse/default.pa.custom
+
+### BEGIN: Equalized audio configuration
+### Generated from: pulseaudio-equalizer
+.nofail
+load-module module-ladspa-sink sink_name=ladspa_output.mbeq_1197.mbeq sink_master=bluez_sink.E6_48_09_70_2F_3E.a2dp_sink plugin=mbeq_1197 label=mbeq control=3.0,7.0,7.3,7.0,3.0,-1.0,-6.6,-6.3,-4.5,-4.0,3.1,7.9,9.6,9.9,6.8
+set-default-sink ladspa_output.mbeq_1197.mbeq
+set-sink-mute bluez_sink.E6_48_09_70_2F_3E.a2dp_sink 0
+.fail
+### END: Equalized audio configuration

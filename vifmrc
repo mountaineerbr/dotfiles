@@ -203,12 +203,12 @@ endif
 
 ":mark mark /full/directory/path [filename]
 mark 1 ~
+mark h ~
 mark q ~/arq
 mark c ~/arq/concursos
 mark d ~/arq/docs
 mark D ~/Documents
 mark k ~/.config/conky/confs
-mark M /media
 mark s ~/bin
 mark t /tmp
 mark T ~/tmp
@@ -238,6 +238,10 @@ command! make !!make %a
 command! mkcd :mkdir %a | cd %a
 command! vgrep vim "+grep %a"
 command! reload :write | restart full
+
+command copyh !cp -f "%f" "%D"
+command copys !cp -f "%F" "%D"
+
 
 " Open Root ViFM
 command! Root :!sudo vifm %d %D

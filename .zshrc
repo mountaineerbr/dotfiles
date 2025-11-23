@@ -128,7 +128,8 @@ setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_ALL_DUPS
 
 #remove command lines from the history list when the first character on the line is a space
-setopt NO_HIST_IGNORE_SPACE
+#setopt NO_HIST_IGNORE_SPACE
+setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
 setopt HIST_NO_FUNCTIONS 
 setopt HIST_FIND_NO_DUPS #!#important
@@ -1263,3 +1264,9 @@ compdef _files mail
 
 compdef _chatgpt.sh chat
 
+
+## TERMUX Android
+#
+#[[ -d ~/www/shellChatGPT/comp/zsh/ ]] && fpath+=(~/www/shellChatGPT/comp/zsh/)
+#
+#PS1="%(?..%? )jack@g35:%1~ %# "
