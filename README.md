@@ -18,15 +18,15 @@ Shell, terminal, and other configuration files
 
 ## Dotfiles
 
-Most __shell functions__ and __aliases__ are at __[.rc file](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.rc)__.
+Most __shell functions__ and __aliases__ are at the __[.rc file](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.rc)__.
 That is sourced from
 both [.bashrc](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.bashrc) and [.zshrc](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.zshrc), which contain configs for each shell.
 
 The [.rc file](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.rc) changes constantly and is also a testcamp for new code.
 When functions become large, and mature, they may be promoted to
-full-fledged scripts and moved to __[scripts repo](https://gitlab.com/mountaineerbr/scripts)__.
+full-fledged scripts and moved to the __[scripts repo](https://gitlab.com/mountaineerbr/scripts)__.
 
-Some configuration files from `/etc` (such as `/etc/issue`) and subdirectories under `~/.config` (such as `~/.config/vifm/vifmrc`) are present but not hierarchically organised in this repo. 
+Some configuration files from `/etc` (such as `/etc/issue`) and subdirectories under `~/.config` (such as `~/.config/vifm/vifmrc`) are present but not hierarchically organised in this repo.
 
   
   
