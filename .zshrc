@@ -128,7 +128,6 @@ setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_ALL_DUPS
 
 #remove command lines from the history list when the first character on the line is a space
-#setopt NO_HIST_IGNORE_SPACE
 setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
 setopt HIST_NO_FUNCTIONS 
@@ -200,8 +199,8 @@ HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
 #do not add to history, however it stays in the interactive history
 HISTORY_IGNORE='(q|qq|exit|bye)'
 #HISTORY_IGNORE="(ls|cd|pwd|exit|cd)"
-HISTSIZE=1000000
-SAVEHIST=100000
+HISTSIZE=6000
+SAVEHIST=4000
 
 # dirstack handling
 DIRSTACKSIZE=20

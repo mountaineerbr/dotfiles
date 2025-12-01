@@ -505,7 +505,7 @@ inoremap <c-S> <c-r>+
 " expressions, input() lines & debug cmds
 " It does not manage Undo history!
 " Default is 50; max 10000
-set history=6000
+set history=4000
 "Notes: There are five separate history tables:
 "- one for ':' commands
 "- one for search strings
@@ -527,7 +527,7 @@ set history=6000
 set undofile
 " Undo levels
 " ( Default: 1000 for Unix )
-set undolevels=3000
+set undolevels=2000
 
 "TIP: move through history branches!
 " type g- and g+

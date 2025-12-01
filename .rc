@@ -2516,7 +2516,7 @@ codepoint()
 #emoji, a little hard on the terminal buffer
 alias emoji='curl https://www.unicode.org/Public/emoji/14.0/emoji-test.txt'
 alias emoji2='htmlentities 129510 8986'
-rj() { 	rofimoji 2>&1 | xsel -b ;}
+alias rj='rofimoji'
 
 # Ring the terminal bell, and put a badge on Terminal.app’s Dock icon
 # (useful when executing time-consuming commands)
