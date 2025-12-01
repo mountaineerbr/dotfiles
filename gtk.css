@@ -1,0 +1,59 @@
+
+
+/* CSS for XFCE4 Panel Systray */
+
+/* 
+#sn-button {
+	padding: 1px;
+	margin: 0px;
+}
+#sn-button image {
+	-gtk-icon-transform: scale(0.95);
+}
+
+#xfce-panel-toggle-button image {
+	-gtk-icon-transform: scale(0.8);
+}
+*/
+
+
+/* 
+#pulseaudio-button {
+	min-width: 12px;
+	min-height: 12px;
+	padding: 1px;
+}
+
+#pulseaudio-button box {
+	padding: 1px;
+	margin: 0px;
+}
+*/
+#pulseaudio-button image {
+	-gtk-icon-transform: scale(0.84);
+	/* min-width: 8px; */
+	/* min-height: 8px; */
+	padding: 1px;
+}
+
+/*
+#xfce4-power-manager-plugin {
+	padding: 1px;
+}
+#xfce4-power-manager-plugin image {
+	-gtk-icon-transform: scale(0.7);
+}
+*/
+
+/* https://www.reddit.com/r/xfce/comments/1p8xdyw/how_can_i_properly_resize_these_icons/ */
+
+
+/*
+ * CHECK THE SELECTOR WITH GTK INSPECTOR
+ *
+ * First:
+ * gsettings set org.gtk.Settings.Debug enable-inspector-keybinding true
+ *
+ * Then:
+ * killall xfce4-panel && GTK_DEBUG=interactive xfce4-panel 
+ */
