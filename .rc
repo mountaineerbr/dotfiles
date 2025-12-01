@@ -1,7 +1,7 @@
 #
 # ~/.rc
 # shell functions
-# 2025-Oct-11  by mountaineerbr
+# 2025-Dec  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 #                        __       _                  ___
 #  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
@@ -2516,7 +2516,7 @@ codepoint()
 #emoji, a little hard on the terminal buffer
 alias emoji='curl https://www.unicode.org/Public/emoji/14.0/emoji-test.txt'
 alias emoji2='htmlentities 129510 8986'
-alias rj='rofimoji'
+alias rj='rofimoji -a copy'
 
 # Ring the terminal bell, and put a badge on Terminal.app’s Dock icon
 # (useful when executing time-consuming commands)
