@@ -197,7 +197,7 @@ setopt PUSHD_IGNORE_DUPS
 #history
 HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
 #do not add to history, however it stays in the interactive history
-HISTORY_IGNORE='(q|qq|exit|bye)'
+HISTORY_IGNORE='(q|qq|exit|bye|gitup|upchat|upchatall)'
 #HISTORY_IGNORE="(ls|cd|pwd|exit|cd)"
 HISTSIZE=6000
 SAVEHIST=4000

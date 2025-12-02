@@ -110,7 +110,7 @@ HISTFILESIZE=10000
 
 #history duplicate controls
 #history erases duplicates
-HISTCONTROL=erasedups:ignoredups
+HISTCONTROL=erasedups:ignoredups:ignorespace
 #HISTCONTROL is a colon-separated list of values
 
 #history ignore cmds
