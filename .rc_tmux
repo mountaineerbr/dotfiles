@@ -56,6 +56,15 @@ then
 fi
 
 
+# Check for X11, a missing SESSION_MANAGER, and a running xfwm4.
+if [[ -n $TMUX && -n $DISPLAY && -z $SESSION_MANAGER ]] && pgrep xfwm4 >/dev/null;
+then
+    sm_var=$(tr '\0' '\n' < /proc/$(pgrep xfwm4)/environ | grep SESSION_MANAGER) &&
+    [[ -n "$sm_var" ]] && export "$sm_var";
+    unset sm_var
+fi
+
+
 #exit tmux and rerun last command
 #{
 #	if [[ -n $TMUX ]]
