@@ -218,16 +218,6 @@ tibagi:-24.50944:-50.41361:748
 ribeirao preto:-21.180889:-47.845444:546
 "
 
-
-# Check for X11, a missing SESSION_MANAGER, and a running xfwm4.
-if [[ -n $DISPLAY && -z $SESSION_MANAGER ]] && pgrep xfwm4 >/dev/null;
-then
-    sm_var=$(tr '\0' '\n' < /proc/$(pgrep xfwm4)/environ | grep SESSION_MANAGER) &&
-    [[ -n "$sm_var" ]] && export "$sm_var";
-    unset sm_var
-fi
-
-
 #is it linux tty?
 if [[ "$TERM" = linux ]]
 then
