@@ -6,7 +6,7 @@ Shell, terminal, and other configuration files
 
 These are kept at
 `~/.config/systemd/user/` or
-`/etc/systemd/system`.
+`/etc/systemd/system/`.
 
 
 ### User
