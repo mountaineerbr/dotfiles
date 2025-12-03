@@ -13,7 +13,7 @@ Shell, terminal, and other configuration files
 
 ## Dotfiles
 
-Most __shell functions__ and __aliases__ are at the __[.rc file](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.rc)__.
+Most __shell functions__ and __aliases__ are at the __[.rc file](.rc)__.
 That is sourced from
 both [.bashrc](.bashrc) and [.zshrc](.zshrc), which contain configs for each shell.
 
