@@ -19,7 +19,9 @@ both [.bashrc](.bashrc) and [.zshrc](.zshrc), which contain configs for each she
 
 The [.rc file](.rc) changes constantly and is also a testcamp for new code.
 When functions become large, and mature, they may be promoted to
-full-fledged scripts and moved to the __[scripts repo](https://gitlab.com/mountaineerbr/scripts)__.
+full-fledged scripts and moved to the
+__[GitLab repo](https://gitlab.com/mountaineerbr/scripts)__ and
+__[GitHub repo](https://github.com/mountaineerbr/scripts)__.
 
 Some configuration files from `/etc` (such as `/etc/issue`) and subdirectories under `~/.config` (such as `~/.config/vifm/vifmrc`) are present but not hierarchically organised in this repo.
 
