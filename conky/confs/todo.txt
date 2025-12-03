@@ -1,0 +1,20 @@
+========================== TO-DO LISTS +++ [ 03/Dec/2025 ] =====================
++ Fazer banco de perguntas/repostas para estudo
++ Carros a diesel usam mais platina, a gasolina mais paládio.
++ 
++ 
++                                   
++                   "                   "    ""#   
++                 mmm    mmm   mmmmm  mmm      #   
++                   #   "   #  # # #    #      #   
++                   #   m"""#  # # #    #      #   
++                   #   "mm"#  # # #  mm#mm    "mm 
++                   #                              
++                 ""                               
++ 
++ Fibs  : 23.6%, 38.2%, 61.8% and 78.6%
++ SMAs  : 3(pink), 7(red) e 30(blue) for weekly e monthly (T. Jenks)
++ 
++ 1.Singularity 2.Transferability 3.Unconfiscatability 4.Privacy 5.Invisibility
++ 6.Divisibility 7.Fungibility 8.Anonimity 9.Universality 10.Eternality
+============================== [ 20 L - END ] ==================================
