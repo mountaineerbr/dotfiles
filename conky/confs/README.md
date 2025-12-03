@@ -2,7 +2,7 @@
 Shell, terminal, and other configuration files
 
 
-## SystemD User Services
+## Conkies
 
 
 <br/>
@@ -15,19 +15,13 @@ Shell, terminal, and other configuration files
 
 <br/>
 
-These services are stored at `~/.config/systemd/user/` and are managed via the `systemctl --user` command.
+These conkies are stored at `~/.config/conky/confs/`.
 
-*   **Wallpaper:** [_Timer_](wallpaper.timer) / [_Service_](wallpaper.service) pair that runs a background update [_script_](wallpaper.sh) to periodically fetch and set a new desktop background from NASA's SDO / GOES satellites.
-    *   **Tip:** user is required to update the script [`wallpaper.sh`](wallpaper.sh) to work with his Desktop Environment!
+A [_systemd service_](../../systemd/user/conky-session.service) launches the conkies with a
+[_shell script_](../../systemd/user/conkykiller.sh), and a
+[_systemd timer_](../../systemd/user/conky-restart.timer)
+periodically kills and respawns the conkies.
 
-*   **Conky:** [_Service_](conky-session.service) to launch multiple conkies and [_timer_](conky-restart.timer) / [_trigger_](conky-restart-trigger.service) pair to periodically restart them.
-    *   **Tip:** The restart mechanism uses an indirect trigger (`timer → trigger → session`)!
-
-<!--
-    SDO - Solar Dynamics Observatory
-   GOES - Geostationary Operational Environmental Satellite
-
-   -->
 
 <br/>
 
@@ -35,6 +29,7 @@ These services are stored at `~/.config/systemd/user/` and are managed via the `
 
 ---
 
+<!--
 
     :::::::-.      ...   ::::::::::::.-:::::'::: :::    .,:::::: .::::::. 
      ;;,   `';, .;;;;;;;.;;;;;;;;'''';;;'''' ;;; ;;;    ;;;;'''';;;`    ` 
@@ -55,4 +50,6 @@ These services are stored at `~/.config/systemd/user/` and are managed via the `
      /  ' \/ _ \/ // / _ \/ __/ _ `/ / _ \/ -_) -_) __/ _  / __/
     /_/_/_/\___/\_,_/_//_/\__/\_,_/_/_//_/\__/\__/_/ /____/_/   
                                                             
+
+-->
 
