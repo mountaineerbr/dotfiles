@@ -7,11 +7,15 @@ Shell, terminal, and other configuration files
 These are kept at `~/.config/systemd/user/` and managed through `systemctl --user` command.
 
 ![ScreenShot](https://gitlab.com/mountaineerbr/etc/-/raw/main/gfx/git_screenshot2.jpg)
-Fig 1. *My current desktop with conkies and the changing wallpaper of the Sun (from GOES).*
+  </br>
+  Fig 1. *My current desktop with conkies and the changing wallpaper of the Sun (from GOES).*
 
 
- 
+
+</br>
+
 ---
+
 
     :::::::-.      ...   ::::::::::::.-:::::'::: :::    .,:::::: .::::::. 
      ;;,   `';, .;;;;;;;.;;;;;;;;'''';;;'''' ;;; ;;;    ;;;;'''';;;`    ` 
