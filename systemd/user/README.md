@@ -17,12 +17,17 @@ Shell, terminal, and other configuration files
 
 These services are kept at `~/.config/systemd/user/` and are managed via the `systemctl --user` command.
 
-*   **Wallpaper:** [_Timer_](wallpaper.timer) / [_Service_](wallpaper.service) pair that runs a background update [_script_](wallpaper.sh) to periodically fetch and set a new desktop background from NASA's SDO/GOES satellites.
-    *   **Tip:** user is required to update the script `wallpaper.sh` to work with his DE.
+*   **Wallpaper:** [_Timer_](wallpaper.timer) / [_Service_](wallpaper.service) pair that runs a background update [_script_](wallpaper.sh) to periodically fetch and set a new desktop background from NASA's SDO / GOES satellites.
+    *   **Tip:** user is required to update the script [`wallpaper.sh`](wallpaper.sh) to work with his Desktop Environment!
 
 *   **Conky:** [_Service_](conky-session.service) to launch multiple conkies and [_timer_](conky-restart.timer) / [_trigger_](conky-restart-trigger.service) pair to periodically restart them.
-    *   **Tip:** The restart mechanism uses an indirect trigger (`timer → trigger → session`).
+    *   **Tip:** The restart mechanism uses an indirect trigger (`timer → trigger → session`)!
 
+<!--
+    SDO - Solar Dynamics Observatory
+   GOES - Geostationary Operational Environmental Satellite
+
+   -->
 
 <br/>
 
