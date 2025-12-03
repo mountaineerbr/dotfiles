@@ -15,7 +15,7 @@ Shell, terminal, and other configuration files
 
 Most __shell functions__ and __aliases__ are at the __[.rc file](.rc)__.
 That is sourced from
-both [.bashrc](.bashrc) and [.zshrc](.zshrc), which contain configs for each shell.
+both __[.bashrc](.bashrc)__ and __[.zshrc](.zshrc)__, which contain configs for each shell.
 
 The [.rc file](.rc) changes constantly and is also a testcamp for new code.
 When functions become large, and mature, they may be promoted to
