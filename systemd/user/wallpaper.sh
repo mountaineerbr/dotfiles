@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 # Download and Set New Wallpaper XFCE4
-# v0.2  Dec/2025  mountaineerbr
+# v0.2.1  Dec/2025  mountaineerbr
 
 
 #curl with custom parameters
@@ -18,12 +18,10 @@ sdof()
 	dir_sdo=${PICTURES_DIR}/SDO
 	dir_goes=${PICTURES_DIR}/GOES
 
-	[[ -d $dir_sdo ]] || mkdir -pv -- "$dir_sdo" || return;
-	[[ -d $dir_goes ]] || mkdir -pv -- "$dir_goes" || return;
-
-
 	if ((RANDOM%2))
-	then
+	then 	#sdo
+		[[ -d $dir_sdo ]] || mkdir -pv -- "$dir_sdo" || return;
+
 		lengths=(
 			latest_1024_0094.jpg
 			latest_1024_0131.jpg
@@ -35,11 +33,13 @@ sdof()
 			latest_1024_HMID.jpg
 			latest_1024_1600.jpg
 		)
-
+		
 		filename="${lengths[RANDOM%${#lengths[@]}]}"
 		filepath="${dir_sdo}/${filename:-${lengths[0]}}"
 		url="https://sdo.gsfc.nasa.gov/assets/img/latest/${filepath##*/}"
 	else
+		#goes
+		[[ -d $dir_goes ]] || mkdir -pv -- "$dir_goes" || return;
 
 		if ((RANDOM%2))
 		then
