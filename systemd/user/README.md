@@ -7,7 +7,7 @@ Shell, terminal, and other configuration files
 These are kept at `~/.config/systemd/user/` and managed through `systemctl --user` command.
 
 
-<br/> <br/>
+<br/>
 
 ![ScreenShot](https://gitlab.com/mountaineerbr/etc/-/raw/main/gfx/git_screenshot2.jpg)
   <br/>
