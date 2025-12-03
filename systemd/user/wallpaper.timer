@@ -1,0 +1,12 @@
+# ~/.config/systemd/user/wallpaper.timer
+
+[Unit]
+Description=Timer to download and set new wallpaper
+
+[Timer]
+OnCalendar=*:02,17,32,47
+OnBootSec=3min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

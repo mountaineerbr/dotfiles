@@ -1,0 +1,17 @@
+# ~/.config/systemd/user/conky-session.service
+
+[Unit]
+Description=Conky Session Manager
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExitType=cgroup
+ExecStart=%h/bin/conkykiller.sh
+ExecStop=/usr/bin/killall conky
+TimeoutStopSec=3s
+#Restart=on-failure
+#RestartSec=6s
+
+[Install]
+WantedBy=graphical-session.target

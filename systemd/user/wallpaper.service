@@ -1,0 +1,11 @@
+# ~/.config/systemd/user/wallpaper.service
+
+[Unit]
+Description=Download and set New Wallpaper
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+#User=jsn
+ExecStart=%h/bin/wallpaper.sh

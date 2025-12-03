@@ -1,0 +1,15 @@
+# ~/.config/systemd/user/conky-restart.timer
+
+[Unit]
+Description=Restart conky every 6 hours
+
+
+[Timer]
+OnActiveSec=4min
+OnCalendar=*-*-* 0/6:00:00
+Persistent=false
+#Unit=conky-session.service
+Unit=conky-restart-trigger.service
+
+[Install]
+WantedBy=timers.target

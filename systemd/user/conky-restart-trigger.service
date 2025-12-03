@@ -1,0 +1,8 @@
+# ~/.config/systemd/user/conky-restart-trigger.service
+
+[Unit]
+Description=Trigger for Conky session restart
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl --user restart conky-session.service

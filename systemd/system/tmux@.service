@@ -1,8 +1,7 @@
-#/etc/systemd/system/tmux@.service
+# /etc/systemd/system/tmux@.service
+
 [Unit]
 Description=Start tmux in detached session
-
-#
 After=graphical-session.target
 
 [Service]
@@ -13,6 +12,4 @@ ExecStop=/usr/bin/tmux kill-session -t %u
 
 [Install]
 #WantedBy=multi-user.target
-
-#
 WantedBy=graphical-session.target
