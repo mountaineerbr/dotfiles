@@ -7,5 +7,4 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-#User=jsn
 ExecStart=%h/bin/wallpaper.sh
