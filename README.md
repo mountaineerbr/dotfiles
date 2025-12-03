@@ -15,9 +15,9 @@ Shell, terminal, and other configuration files
 
 Most __shell functions__ and __aliases__ are at the __[.rc file](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.rc)__.
 That is sourced from
-both [.bashrc](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.bashrc) and [.zshrc](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.zshrc), which contain configs for each shell.
+both [.bashrc](.bashrc) and [.zshrc](.zshrc), which contain configs for each shell.
 
-The [.rc file](https://gitlab.com/mountaineerbr/dotfiles/-/blob/main/.rc) changes constantly and is also a testcamp for new code.
+The [.rc file](.rc) changes constantly and is also a testcamp for new code.
 When functions become large, and mature, they may be promoted to
 full-fledged scripts and moved to the __[scripts repo](https://gitlab.com/mountaineerbr/scripts)__.
 
