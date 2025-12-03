@@ -3,6 +3,7 @@ Shell, terminal, and other configuration files
 
 ---
 
+
     :::::::-.      ...   ::::::::::::.-:::::'::: :::    .,:::::: .::::::. 
      ;;,   `';, .;;;;;;;.;;;;;;;;'''';;;'''' ;;; ;;;    ;;;;'''';;;`    ` 
      `[[     [[,[[     \[[,   [[     [[[,,== [[[ [[[     [[cccc '[==/[[[[,
@@ -26,13 +27,15 @@ __[GitHub repo](https://github.com/mountaineerbr/scripts)__.
 Some configuration files from `/etc` (such as `/etc/issue`) and subdirectories under `~/.config` (such as `~/.config/vifm/vifmrc`) are present but not hierarchically organised in this repo.
 
 
- 
+
 
 ![ScreenShot](https://gitlab.com/mountaineerbr/etc/-/raw/main/gfx/git_screenshot1.png)
-Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](https://www.youtube.com/watch?v=Mu3BfD6wmPg "Chilled Cow by Kupla")
+  <br/>
+  Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](https://www.youtube.com/watch?v=Mu3BfD6wmPg "Chilled Cow by Kupla")
 
- 
- 
+
+<br/>
+
 
                    __  ___                  
      _______ ____ / /_/ _ |_    _____ ___ __
@@ -46,8 +49,11 @@ Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](htt
                                                             
 
 
+
 <!--
 
+
 # This repo __[may be moved to GitLab](https://gitlab.com/mountaineerbr/dotfiles/)__.
+
 -->
 
