@@ -33,7 +33,7 @@ sdof()
 			latest_1024_HMID.jpg
 			latest_1024_1600.jpg
 		)
-		
+
 		filename="${lengths[RANDOM%${#lengths[@]}]}"
 		filepath="${dir_sdo}/${filename:-${lengths[0]}}"
 		url="https://sdo.gsfc.nasa.gov/assets/img/latest/${filepath##*/}"
