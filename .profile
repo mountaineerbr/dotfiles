@@ -1,11 +1,12 @@
 #
 # ~/.profile
-# 2025-Oct-11  by mountaineerbr
+# 2026  by mountaineerbr
 # sourced from ~/.bashrc and ~/.zhenv
 #
 # executed by the command interpreter for login shells
 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login exists
 # see /usr/share/doc/bash/examples/startup-files
+
 
 #source from .bashrc if it exists
 [[ -n $BASH_VERSION ]] &&
@@ -14,23 +15,26 @@
 #personal api keys
 [[ -e "$HOME/.apikeys" ]] && . "$HOME/.apikeys"
 
+
 #golang path
 export GOPATH="$HOME/go"
 
+
 #set custom $PATH
-for d in  \
+for dir in  \
 	"$GOPATH/bin" \
 	"$HOME/.local/bin" \
 	"$HOME/bin/more" \
 	"$HOME/bin/markets" \
 	"$HOME/bin" \
-	.
+	"." 
 do
-	if [[ -d "$d" ]] && [[ :"$PATH": != *:"${d:-x}":* ]]
-	then 	PATH="$d:$PATH"
+	if [[ -d $dir ]] && [[ :$PATH: != *:${dir:-x}:* ]]
+	then 	PATH=$dir:$PATH
 	fi
 done
-unset d
+unset dir
+
 
 #set $CDPATH
 CDPATH=".:..:$HOME:$HOME/bin:$CDPATH"
@@ -67,12 +71,25 @@ CDPATH="${CDPATH%:}"
 #export PAPERSIZE=a4
 ##export LANGUAGE=$LANG
 
+#export XDG_CONFIG_HOME=$HOME/.config
+#export XDG_CONFIG_HOME=$HOME/.cache 
+#export XDG_DATA_HOME =$HOME/.local/share
+#more in ~/.config/user-dirs.dirs
+#xdg-user-dir TEMPLATES
+
 #full-screen text editor
 export VISUAL="${VISUAL:-vim}"
 #stream editor
 export EDITOR="$VISUAL"
 #sudoers editor
 export SUDO_EDITOR="$VISUAL"
+
+export BROWSER="w3m"
+#if [ -n "$DISPLAY" ]
+#then export BROWSER=firefox
+#else export BROWSER=links
+#fi
+#https://wiki.archlinux.org/index.php/environment_variables#Examples
 
 #man pager
 #export MANPAGER="vim -M +MANPAGER -u ~/.vimrc_manpager -"
@@ -138,19 +155,6 @@ export GTK_OVERLAY_SCROLLING=0
 #XCURSOR_SIZE=32
 #from crystal-style icon-set (Marco Martin, 2004)
 
-#set default repo for ala.sh script
-#default repo?
-#user set environment variable $DEFALAREPO ?
-#export DEFALAREPO=month
-
-#$BROWSER contains the path to the web browser
-export BROWSER="w3m"
-#if [ -n "$DISPLAY" ]
-#then export BROWSER=firefox
-#else export BROWSER=links
-#fi
-#https://wiki.archlinux.org/index.php/environment_variables#Examples
-
 
 #MOZILLA FIREFOX
 #Enable OpenGL in `pvkrun' and `primusrun'
@@ -201,8 +205,7 @@ export BCEXTFILE="$HOME/bin/bcalc_ext.bc"
 export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
 
 #wf.sh -- norway institute of meteorology
-export WFAV="
-apucarana:-23.5525327:-51.4610764:840
+export WFAV="apucarana:-23.5525327:-51.4610764:840
 arapongas:-23.4152862:-51.4293961:816
 astorga:-23.2350184:-51.6647074:675
 belo horizonte:-19.9227318:-43.9450948:852
@@ -215,8 +218,8 @@ ponta grossa:-25.0891685:-50.1601812:975
 porto alegre:-30.0324999:-51.2303767:10
 sapopema:-23.9105099:-50.5791315:759
 tibagi:-24.50944:-50.41361:748
-ribeirao preto:-21.180889:-47.845444:546
-"
+ribeirao preto:-21.180889:-47.845444:546"
+
 
 #is it linux tty?
 if [[ "$TERM" = linux ]]

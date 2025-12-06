@@ -61,7 +61,7 @@ set fastrun
 " Maximum number of changes that can be undone
 " One file deleted, one unit, not one operation
 " (Default: 100)
-set undolevels=1600
+set undolevels=2000
 
 " If you installed the vim.txt help file set vimhelp.
 " If would rather use a plain text help file set novimhelp.
@@ -203,12 +203,10 @@ endif
 
 ":mark mark /full/directory/path [filename]
 mark 1 ~
-mark h ~
-mark q ~/arq
-mark c ~/arq/concursos
 mark d ~/arq/docs
 mark D ~/Documents
-mark k ~/.config/conky/confs
+mark h ~
+mark q ~/arq
 mark s ~/bin
 mark t /tmp
 mark T ~/tmp

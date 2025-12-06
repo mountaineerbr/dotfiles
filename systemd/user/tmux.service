@@ -1,0 +1,19 @@
+# ~/.config/systemd/user/tmux.service -- use %u
+# /etc/systemd/system/tmux@.service  -- use %I
+
+[Unit]
+Description=Start tmux in detached session for user (%u) <%I>
+#After=user-graphical-login.target
+After=graphical-session.target
+
+[Service]
+Type=forking
+#User=%I
+ExecStart=/usr/bin/tmux new-session -s %u -d
+ExecStop=/usr/bin/tmux kill-session -t %u
+
+[Install]
+#WantedBy=default.target
+#WantedBy=multi-user.target
+#WantedBy=user-graphical-login.target
+WantedBy=graphical-session.target

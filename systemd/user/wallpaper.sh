@@ -18,7 +18,7 @@ sdof()
 	dir_sdo=${PICTURES_DIR}/SDO
 	dir_goes=${PICTURES_DIR}/GOES
 
-	if ((RANDOM%2))
+	if   ! :;  ##((RANDOM%2))
 	then 	#sdo
 		[[ -d $dir_sdo ]] || mkdir -pv -- "$dir_sdo" || return;
 
@@ -93,7 +93,7 @@ ipmetf()
 {
 	typeset filepath filename var
 
-	if ((RANDOM%2))
+	if   ((RANDOM%4))   #3/4
 	then
 		#ipmet
 		filepath=$(IMGVIEWER=":" ${HOME}/bin/ipmet.sh)

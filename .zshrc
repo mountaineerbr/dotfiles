@@ -1,6 +1,6 @@
 #
 # ~/.zshrc
-# 2025-October  by mountaineerbr
+# 2026  by mountaineerbr
 #               __  ___
 # _______ ____ / /_/ _ |_    _____ ___ __
 #/ __/ _ `(_-</ __/ __ | |/|/ / _ `/ // /
@@ -197,7 +197,7 @@ setopt PUSHD_IGNORE_DUPS
 #history
 HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
 #do not add to history, however it stays in the interactive history
-HISTORY_IGNORE='(q|qq|exit|bye|gitup|upchat|upchatall)'
+HISTORY_IGNORE='(q|qq|exit|bye|upchat|upchatall)'
 #HISTORY_IGNORE="(ls|cd|pwd|exit|cd)"
 HISTSIZE=6000
 SAVEHIST=4000
@@ -893,24 +893,23 @@ alias - -="fg %-"
 # 'hash' some often used directories
 #maybe CDABLE_VARS must be enabled
 hash -d arq=~/arq
-hash -d bak=~/bak
 hash -d bin=~/bin
-hash -d dl=~/Downloads
+hash -d doc=~/arq/docs
 hash -d Doc=~/Documents
-hash -d docs=~/arq/docs
 hash -d markets=~/bin/markets
-hash -d media=/run/media
 hash -d mkt=~/bin/markets
+hash -d media=/run/media
 hash -d tmp=~/tmp
 hash -d w=~/Downloads
+hash -d www=~/Downloads
 
 # start
-hash -d doc=/usr/share/doc
+#hash -d doc=/usr/share/doc
 hash -d linux=/lib/modules/$(command uname -r)/build/
 hash -d log=/var/log
 hash -d slog=/var/log/syslog
 hash -d src=/usr/src
-hash -d www=/var/www
+#hash -d www=/var/www
 
 # aliases
 alias la=' ls -la'
@@ -1221,9 +1220,17 @@ zmodload -aF zsh/datetime b:strftime p:EPOCHSECONDS
 for f in \
 	/usr/share/doc/pkgfile/command-not-found.zsh \
 	/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
-	~/.rc
+	~/.rc 
 do [[ -e "$f" ]] && . "$f"
 done; unset f
+
+
+#start termux  (~/.rc function)
+[[ -n ${TMUX}${VIFMSET} ]] ||
+[[ ${EUID} -eq 0 ]] || [[ $- != *i* ]] ||
+! command -v tmux_hack >/dev/null 2>&1 ||
+tmux_hack;
+
 
 #highlight brackets
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)  #(pattern)

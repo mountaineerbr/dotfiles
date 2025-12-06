@@ -7,8 +7,9 @@ After=graphical-session.target
 [Service]
 Type=forking
 User=%I
-ExecStart=/usr/bin/tmux new-session -s %u -d
-ExecStop=/usr/bin/tmux kill-session -t %u
+# WARNING: use %I instead of %u here; %u=root in system services.
+ExecStart=/usr/bin/tmux new-session -s %I -d
+ExecStop=/usr/bin/tmux kill-session -t %I
 
 [Install]
 #WantedBy=multi-user.target

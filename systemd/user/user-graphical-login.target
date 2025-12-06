@@ -1,0 +1,10 @@
+# ~/.config/systemd/user/user-graphical-login.target
+#
+#https://naftuli.wtf/2017/12/28/systemd-user-environment/
+#https://bbs.archlinux.org/viewtopic.php?id=247292
+
+[Unit]
+Description=User Graphical Login
+Requires=default.target
+After=default.target
+
