@@ -16,7 +16,7 @@
 [[ -e "$HOME/.apikeys" ]] && . "$HOME/.apikeys"
 
 
-#set custom $PATH
+#idempotently add directories to PATH
 for dir in  \
 	"$GOPATH/bin" \
 	"$HOME/.local/bin" \
@@ -31,13 +31,13 @@ do
 done
 unset dir
 
-#set $CDPATH
+#search path for `cd dir' from anywhere
 CDPATH=".:..:$HOME:$HOME/bin:$CDPATH"
-CDPATH="${CDPATH%:}"
+CDPATH="${CDPATH%%:}"
 #https://linux.101hacks.com/cd-command/cdpath/
 #https://bosker.wordpress.com/2012/02/12/bash-scripters-beware-of-the-cdpath/
 
-#golang path
+#golang
 export GOPATH="$HOME/go"
 
 #full-screen text editor
@@ -59,7 +59,7 @@ export BROWSER="w3m"
 #export EMAIL=nobody@nowhere.away
 
 #pager
-export PAGER=less
+export PAGER="less"
 
 #less config
 #export LESSOPEN="|lesspipe.sh %s"  #just install pkg `lesspipe'
@@ -192,7 +192,7 @@ export GTK_OVERLAY_SCROLLING=0
 export BCEXTFILE="$HOME/bin/bcalc_ext.bc"
 
 #config for bitcoin.{blk,tx}.sh
-export BITCOINCONF=/media/primary/blockchain/bitcoin.conf
+export BITCOINCONF="/media/primary/blockchain/bitcoin.conf"
 
 #wf.sh -- norway institute of meteorology
 export WFAV="apucarana:-23.5525327:-51.4610764:840
