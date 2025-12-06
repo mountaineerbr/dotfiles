@@ -8,16 +8,12 @@
 # see /usr/share/doc/bash/examples/startup-files
 
 
-#source from .bashrc if it exists
-[[ -n $BASH_VERSION ]] &&
+#bash interactive login shells
+[[ -n $BASH_VERSION ]] && [[ $- = *i* ]] &&
 	[[ -e "$HOME/.bashrc" ]] && . "$HOME/.bashrc"
 
 #personal api keys
 [[ -e "$HOME/.apikeys" ]] && . "$HOME/.apikeys"
-
-
-#golang path
-export GOPATH="$HOME/go"
 
 
 #set custom $PATH
@@ -35,20 +31,76 @@ do
 done
 unset dir
 
-
 #set $CDPATH
 CDPATH=".:..:$HOME:$HOME/bin:$CDPATH"
 CDPATH="${CDPATH%:}"
-#eg: % CDPATH=/etc
-#eg: % cd mail
-#pwd: /etc/mail
 #https://linux.101hacks.com/cd-command/cdpath/
-#a . is needed to cd into $PWD dir before any other in $CDPATH
 #https://bosker.wordpress.com/2012/02/12/bash-scripters-beware-of-the-cdpath/
 
-# the default umask is set in /etc/profile; for setting the umask
-# for ssh logins, install and configure the libpam-umask package.
-# umask 022
+#golang path
+export GOPATH="$HOME/go"
+
+#full-screen text editor
+export VISUAL="${VISUAL:-vim}"
+#stream editor
+export EDITOR="$VISUAL"
+#sudoers editor
+export SUDO_EDITOR="$VISUAL"
+
+export BROWSER="w3m"
+#if [ -n "$DISPLAY" ]
+#then export BROWSER=firefox
+#else export BROWSER=links
+#fi
+#https://wiki.archlinux.org/index.php/environment_variables#Examples
+
+#mail
+#export MAIL="/var/mail/$USER"
+#export EMAIL=nobody@nowhere.away
+
+#pager
+export PAGER=less
+
+#less config
+#export LESSOPEN="|lesspipe.sh %s"  #just install pkg `lesspipe'
+#export LESS=' -R'
+#
+#LESS='-i -e -M -P%t?f%f :stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
+
+#bat pages
+export BAT_STYLE="numbers"
+
+#man pager
+#export MANPAGER="vim -M +MANPAGER -u ~/.vimrc_manpager -"
+#export MANWIDTH=83
+#export MANPAGER='col -b | vim -u ~/.vimmanrc --not-a-term -'  #trilby
+#from arch wiki: https://wiki.archlinux.org/title/Color_output_in_console#Using_less
+#export MANPAGER="less -R --use-color -Dd+r -Du+b"
+export MANROFFOPT="-P -c"
+#grotty from groff >1.23.0 requires "-c" option to output overstricken output instead of ansi escapes. less relies on the overstrike formatting to apply its color options, so we need man to pass this option when formatting the man pages for customization to be effective.
+
+#timezone config (unix system can automatically set locale time)
+#export TZ=America/Sao_Paulo
+#export TZ=/etc/localtime  #dont TZ=:/etc/localtime
+#https://bbs.archlinux.org/viewtopic.php?id=65318&p=279
+
+#`ls -l` date format
+export TIME_STYLE="long-iso"
+
+#set up for a better xfce4 session
+export QT_QPA_PLATFORMTHEME="qt5ct"
+#export QT_SELECT=4  #qt4 is deprecated
+export QT_AUTO_SCREEN_SCALE_FACTOR=0
+#export QT_SCALE_FACTOR=1  #for hi dpi
+export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
+#https://github.com/manjaro/manjaro-xfce-settings/blob/master/skel/.profile
+
+#gtk 3
+#export NO_AT_BRIDGE=1
+#keep gtk scrollbars from autohidding:
+export GTK_OVERLAY_SCROLLING=0
+#https://github.com/AladW/dotfiles/blob/master/xinit/.xinitrc
+#https://github.com/linuxmint/Cinnamon/issues/5306
 
 #make sure user locale is loaded (depends on user settings)
 #I don't know of programs that will use ~/.config/locale.conf.
@@ -71,55 +123,12 @@ CDPATH="${CDPATH%:}"
 #export PAPERSIZE=a4
 ##export LANGUAGE=$LANG
 
+#xdg base directory specification
 #export XDG_CONFIG_HOME=$HOME/.config
 #export XDG_CONFIG_HOME=$HOME/.cache 
 #export XDG_DATA_HOME =$HOME/.local/share
 #more in ~/.config/user-dirs.dirs
 #xdg-user-dir TEMPLATES
-
-#full-screen text editor
-export VISUAL="${VISUAL:-vim}"
-#stream editor
-export EDITOR="$VISUAL"
-#sudoers editor
-export SUDO_EDITOR="$VISUAL"
-
-export BROWSER="w3m"
-#if [ -n "$DISPLAY" ]
-#then export BROWSER=firefox
-#else export BROWSER=links
-#fi
-#https://wiki.archlinux.org/index.php/environment_variables#Examples
-
-#man pager
-#export MANPAGER="vim -M +MANPAGER -u ~/.vimrc_manpager -"
-#export MANWIDTH=83
-#export MANPAGER='col -b | vim -u ~/.vimmanrc --not-a-term -'  #trilby
-#from arch wiki: https://wiki.archlinux.org/title/Color_output_in_console#Using_less
-#export MANPAGER="less -R --use-color -Dd+r -Du+b"
-export MANROFFOPT="-P -c"
-#grotty from groff >1.23.0 requires "-c" option to output overstricken output instead of ansi escapes. less relies on the overstrike formatting to apply its color options, so we need man to pass this option when formatting the man pages for customization to be effective.
-
-#pager
-export PAGER=less
-
-#less config
-#export LESSOPEN="|lesspipe.sh %s"  #just install pkg `lesspipe'
-#export LESS=' -R'
-#
-#LESS='-i -e -M -P%t?f%f :stdin .?pb%pb\%:?lbLine %lb:?bbByte %bb:-...'
-
-#bat pages
-export BAT_STYLE="numbers"
-
-#timezone config (unix system can automatically set locale time)
-#export TZ=America/Sao_Paulo
-#export TZ=/etc/localtime  #dont TZ=:/etc/localtime
-#https://bbs.archlinux.org/viewtopic.php?id=65318&p=279
-
-#mail
-#export MAIL="/var/mail/$USER"
-#export EMAIL=nobody@nowhere.away
 
 #ViFM c file
 #MYVIFMRC="$VIFM/vifmrc"
@@ -128,32 +137,13 @@ export BAT_STYLE="numbers"
 #fim, fbi improved file viewer
 #export FBFONT=/usr/share/kbd/consolefonts/ter-216n.psf.gz
 
-#`ls -l` date format
-export TIME_STYLE="long-iso"
-
-#set up for a better xfce4 session
-export QT_QPA_PLATFORMTHEME="qt5ct"
-#export QT_SELECT=4  #qt4 is deprecated
-export QT_AUTO_SCREEN_SCALE_FACTOR=0
-#export QT_SCALE_FACTOR=1  #for hi dpi
-export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
-#https://github.com/manjaro/manjaro-xfce-settings/blob/master/skel/.profile
-
-#gtk 3
-#export NO_AT_BRIDGE=1
-#keep gtk scrollbars from autohidding:
-export GTK_OVERLAY_SCROLLING=0
-#https://github.com/AladW/dotfiles/blob/master/xinit/.xinitrc
-#https://github.com/linuxmint/Cinnamon/issues/5306
-
-#xdg base directory specification
-#export XDG_DATA_HOME="$HOME/.local/share"
-#export XDG_CONFIG_HOME="$HOME/.config"
-#export XDG_CACHE_HOME="$HOME/.cache"
-
 #enable 32x32 cursors
 #XCURSOR_SIZE=32
 #from crystal-style icon-set (Marco Martin, 2004)
+
+# the default umask is set in /etc/profile; for setting the umask
+# for ssh logins, install and configure the libpam-umask package.
+# umask 022
 
 
 #MOZILLA FIREFOX
