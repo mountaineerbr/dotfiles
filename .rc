@@ -550,7 +550,7 @@ out()
 {
 	if ps aux | grep \[x\]fce4-session | grep -q "^$(whoami)"
 	then
-		echo 'xfce4-session-logout --logout --fast' >&2;
+		echo '[xfce4-session-logout]' >&2;
 		xfce4-session-logout --logout --fast;
 	fi
 }
@@ -743,21 +743,26 @@ alias bat='bat --style=changes,snip,header'
 #move to trash
 trash()
 {
-	local g gg n file trash
-	trash=${XDG_DATA_HOME:-${HOME}/.local/share}/Trash/files
-	[[ -d ${trash} ]] || mkdir -pv -- "${trash}" || return;
+	local trash file name stamp
+
+	trash="${XDG_DATA_HOME:-$HOME/.local/share}/Trash/files";
+	[[ -d $trash ]] || mkdir -pv -- "$trash" || return;
 
 	for file
-	do  file=${file%%/} g=${file##*/};
-		if [[ -e ${trash}/${g} ]]
-		then 	for ((n=2;n<100;n++))
-			do 	gg=${g}-${n};
-				[[ $g == .* ]] || [[ ${g%.*} == ${g} ]] || gg=${g%.*}-${n}.${g##*.};
-				[[ -e ${trash}/${gg} ]] && continue;
-				g=${gg}; break;
-			done;
-		fi;
-		[[ -n ${g} ]] && /usr/bin/mv -v -- "$file" "${trash}/${g}"
+	do 	file=${file%%/} name=${file##*/};
+
+		if [[ -e $trash/$name ]]
+		then
+			stamp=$(date +'%Y-%m-%dT%H-%M-%S');
+			#stamp=$(date +'%s.%N');  #bash: EPOCHREALTIME
+
+			if [[ -d $file ]] || [[ $name == .* ]] || [[ ${name%.*} == $name ]]
+			then 	name=${name}-${stamp};
+			else 	name=${name%.*}-${stamp}.${name##*.};
+			fi
+		fi
+
+		command mv -v -- "$file" "$trash/$name";
 	done;
 }
 

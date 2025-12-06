@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 # Download and Set New Wallpaper XFCE4
-# v0.2.1  Dec/2025  mountaineerbr
+# v0.2.2  Dec/2025  mountaineerbr
 
 
 #curl with custom parameters
@@ -18,7 +18,7 @@ sdof()
 	dir_sdo=${PICTURES_DIR}/SDO
 	dir_goes=${PICTURES_DIR}/GOES
 
-	if   ! :;  ##((RANDOM%2))
+	if ((RANDOM%2))
 	then 	#sdo
 		[[ -d $dir_sdo ]] || mkdir -pv -- "$dir_sdo" || return;
 
@@ -93,7 +93,7 @@ ipmetf()
 {
 	typeset filepath filename var
 
-	if   ((RANDOM%4))   #3/4
+	if ((RANDOM%2))
 	then
 		#ipmet
 		filepath=$(IMGVIEWER=":" ${HOME}/bin/ipmet.sh)
