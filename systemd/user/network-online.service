@@ -1,0 +1,10 @@
+[Unit]
+Description=Wait for Network Online
+
+[Service]
+Type=oneshot
+ExecStart=/home/jsn/bin/wait-for-network.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=default.target

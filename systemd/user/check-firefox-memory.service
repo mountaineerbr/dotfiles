@@ -1,0 +1,8 @@
+[Unit]
+Description=Check and kill Firefox if RAM usage exceeds threshould
+After=network.target
+
+[Service]
+Type=oneshot
+#User=jsn
+ExecStart=/home/jsn/bin/check-firefox-memory.sh
