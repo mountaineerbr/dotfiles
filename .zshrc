@@ -1232,9 +1232,14 @@ done; unset f
 tmux_hack;
 
 
+#aliasing `mail' may conflict with Z-shell autocompletion
+compdef _files mail
+#https://unix.stackexchange.com/questions/677280/disable-zsh-smart-autocompletion-for-gem-command-but-keep-ordinary-path-compl
+compdef _chatgpt.sh chat
+
+
 #highlight brackets
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)  #(pattern)
-
 
 #declare user-overidable styles
 #ZSH_HIGHLIGHT_STYLES[default]=none
@@ -1262,13 +1267,6 @@ ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue,bold
 #ZSH_HIGHLIGHT_STYLES[assign]=none
 #https://blog.patshead.com/2012/01/using-and-customizing-zsh-syntax-highlighting-with-oh-my-zsh.html
 #https://blog.aktsbot.in/color-me-baby.html
-
-
-#aliasing `mail' may conflict with Z-shell autocompletion
-compdef _files mail
-#https://unix.stackexchange.com/questions/677280/disable-zsh-smart-autocompletion-for-gem-command-but-keep-ordinary-path-compl
-
-compdef _chatgpt.sh chat
 
 
 ## TERMUX Android
