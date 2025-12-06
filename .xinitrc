@@ -61,8 +61,7 @@ dbus-update-activation-environment --systemd --all
 #https://gitlab.xfce.org/xfce/xfce4-session/-/issues/213
 #https://github.com/i3/i3/issues/5186
 
-#import env to systemd 
-#systemctl --user import-environment DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS XDG_RUNTIME_DIR
+#import environment to systemd 
 #manual hook to be able to run services at login:
 #systemctl --no-block --user start xsession.target
 #https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg
