@@ -1,4 +1,6 @@
 #!/bin/sh
+# ~/.xinitrc
+# 2026  by mountaineerbr
 
 #some defaults files are not present
 #in arch linux by defaults
@@ -47,31 +49,39 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
 	unset f
 fi
 
-#start picom (fork of compton)
-picom --dbus -b
+
+#import x11 and dbus envars
+systemctl --user import-environment DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS XDG_RUNTIME_DIR
+dbus-update-activation-environment --systemd --all
+
+#xfce4 and graphical-session.target 
+#!# currently managed by xfce4 session startup!
+#systemctl --user start xfce-session.target
+#stop must be set with xfce4 session startup manager!
+#https://gitlab.xfce.org/xfce/xfce4-session/-/issues/213
+#https://github.com/i3/i3/issues/5186
 
 #import env to systemd 
-##systemctl --user import-environment DISPLAY XAUTHORITY
-#!#systemd should import xorg env automatically
-#manual hook to be able to run services at login
-#systemctl --no-block --user xsession.target
+#systemctl --user import-environment DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS XDG_RUNTIME_DIR
+#manual hook to be able to run services at login:
+#systemctl --no-block --user start xsession.target
 #https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg
-
-#start systemd services
-#systemctl --user conkies.service
 
 
 #nvidia driver
 #xrandr --setprovideroutputsource modesetting NVIDIA-0
 #xrandr --auto
 
-#load key binding
-xbindkeys
-
 #start conky service
-##systemctl --user start conky.service &
+#systemctl --user start conky.service &
 
 #oneko -tora & oneko -tomoyo &
+
+#start picom (fork of compton)
+picom --dbus -b
+
+#load key binding
+xbindkeys
 
 #start xfce4
 exec startxfce4

@@ -1,0 +1,8 @@
+# ~/.config/systemd/user/xfce-session.target
+#enable graphical-session.target and xfce-session.target
+#https://git.linux-help.org/infusix/xfce-session-target
+
+[Unit]
+Description=XFCE Session Running
+BindsTo=graphical-session.target
+

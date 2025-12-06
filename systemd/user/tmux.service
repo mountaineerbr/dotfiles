@@ -2,18 +2,20 @@
 # /etc/systemd/system/tmux@.service  -- use %I
 
 [Unit]
-Description=Start tmux in detached session for user (%u) <%I>
-#After=user-graphical-login.target
-After=graphical-session.target
+Description=Start tmux in detached session for (%u) <%I>
+#After=graphical-session.target
+After=default.target
 
 [Service]
 Type=forking
+#ExitType=cgroup
 #User=%I
 ExecStart=/usr/bin/tmux new-session -s %u -d
 ExecStop=/usr/bin/tmux kill-session -t %u
+#requires: loginctl enable-linger $(whoami)
+#requires: tmux set-option -g exit-empty off
 
 [Install]
-#WantedBy=default.target
+#WantedBy=graphical-session.target
 #WantedBy=multi-user.target
-#WantedBy=user-graphical-login.target
-WantedBy=graphical-session.target
+WantedBy=default.target
