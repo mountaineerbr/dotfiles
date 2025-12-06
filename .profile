@@ -1,7 +1,7 @@
 #
 # ~/.profile
 # 2026  by mountaineerbr
-# sourced from ~/.bashrc and ~/.zhenv
+# config source for bash and zsh
 #
 # executed by the command interpreter for login shells
 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login exists
