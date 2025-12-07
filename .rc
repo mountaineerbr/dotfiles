@@ -1587,6 +1587,7 @@ activate()
 	source ~/venv/bin/activate 
 }
 #exit: deactivate
+#see also: pipx, pipenv
 
 #list aur packages
 alias aurl='curl https://aur.archlinux.org/packages.gz'
