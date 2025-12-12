@@ -1,7 +1,6 @@
 #!/bin/bash
-#
-# Example config file for cdm(1).
-# Values set here is the default as in cdm(1).
+# /etc/cdmrc
+# by mountaineerbr  2026
 
 # List of programs, commands with whitespaces should be quoted or escaped.
 # If unset, all sessions in /etc/X11/Sessions or /usr/share/xsessions are
@@ -16,8 +15,11 @@
 # )
 binlist=(
    '/bin/startxfce4'                # XFCE
+   '/bin/startx'                    # StartX (user ~/.xinitrc)
    '/bin/bash --login'              # or just execute your shell,
    '/usr/bin/fbterm'                # or start a frame buffer console,
+   '/bin/systemctl reboot'          # Shut down and reboot the system 	
+   '/bin/systemctl poweroff'        # Shut down and power-off the system 	
 )
 
 # List all program display names, one-by-one matched with $binlist.
@@ -25,7 +27,7 @@ binlist=(
 #
 # (Continued example:)
 # namelist=('X session' Console FBTerm 'Sub menu')
-namelist=(XFCE Console FBTerm)
+namelist=(XFCE X-Session Console FBTerm Reboot Power-Off)
 
 # Type of the programs, one-by-one matched with $binlist.
 # `C' for *C*onsole programs, which would be `exec'ed.
@@ -33,7 +35,7 @@ namelist=(XFCE Console FBTerm)
 #
 # (Continued example:)
 # flaglist=(X C C C)
-flaglist=(C C C)
+flaglist=(C C C C C C)
 
 # Style for the cdm dialog, which is printed with dialog(1).
 # Default to unset, causing dialog(1) to use the system wide default.

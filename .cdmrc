@@ -1,40 +1,27 @@
 #!/bin/bash
-#
-# Example config file for cdm(1).
-# Values set here is the default as in cdm(1).
+# ~/.cdmrc  by mountaineerbr  2026
 
 # List of programs, commands with whitespaces should be quoted or escaped.
 # If unset, all sessions in /etc/X11/Sessions or /usr/share/xsessions are
 # offered as choices.
-#
-# (An example:)
-#binlist=(
-#   '~/.xsession'                    # Launch your X session,
-#   '/bin/bash --login'              # or just execute your shell,
-#   '/usr/bin/fbterm'                # or start a frame buffer console,
-#   '/usr/bin/cdm ~/.submenu.cdmrc'  # or go to a submenu :)
-# )
-
 binlist=(
-   '/bin/startx'                    # Use Xinitrc
-   '/bin/zsh --login'               # or just execute your shell,
-   '/bin/bash --login'              # or just execute your shell,
+   '/bin/startxfce4'                # XFCE
+   '/bin/startx'                    # StartX (user ~/.xinitrc)
+   '/bin/zsh --login'               # Zsh
+   '/bin/bash --login'              # Bash
+   '/bin/systemctl reboot'          # Shut down and reboot the system 	
+   '/bin/systemctl poweroff'        # Shut down and power-off the system 	
  )
 
 # List all program display names, one-by-one matched with $binlist.
 # Names with whitespaces should be quoted or escaped.
-#
-# (Continued example:)
-# namelist=('X session' Console FBTerm 'Sub menu')
-namelist=('X session' Zsh Bash)
+namelist=('XFCE' 'X-Session' 'Zsh' 'Bash' 'Reboot' 'Power-Off')
 
 # Type of the programs, one-by-one matched with $binlist.
 # `C' for *C*onsole programs, which would be `exec'ed.
 # `X' for *X* programs, which would be run with cdm-xlaunch(1).
-#
-# (Continued example:)
-# flaglist=(X C C C)
-flaglist=(C C C)
+flaglist=(C C C C C C)
+
 
 # Style for the cdm dialog, which is printed with dialog(1).
 # Default to unset, causing dialog(1) to use the system wide default.
@@ -71,7 +58,7 @@ cktimeout=30
 #   /usr/bin/X :$display "${serverargs[@]}" vt$((xtty+display))
 # Arguments with whitespaces should be quoted or escaped.
 #serverargs=(-nolisten tcp)
-serverargs=( )  #i have got that set up i ~/.xserverrc
+serverargs=( )  #see user configuration: ~/.xserverrc
 
 # Alternative method of calling startx(/setsid). Should only be set if cdm
 # does not start X as expected (bash -x shows call to setsid startx, but for
@@ -81,3 +68,4 @@ altstartx=no
 
 # Destination for stdout and stderr output from startx.
 startxlog=/dev/null
+

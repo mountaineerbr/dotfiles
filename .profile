@@ -129,6 +129,7 @@ export GTK_OVERLAY_SCROLLING=0
 #export XDG_DATA_HOME =$HOME/.local/share
 #more in ~/.config/user-dirs.dirs
 #xdg-user-dir TEMPLATES
+#usually set up by a desktop environment software
 
 #ViFM c file
 #MYVIFMRC="$VIFM/vifmrc"

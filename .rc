@@ -1244,6 +1244,9 @@ alias marv="chat --md --time -256- -cc --frequency-penalty=0.7 --temp=0.8 --top_
 alias learn='chatgpt.sh -cc -6000 --goo --top-p 0.95 --top-k 64 -m learnlm-1.5-pro-experimental'
 alias dchatgpt.sh=$HOME/bin/openai/debug.chatgpt.sh
 alias dchat=dchatgpt.sh
+#chatgpt.sh with deepseek speciale
+alias deep='DEEPSEEK_BASE_URL=https://api.deepseek.com/v3.2_speciale_expires_on_20251215 chatgpt.sh --deepseek -cc'
+
 
 #local-ai
 lchat()
@@ -2110,7 +2113,7 @@ unichar()
 }
 #see also: https://stackoverflow.com/questions/41125346/how-do-i-display-the-unicode-syntax-uxxxx-from-a-string/41125383
 
-#url encode/decode - percente codes
+#url encode/decode - percent codes
 #python2
 #alias urldecode='python -c "import sys, urllib as ul; print ul.unquote_plus(sys.argv[1])"'
 #alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])"'
@@ -2153,7 +2156,7 @@ urldecode()
 #encode URL with UTF-8 chars
 urlencode()
 {
-	jq --slurp --raw-input --raw-output @uri <<<$*;
+	printf '%s' "$*" | jq --slurp --raw-input --raw-output @uri;
 }
 
 #submit sitemap to google
@@ -2391,13 +2394,10 @@ moon()
 #ip adresses
 myip()
 {
-	{
-	  date -R
-	  { 	#wget -cq http://jsonip.com/ -O -
-		wget -qO- https://ipv4.jsonip.com/
-		wget -qO- https://ipv6.jsonip.com/
-	  } | jq -r '.ip'
-	} | tee -a ~/.myIP.log
+ 	{  #wget -cq http://jsonip.com/ -O -
+	    wget -qO- https://ipv4.jsonip.com/
+	    wget -qO- https://ipv6.jsonip.com/
+	} | jq -r '.ip'
 }
 #sed -Ee 's/.*("ip"[^,]*).*/\1/' -e 's/["]//g;s/:/ /;s/$/\n/'
 #https://www.ostechnix.com/how-to-parse-and-pretty-print-json-with-linux-commandline-tools/
