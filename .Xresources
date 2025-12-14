@@ -556,6 +556,8 @@ xterm.vt100.internalBorder: 2
 !xterm fonts
 !for a font list, use 'xlsfonts'
 !unicode is the character set, UTF-8 is an encoding of it, related to ISO 10646
+!list chars in of a font:
+!xfd -fn '-xos4-terminus-medium-r-normal--16-160-72-72-c-80-iso10646-1'
 
 !default font:
 !xterm*vt100.font:
