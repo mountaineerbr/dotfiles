@@ -555,21 +555,15 @@ xterm.vt100.internalBorder: 2
 
 !xterm fonts
 !for a font list, use 'xlsfonts'
-
-!Unicode is the character set, UTF-8 is an encoding of it, related to ISO 10646
+!unicode is the character set, UTF-8 is an encoding of it, related to ISO 10646
 
 !default font:
-!xterm*font: -xos4-terminus-medium-r-normal--14-140-72-72-c-80-iso10646-1
-xterm*font: -xos4-terminus-medium-r-normal--16-160-72-72-c-80-iso10646-1
-!xterm*font: -xos4-terminus-medium-r-normal--18-180-72-72-c-100-iso10646-1
-!xterm*font: -xos4-terminus-medium-r-normal--20-200-72-72-c-100-iso10646-1
-!xterm*font: -xos4-terminus-medium-r-normal--22-220-72-72-c-110-iso10646-1
-!xterm*font: -xos4-terminus-medium-r-normal--24-240-72-72-c-120-iso10646-1
-!!xterm*font: -xos4-terminus-medium-r-normal--28-280-72-72-c-140-iso10646-1
-!xterm*font: -xos4-terminus-medium-r-normal--32-320-72-72-c-160-iso10646-1
-!xterm*font: *-fixed-*-*-18-*-*
-
+!xterm*vt100.font:
+!xterm.vt100.utf8Fonts.font
+xterm*vt100.font: -xos4-terminus-medium-r-normal--16-160-72-72-c-80-iso10646-1
+xterm*vt100.boldFont: -xos4-terminus-bold-r-normal--16-160-72-72-c-80-iso10646-1
 !xterm*font: -misc-terminess nerd font mono-medium-r-normal--0-0-0-0-m-0-iso10646-1
+!xterm*font: *-fixed-*-*-18-*-*
 
 !good fonts:
 !7x14
@@ -589,7 +583,7 @@ xterm*font1: -xos4-terminus-medium-r-normal--0-0-72-72-c-0-iso10646-1
 !tiny:
 xterm*font2: -xos4-terminus-medium-r-normal--12-120-72-72-c-60-iso10646-1
 !small:
-xterm*font3: -xos4-terminus-medium-r-normal--14-160-72-72-c-80-iso10646-1
+xterm*font3: -xos4-terminus-medium-r-normal--14-140-72-72-c-80-iso10646-1
 !xterm*font3: -xos4-terminus-medium-r-normal--18-180-72-72-c-100-iso10646-1
 !medium:
 xterm*font4: -xos4-terminus-medium-r-normal--22-220-72-72-c-110-iso10646-1
@@ -597,6 +591,7 @@ xterm*font4: -xos4-terminus-medium-r-normal--22-220-72-72-c-110-iso10646-1
 xterm*font5: -xos4-terminus-medium-r-normal--28-280-72-72-c-140-iso10646-1
 !huge:
 xterm*font6: -xos4-terminus-medium-r-normal--32-320-72-72-c-160-iso10646-1
+xterm*font7: -xos4-terminus-bold-r-normal--32-320-72-72-c-160-iso10646-1
 !9x15bold
 
 xterm*wideFont: -misc-fixed-medium-r-normal-ja-13-120-75-75-c-120-iso10646-1
@@ -606,7 +601,7 @@ xterm*wideFont: -misc-fixed-medium-r-normal-ja-13-120-75-75-c-120-iso10646-1
 
 !use ttf fonts instead
 !xterm*faceName: Terminus (TTF):style=Medium:size=11
-!xterm*faceName:  TerminessTTF Nerd Font Mono:style=Medium:size=11
+!xterm*faceName:  TerminessTTF Nerd Font Mono:style=Medium:size=12
 !xterm*faceName: DejaVuSansMono Nerd Font Mono:style=Regular:size=12
 !xterm*faceName: FiraCode Nerd Font Mono:style=Regular:size=12
 !xterm*faceName: Source Code Pro:style=Regular:size=12
@@ -615,6 +610,12 @@ xterm*wideFont: -misc-fixed-medium-r-normal-ja-13-120-75-75-c-120-iso10646-1
 !!xterm*font: 7x13
 ! start with TrueType fonts disabled
 ! xterm*renderfont: false
+!
+!xterm*xftAntialias: false
+!xterm*xftHinting: true
+!xterm*xftHintStyle: hintslight
+!xterm*xftRgba: none
+!
 !good fonts:
 !Noto Sans Mono Condensed
 !Hack Nerd Font Mono
@@ -624,6 +625,7 @@ xterm*wideFont: -misc-fixed-medium-r-normal-ja-13-120-75-75-c-120-iso10646-1
 !Cousine Nerd Font Mono
 !BitstreamVeraSansMono Nerd Font Mono
 !Inconsolata Nerd Font Mono
+
 
 !warning on font errors
 !xterm.vt100.fontWarnings: 2
