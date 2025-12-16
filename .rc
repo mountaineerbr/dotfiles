@@ -1238,14 +1238,14 @@ upchatall()
 )
 
 alias chat='chatgpt.sh -cc --git --time --md'
-alias unix="chatgpt.sh -..unix -cc  --md --goo"
-alias pt='chatgpt.sh -cc..pt --md'
+alias unix="chatgpt.sh -..unix -cc  --time --md --goo"
+alias pt='chatgpt.sh -cc..pt --time --md'
 alias marv="chat --md --time -256- -cc --frequency-penalty=0.7 --temp=0.8 --top_p=0.4 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
-alias learn='chatgpt.sh -cc -6000 --goo --top-p 0.95 --top-k 64 -m learnlm-1.5-pro-experimental'
+alias learn='chatgpt.sh -cc -6000 --time --goo --top-p 0.95 --top-k 64 -m learnlm-1.5-pro-experimental'
 alias dchatgpt.sh=$HOME/bin/openai/debug.chatgpt.sh
 alias dchat=dchatgpt.sh
 #chatgpt.sh with deepseek speciale
-alias deep='DEEPSEEK_BASE_URL=https://api.deepseek.com/v3.2_speciale_expires_on_20251215 chatgpt.sh --deepseek -cc'
+alias deep='DEEPSEEK_BASE_URL=https://api.deepseek.com/v3.2_speciale_expires_on_20251215 chatgpt.sh --time --deepseek -cc'
 
 
 #local-ai
@@ -1862,11 +1862,18 @@ tza()
 
 vipef()
 {
-	local tmpf=$(mktemp)
-	cat > "$tmpf"
-	${VISUAL:-vim} "$tmpf" </dev/tty >/dev/tty
-	cat "$tmpf"
-	/usr/bin/rm "$tmpf"
+	typeset tmp ed
+	tmp=$(mktemp) || return
+	cat >>"$tmp" || return
+
+	((${#VISUAL}+${#EDITOR})) ||
+	for ed in nvim emacs vim nano vi
+	do 	ed=$(command -v "$ed") && break || ed=
+	done
+
+	${VISUAL:-$EDITOR:-${ed:-ed}} "$tmp" </dev/tty >/dev/tty
+	cat "$tmp"
+	/bin/rm "$tmp"
 }
 
 # unfmt - convert paragraphs into long lines
