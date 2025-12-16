@@ -1866,7 +1866,7 @@ vipef()
 	typeset tmp
 	tmp=$(mktemp) || return
 	cat >> "$tmp" || return
-	${VISUAL:-$EDITOR:-vim} "$tmp" </dev/tty >/dev/tty
+	${VISUAL:-${EDITOR:-vim}} "$tmp" </dev/tty >/dev/tty
 	cat "$tmp"
 	/bin/rm "$tmp"
 }
