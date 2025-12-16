@@ -1860,18 +1860,13 @@ tza()
 #geonames.org provides a data dump (by country) of all known cities and their Olson timezone.
 #Hands down the best way to do it. download.geonames.org/export/dump
 
+#`vipe' alternative
 vipef()
 {
-	typeset tmp ed
+	typeset tmp
 	tmp=$(mktemp) || return
-	cat >>"$tmp" || return
-
-	((${#VISUAL}+${#EDITOR})) ||
-	for ed in nvim emacs vim nano vi
-	do 	ed=$(command -v "$ed") && break || ed=
-	done
-
-	${VISUAL:-$EDITOR:-${ed:-ed}} "$tmp" </dev/tty >/dev/tty
+	cat >> "$tmp" || return
+	${VISUAL:-$EDITOR:-vim} "$tmp" </dev/tty >/dev/tty
 	cat "$tmp"
 	/bin/rm "$tmp"
 }
