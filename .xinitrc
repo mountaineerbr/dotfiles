@@ -35,9 +35,8 @@ if [ -f "$userresources" ]; then
 fi
 
 if [ -f "$usermodmap" ]; then
-	
-	#hack: wait until xfce starts
-	#( sleep 20; xmodmap "$usermodmap" ) &
+
+
 	xmodmap "$usermodmap"
 fi
 #xmodmap and xfce4 may not well together.

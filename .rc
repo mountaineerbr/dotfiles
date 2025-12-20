@@ -2716,7 +2716,7 @@ alias chessonline='telnet freechess.org 5000'
 
 #youtube download fun
 #command:
-YTDL_CMD=yt-dlp
+YT_CMD=yt-dlp
 #yt-dlp --proxy socks5://127.0.0.1:9050  #tor
 
 #YOUTUBE-DL WRAPPERS
@@ -2731,19 +2731,19 @@ YTDL_CMD=yt-dlp
 #usage: yt [urls..]
 _yt()
 {
-	$YTDL_CMD --restrict-filenames -o "%(title)s-%(id)s.%(ext)s" "$@"
+	$YT_CMD --restrict-filenames -o "%(title)s-%(id)s.%(ext)s" "$@"
 }
 #dl audio and convert to mp3 (MUSIC)
 _ytm()
 {
-	$YTDL_CMD -k -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 \
+	$YT_CMD -k -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 \
 		--restrict-filenames --metadata-from-title '(?P<artist>.+?)-(?P<title>.+)' \
        		--embed-thumbnail --add-metadata -o "%(title)s.%(ext)s" "$@"
 }
 #dl general audio only stream (GENERAL AUDIO)
 _yta()
 {
-	$YTDL_CMD -k -f bestaudio --restrict-filenames -o "%(title)s.%(ext)s" "$@"
+	$YT_CMD -k -f bestaudio --restrict-filenames -o "%(title)s.%(ext)s" "$@"
 }
 #dl audio and video of best quality
 _ytb()
@@ -2762,6 +2762,7 @@ alias ytb='noglob _ytb'
 alias yta='noglob _yta'
 alias ytm='noglob _ytm'
 alias yt='noglob _yt'
+alias yt-dlp="noglob yt-dlp"
 
 #youtube caption subtitiles
 #https://stackoverflow.com/questions/9611397/how-to-extract-closed-caption-transcript-from-youtube-video

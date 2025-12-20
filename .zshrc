@@ -1235,7 +1235,7 @@ done; unset f
 #aliasing `mail' may conflict with Z-shell autocompletion
 compdef _files mail
 #https://unix.stackexchange.com/questions/677280/disable-zsh-smart-autocompletion-for-gem-command-but-keep-ordinary-path-compl
-compdef _chatgpt.sh chat
+compdef _chatgpt.sh chat pt marv learn deep unix
 
 
 #highlight brackets

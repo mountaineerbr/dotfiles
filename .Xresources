@@ -562,8 +562,8 @@ xterm.vt100.internalBorder: 2
 !default font:
 !xterm*vt100.font:
 !xterm.vt100.utf8Fonts.font
-xterm*vt100.font: -xos4-terminus-medium-r-normal--16-160-72-72-c-80-iso10646-1
-xterm*vt100.boldFont: -xos4-terminus-bold-r-normal--16-160-72-72-c-80-iso10646-1
+xterm*font: -xos4-terminus-medium-r-normal--16-160-72-72-c-80-iso10646-1
+xterm*boldFont: -xos4-terminus-bold-r-normal--16-160-72-72-c-80-iso10646-1
 !xterm*font: -misc-terminess nerd font mono-medium-r-normal--0-0-0-0-m-0-iso10646-1
 !xterm*font: *-fixed-*-*-18-*-*
 
