@@ -33,8 +33,8 @@ Some configuration files from `/etc` (such as `/etc/issue`) and subdirectories u
 
 ![ScreenShot](https://gitlab.com/mountaineerbr/etc/-/raw/main/gfx/git_screenshot1.png)
   <br/>
-  Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](https://www.youtube.com/watch?v=Mu3BfD6wmPg "Chilled Cow by Kupla")
-
+  Fig 1. [*"Own deserted island in the heart of a busy city. Breathe in[..]"*](https://www.youtube.com/watch?v=FiqElCUnF_8&list=PL18HkBss0Im7o_LbfKth5qG2Ld5f6YE_A "Chilled Cow by Kupla")
+  <!-- https://www.youtube.com/watch?v=Mu3BfD6wmPg -->
 
 
 <br/>
