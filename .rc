@@ -1885,7 +1885,7 @@ function sleepf
 	done
 }
 #https://www.youtube.com/watch?v=47qrH5JZUUg
-#shoudl work with bash, zsh, and ksh
+#should work with bash, zsh, and ksh
 #command -v sleep >/dev/null 2>&1 || function sleep { 	sleepf ${*//[!0-9.]} ;};
 
 # unfmt - convert paragraphs into long lines
