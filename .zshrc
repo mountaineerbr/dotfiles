@@ -1229,7 +1229,7 @@ done; unset f
 [[ -n ${TMUX}${VIFMSET} ]] ||
 [[ ${EUID} -eq 0 ]] || [[ $- != *i* ]] ||
 #! command -v tmux >/dev/null 2>&1 || ! command -v tmux_hack >/dev/null 2>&1 ||
-  tmux_hack;
+  : #tmux_hack;
 
 
 #aliasing `mail' may conflict with Z-shell autocompletion

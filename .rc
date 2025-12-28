@@ -591,7 +591,9 @@ tmux_hack()
 	while IFS= read -r var
 	do case "${var}" in
 		[0-9]*[Aa]ttached*) continue;;
-		[0-9]:*|[0-9][0-9]:*) session=${var%%:*}; break;;
+		[0-9]:*|[0-9][0-9]:*|[0-9][0-9][0-9]:*|\
+		[0-9][0-9][0-9][0-9]:*|[0-9][0-9][0-9][0-9][0-9]:*)
+		session=${var%%:*}; break;;
 	  esac;
 	done < <(tmux ls)
 	
@@ -1871,6 +1873,21 @@ vipef()
 	/bin/rm "$tmp"
 }
 
+#safe sleep (lol)
+function sleepf
+{
+	typeset fd
+	for fd in 0 1 2
+	do 	[[ -t $fd ]] && {
+		read -t ${1:-1} -u ${fd:-0} "$@";
+		return;
+		};
+	done
+}
+#https://www.youtube.com/watch?v=47qrH5JZUUg
+#shoudl work with bash, zsh, and ksh
+#command -v sleep >/dev/null 2>&1 || function sleep { 	sleepf ${*//[!0-9.]} ;};
+
 # unfmt - convert paragraphs into long lines
 # 20jul2014  +chris+  zsh function
 # 15dec2014  +chris+  simplify
@@ -2186,15 +2203,15 @@ gsitemap()
 #https://bbs.archlinux.org/viewtopic.php?id=271469
 
 #weather forecast
-#requires the script 'ansiweather'
-wf() { 	ansiweather -l "${*:-${CITY:-londrina}}" ;}
+wf() { 	~/bin/wf.sh -ww "$@" ;}
+wf2() { 	ansiweather -l "${*:-londrina}" ;}
 
 #weather forecast (previsão do tempo)
 #and moon phase forecast
 #type :help to see options summary
-wf2()
+wf3()
 {
-    local request="wttr.in/${1}"  #it chooses location automatically
+    local request="wttr.in/${1// /%20}"  #it chooses location automatically
     [[ "$COLUMNS" -lt 125 ]] && request+='?nMAFqT'
     curl -fsH "Accept-Language: ${LANG%_*}" --compressed "$request" | tac
 }

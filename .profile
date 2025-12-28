@@ -125,7 +125,7 @@ export GTK_OVERLAY_SCROLLING=0
 
 #xdg base directory specification
 #export XDG_CONFIG_HOME=$HOME/.config
-#export XDG_CONFIG_HOME=$HOME/.cache 
+#export XDG_CACHE_HOME=$HOME/.cache 
 #export XDG_DATA_HOME =$HOME/.local/share
 #more in ~/.config/user-dirs.dirs
 #xdg-user-dir TEMPLATES
