@@ -16,7 +16,7 @@ Shell, terminal, and other configuration files
 
 ## Dotfiles
 
-Most __shell functions__ and __aliases__ are at the __[.rc file](.rc)__.
+Most __shell functions__ and __alias definitions__ live at the __[.rc file](.rc)__.
 That is sourced from
 both __[.bashrc](.bashrc)__ and __[.zshrc](.zshrc)__, which contain configs for each shell.
 
