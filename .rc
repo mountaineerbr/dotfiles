@@ -1867,7 +1867,7 @@ vipef()
 {
 	typeset tmp
 	tmp=$(mktemp) || return
-	cat >> "$tmp" || return
+	[[ -t 0 ]] || cat >> "$tmp" || return
 	${VISUAL:-${EDITOR:-vim}} "$tmp" </dev/tty >/dev/tty
 	cat "$tmp"
 	/bin/rm "$tmp"
@@ -1945,8 +1945,27 @@ zpass()
 #ascii=$(for ((i=32;i<127;i++)) ;do printf "\\$(printf %03o "$i")"; done)
 #ascii="\ \!\"#\$%\&\'\(\)\*+\,./0123456789:\;\<=\>\?@ABCDEFGHIJKLMNOPQRSTUVWXYZ\[\]\^_\`abcdefghijklmnopqrstuvwxyz\{\|\}~\\-"
 
-#cep dos correios
+#viacep
 cep()
+{
+	if [[ $1 = [0-9]* ]]
+	then
+		set -- "${1//[!0-9]}";
+		\curl -\# -f -L "https://viacep.com.br/ws/${1:?CEP}/json/"
+	else
+		set -- "${1//[$IFS]/+}" "${2//[$IFS]/+}" "${3:-PR}";
+		printf 'Logradouro: %s\nCidade: %s  Estado: %s\n' "$1" "${2:-Londrina}" "$3" >&2;
+
+		\curl -\# -f -L "https://viacep.com.br/ws/${3}/${2:-Londrina}/${1:?Logradouro}/json/" |
+		jq -r '.[]? | to_entries[] | "\(.key): \t\(.value | if . == null or . == "" then empty else . end)"' |
+		tac | column -t -s $'\t' || echo "Lookup failed" >&2;
+	fi;
+}
+#discussão do porquê os ceps não são disponibilizados pelos correios
+#https://groups.google.com/g/django-brasil/c/wvERTS9Bz3M
+
+#cep dos correios
+cep2()
 {
 	tr -d \\r <~/arq/docs/cep_TB_CEP_BR_2018.csv \
 		| grep "${@:?grep requer args}" \
@@ -3370,6 +3389,8 @@ plot()
 	gnuplot -p "$@"  -e 'plot "/dev/stdin" notitle'
 }
 
+#plot values with dates
+#input: "[value] [date]", as y-axis is $1.
 plot_date()
 {
 	gnuplot -p -e 'set xdata time' -e 'set timefmt "%Y-%m-%dT%H:%M:%S%Z"' -e 'plot "-" using 2:1 with lines notitle'
