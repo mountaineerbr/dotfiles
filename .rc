@@ -1,6 +1,6 @@
 # ~/.rc
 # shell functions
-# 2026  by mountaineerbr
+# 2026-March  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 #                        __       _                  ___
 #  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
@@ -9,13 +9,9 @@
 
 # This file is sourced by ~/.bashrc, ~/.kshrc, and ~/.zshrc
 
-#return from a script if it is sourced
-#{ [[ ${BASH_SOURCE[0]} != "${0}" ]] && return; }
-
 #set xterm font
 #{ echo -e "\e]50;-xos4-terminus-medium-r-*--18-*-*-*-*-*-*-*\a" ;}
 
-#sources
 #welcome message
 [[ -e ~/bin/welcome_message.sh ]] && . ~/bin/welcome_message.sh
 #{ fortune | cowsay | cowthink -sn | repo-elephant ;}
@@ -3936,7 +3932,7 @@ alias paclf="/usr/bin/pacman -Ql"		# '[l]ist [f]iles'	- list all files installed
 alias pacexpl="sudo /usr/bin/pacman -D --asexp"	# 'mark as [expl]icit'	- mark one or more packages as explicitly installed
 alias pacimpl="sudo /usr/bin/pacman -D --asdep"	# 'mark as [impl]icit'	- mark one or more packages as non explicitly installed
 alias pacaur='pacman -Qqm'                      # list all installed packages from AUR
-#acman -Qqen  -- all explicitly installed packages
+#pacman -Qqen  -- all explicitly installed packages
 # '[r]emove [o]rphans' - recursively remove ALL orphaned packages
 #alias pacro="/usr/bin/pacman -Qtdq > /dev/null && sudo /usr/bin/pacman -Rns \$(/usr/bin/pacman -Qtdq | sed -e ':a;N;$!ba;s/\n/ /g')"
 #https://github.com/midfingr

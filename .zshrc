@@ -1,6 +1,6 @@
 #
 # ~/.zshrc
-# 2026  by mountaineerbr
+# 2026-March  by mountaineerbr
 #               __  ___
 # _______ ____ / /_/ _ |_    _____ ___ __
 #/ __/ _ `(_-</ __/ __ | |/|/ / _ `/ // /
@@ -8,6 +8,13 @@
 #                                 /___/
 
 #Global Order: zshenv, zprofile, zshrc, zlogin
+
+#Detect if a script is being sourced vs executed
+#if [[ $ZSH_EVAL_CONTEXT == 'toplevel' ]]; then
+#    :  # We're not being sourced
+#fi
+#https://www.zsh.org/mla/users/2014/msg00812.html
+#https://unix.stackexchange.com/questions/73008
 
 #GRML's zshrc
 grmlzsh() wget -qO- https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
@@ -298,6 +305,31 @@ key[Control-Right]="${terminfo[kRIT5]}"
 [[ -n $key[PageDown]  ]] && bindkey - $key[PageDown]   down-line-or-history
 #[[ -n $key[Backspace] ]] && bindkey - $key[Backspace]  backward-delete-char
 #[[ -n $key[Shift-Tab] ]] && bindkey - $key[Shift-Tab]  reverse-menu-complete
+
+
+# Here are still a few hardcoded escape sequences; Special sequences
+# like Ctrl-<Cursor-key> etc do suck a fair bit, because they are not
+# standardised and most of the time are not available in a terminals terminfo entry.
+# hard coded key bindings like these are discouraged.
+# use Ctrl-left-arrow and Ctrl-right-arrow for jumping to word-beginnings on the command line.
+# URxvt sequences:
+bindkey - '\eOc' forward-word
+bindkey - '\eOd' backward-word
+# These are for xterm:
+bindkey - '\e[1;5C' forward-word
+bindkey - '\e[1;5D' backward-word
+## the same for alt-left-arrow and alt-right-arrow
+# URxvt again:
+bindkey - '\e\e[C' forward-word
+bindkey - '\e\e[D' backward-word
+# Xterm again:
+bindkey - '^[[1;3C' forward-word
+bindkey - '^[[1;3D' backward-word
+# Also try ESC Left/Right:
+bindkey - '\e'$key[Right] forward-word
+bindkey - '\e'$key[Left]  backward-word
+#bindkey - '\eq' push-line-or-edit
+
 
 # Finally, make sure the terminal is in application mode when zle is
 # active. Only then are the values from $terminfo valid.
@@ -649,30 +681,6 @@ zstyle :predict toggle yes
 #WORDCHARS=.
 #WORDCHARS='*?_[]~=&;!#$%^(){}'
 #WORDCHARS='${WORDCHARS:s@/@}'
-
-#bindkey - '\eq' push-line-or-edit
-
-# Here are still a few hardcoded escape sequences; Special sequences
-# like Ctrl-<Cursor-key> etc do suck a fair bit, because they are not
-# standardised and most of the time are not available in a terminals terminfo entry.
-# hard coded key bindings like these are discouraged.
-# use Ctrl-left-arrow and Ctrl-right-arrow for jumping to word-beginnings on the command line.
-# URxvt sequences:
-bindkey - '\eOc' forward-word
-bindkey - '\eOd' backward-word
-# These are for xterm:
-bindkey - '\e[1;5C' forward-word
-bindkey - '\e[1;5D' backward-word
-## the same for alt-left-arrow and alt-right-arrow
-# URxvt again:
-bindkey - '\e\e[C' forward-word
-bindkey - '\e\e[D' backward-word
-# Xterm again:
-bindkey - '^[[1;3C' forward-word
-bindkey - '^[[1;3D' backward-word
-# Also try ESC Left/Right:
-bindkey - '\e'$key[Right] forward-word
-bindkey - '\e'$key[Left]  backward-word
 
 
 #GRML-zshrc

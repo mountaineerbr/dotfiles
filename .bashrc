@@ -1,6 +1,6 @@
 #
 # ~/.bashrc
-# 2025-October  by mountaineerbr
+# 2026-March  by mountaineerbr
 #                         _        _                      ___      
 # ._ _ _  ___  _ _ ._ _ _| |_ ___ <_>._ _  ___  ___  _ _ | . > _ _ 
 # | ' ' |/ . \| | || ' | | | <_> || || ' |/ ._>/ ._>| '_>| . \| '_>
@@ -14,8 +14,8 @@
 
 # This file is sourced by all *interactive* bash shells on startup,
 # including some apparently interactive shells such as scp and rcp
-# that can't tolerate any output. So make sure this doesn't display
-# anything or bad things will happen !
+# that can't tolerate any output. So make sure this doesn't print
+# out anything or weyrd things may happen in those cases!
 
 # Test for an interactive shell. There is no need to set anything
 # past this point for scp and rcp, and it's important to refrain from
@@ -24,6 +24,10 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 #https://wiki.archlinux.org/index.php/Talk:Bash
+
+#return from a script if it is sourced
+#{ [[ ${BASH_SOURCE[0]} != "${0}" ]] && return; }
+
 
 #PS1 prompt
 #colours
@@ -47,7 +51,7 @@ prompt_ssl_max=3
 prompt_ssl=$( ((SHLVL >= prompt_ssl_max)) && echo "${yellow}+${endc}" )
 #basic git integration (prints branch name)
 prompt_git="\$( branch=\$(git rev-parse --abbrev-ref HEAD 2>/dev/null) && echo \"[${yellow}\${branch}${endc}] \" )"
-#check exit code of last command line
+#check exit code of last command
 prompt_exit="\$( ((e=\$? , e)) && echo \"${bred}\${e}${endc} \" )"
 #check how many background jobs
 #prompt_jobs='$([[ \j -gt 0 ]] && echo %\j)'
@@ -144,10 +148,6 @@ set -o noclobber  #override with >|
 #glob
 shopt -s globstar  #nocaseglob
 
-#globs for excluding . and ..
-#{ **/.[^.]*/**/*rc  **/..?*/**/*rc ;}
-#https://unix.stackexchange.com/questions/75786/how-do-i-specify-arguments-to-return-all-dot-files-but-not-and
-
 #lastpipe
 #shopt -s lastpipe
 #in interactive shell job control is active; disbale with 'set +m'
@@ -216,6 +216,10 @@ shopt -s checkwinsize
 #}
 #https://www.redhat.com/sysadmin/cd-command
 
+
+#globs for excluding . and ..
+#{ **/.[^.]*/**/*rc  **/..?*/**/*rc ;}
+#https://unix.stackexchange.com/questions/75786/how-do-i-specify-arguments-to-return-all-dot-files-but-not-and
 
 ##shell globbing
 noglob_helper() {
@@ -306,14 +310,14 @@ semaphore()
 #also in bash source package
 
 
-# Instalacao das Funcoes ZZ (www.funcoeszz.net)
-export ZZOFF=""  # desligue funcoes indesejadas
-export ZZPATH="$HOME/bin/more/funcoeszz/funcoeszz"  # script
-export ZZDIR="$HOME/bin/more/funcoeszz/zz"    # pasta zz/
-#source "$ZZPATH"
-
-#ligar funcoezz
-alias ZZ='source "'"$ZZPATH"'"'
+# # Instalacao das Funcoes ZZ (www.funcoeszz.net)
+# export ZZOFF=""  # desligue funcoes indesejadas
+# export ZZPATH="$HOME/bin/more/funcoeszz/funcoeszz"  # script
+# export ZZDIR="$HOME/bin/more/funcoeszz/zz"    # pasta zz/
+# #source "$ZZPATH"
+# 
+# #ligar funcoezz
+# alias ZZ='source "'"$ZZPATH"'"'
 
 #sources
 for f in \
