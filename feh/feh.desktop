@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=Feh
+Name[en_US]=feh
+GenericName=Image viewer
+GenericName[en_US]=Image viewer
+Comment=Image viewer and cataloguer
+Exec=/home/jsn/bin/feh.sh %F
+#Exec=feh --edit --scale-down --auto-zoom --geometry 640x480+300+100 --insecure %F
+# --start-at %u
+# --borderless --draw-filename --draw-tinted
+# OBS: --geometry 640x480 is a workaround to have large imgs scaled down and centered, alternatively use -R1, or press "r"
+Terminal=false
+Type=Application
+Icon=feh
+Categories=Graphics;2DGraphics;Viewer;
+MimeType=image/bmp;image/gif;image/jpeg;image/jpg;image/pjpeg;image/png;image/tiff;image/webp;image/x-bmp;image/x-pcx;image/x-png;image/x-portable-anymap;image/x-portable-bitmap;image/x-portable-graymap;image/x-portable-pixmap;image/x-tga;image/x-xbitmap;
+NoDisplay=false
+#https://developer.gnome.org/integration-guide/stable/desktop-files.html.en
