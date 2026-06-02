@@ -4,10 +4,12 @@
 "._ _  _ . .._ -+- _.*._  _  _ ._.[__)._.
 "[ | )(_)(_|[ ) | (_]|[ )(/,(/,[  [__)[
 
-" This initializes Vim for new users (as opposed to traditional Vi users)
+
+" =*=*=**=*=*=  START DEFAULTS.VIM CHERRY PICK  =*=*=**=*=*=
+
 "source $VIMRUNTIME/defaults.vim
-"in arch linux at /usr/share/vim/vim82/defaults.vim
-" PICK START
+"arch linux: /usr/share/vim/vim82/defaults.vim
+
 
 "set ttimeout		" time out for key codes
 "set ttimeoutlen=100	" wait up to 100ms after Esc for special key
@@ -131,7 +133,7 @@ if has('langmap') && exists('+langremap')
   set nolangremap
 endif
 
-"defaults.vim PICK END
+" =*=*=**=*=*=  END DEFAULTS.VIM CHERRY PICK  =*=*=**=*=*=
 
 
 " Set Vim colours, either for dark or light backgrounds
@@ -171,7 +173,7 @@ set t_ti= t_te=
 "Ref:https://serverfault.com/questions/270103/gnu-screen-clearing-on-vim-less-etc-exit
 "
 "set t_Co=0" to tell vim the terminal supports zero colors,
-"or `TERM=vt220 vi' or `TERM=vt100 vi' or `TERM=dumb vi' 
+"or `TERM=vt220 vi' or `TERM=vt100 vi' or `TERM=dumb vi'
 "
 "<c-a> may be taken by `tmux' (custom config), type it twice to reach `vim'.
 
@@ -288,15 +290,34 @@ if &t_Co > 2 || has("gui_running")
   set hlsearch
 endif
 
-
-"Unset syntax highlighting in `diff' mode
+"Diff Mode
 if &diff
   set nohls
   syntax off
-  colo 0x7A69_dark
+  colorscheme 0x7A69_dark
+
+  set diffopt=internal,filler,closeoff,algorithm:histogram,
+            \indent-heuristic,inline:char,linematch:60,vertical
+  set fillchars+=diff:╱
+  set cursorline
+  set cursorlineopt=line   "number, both
+  set cursorbind scrollbind
+  set scrollopt=ver,jump,hor
   "set diffopt+=iwhite
+
+  "highlight CursorLine cterm=underline gui=underline ctermbg=NONE guibg=NONE
+  "highlight DiffAdd    ctermbg=22 guibg=#003300
+  "highlight DiffDelete ctermbg=52 guibg=#330000
+  "highlight DiffChange ctermbg=17 guibg=#000033
+  "highlight DiffText   ctermbg=88 guibg=#660000 cterm=bold gui=bold
+
+  "Jump to next/previous change and center the view
+  nnoremap ]c ]czz
+  nnoremap [c [czz
+
   au VimEnter * RainbowParenthesesToggle
 endif
+"Unset syntax highlighting in `diff' mode
 "https://odd.blog/2016/11/24/howto-disable-syntax-highlighting-in-vimdiff/
 
 
@@ -427,7 +448,7 @@ set formatoptions-=t
 
 
 " GUI GVIM
-set guifont=Ubuntu\ Mono\ 14 
+set guifont=Ubuntu\ Mono\ 14
 
 "set window size
 if has("gui_running")
@@ -464,7 +485,7 @@ if !empty($TERMUX_VERSION)
     vnoremap <C-c> :w !termux-clipboard-set<CR><CR>
     inoremap <C-v> <ESC>:read !termux-clipboard-get<CR>i
     "https://ibnishak.github.io/blog/post/copy-to-termux-clip/
-    
+
     au TextYankPost * call system('termux-clipboard-set &', @")
     function Paste(p)
         let sysclip=system('termux-clipboard-get')
@@ -1127,6 +1148,23 @@ nnoremap <BS> <C-W><C-H>
 au BufRead,BufNewFile *.zsh set filetype=bash
 "Read ~/.rc with bash syntax
 au BufRead,BufNewFile .rc set filetype=bash
+
+
+
+"check just the current buffer with a Vim loop that bails early
+"`setlocal` (so it only affects that buffer's window), and short-circuits as soon as it
+"finds one long line.
+"
+function! s:CheckLongLines()
+    for lnum in range(1, line('$'))
+        if col([lnum, '$']) > 4096
+            setlocal nowrap
+            return
+        endif
+    endfor
+endfunction
+
+autocmd BufReadPost * call s:CheckLongLines()
 
 
 " Colour and other configs

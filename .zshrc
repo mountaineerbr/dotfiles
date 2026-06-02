@@ -1,6 +1,6 @@
 #
 # ~/.zshrc
-# 2026-March  by mountaineerbr
+# 2026-June  by mountaineerbr
 #               __  ___
 # _______ ____ / /_/ _ |_    _____ ___ __
 #/ __/ _ `(_-</ __/ __ | |/|/ / _ `/ // /
@@ -52,11 +52,11 @@ export READNULLCMD=less  #defaults=more
 setopt BEEP
 
 #globbing
-setopt G_L___OB_ST_A_R__SH____ORT
+setopt G_L___OB_ST_A_R__SH____ORT  GLOBSTARSHORT
 #**/*c  -> **c
 ##add as many underscores as you want in zshell opts
 
-# don't throw errors when file globs don't match anything and delete the pattern from the argument list 
+# don't throw errors when file globs don't match anything and delete the pattern from the argument list
 #setopt NULL_GLOB
 # only throw errors when no globs match anything
 setopt CSH_NULL_GLOB
@@ -116,7 +116,7 @@ setopt LONGLISTJOBS
 setopt HASH_LIST_ALL
 
 #On an ambiguous completion, cycle matches in place
-setopt MENU_COMPLETE 
+setopt MENU_COMPLETE
 #setopt AUTO_MENU  #overriden by MENU_COMPLETE
 setopt AUTO_LIST # Auto list ambiguous choices.
 
@@ -137,7 +137,7 @@ setopt HIST_IGNORE_ALL_DUPS
 #remove command lines from the history list when the first character on the line is a space
 setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
-setopt HIST_NO_FUNCTIONS 
+setopt HIST_NO_FUNCTIONS
 setopt HIST_FIND_NO_DUPS #!#important
 #setopt HIST_VERIFY
 
@@ -363,7 +363,7 @@ zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
 
 #cmds to run before issuing ps1
 precmd() {
-	#psvars=() 
+	#psvars=()
 	vcs_info
 }
 
@@ -698,7 +698,7 @@ zstyle :predict toggle yes
 	# case insensitivity
 	zstyle ":completion:*" matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
 	# case-insensitive -> partial-word (cs) -> substring completion:
-	zstyle ':completion:*' matcher-list 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'  
+	zstyle ':completion:*' matcher-list 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 	#https://github.com/seebi/zshrc/blob/master/completion.zsh
 
 	# allow one error for every three characters typed in approximate completer
@@ -1228,7 +1228,7 @@ zmodload -aF zsh/datetime b:strftime p:EPOCHSECONDS
 for f in \
 	/usr/share/doc/pkgfile/command-not-found.zsh \
 	/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
-	~/.rc 
+	~/.rc
 do [[ -e "$f" ]] && . "$f"
 done; unset f
 

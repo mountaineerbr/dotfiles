@@ -6,14 +6,7 @@
 ! # # # # # #  # #  # #   ## # #  # ### ### #  #  # #
 ! # # # # # #  # #  # #  # # # #  # #   #   #  #  # #
 ! # # #  #   ### # ## ##  ## # # ##  ##  ## #  ###  #
-                                                                 
 
-!load (default) xresources: xrdb -load ~/.Xresources
-!merge xresources: xrdb -merge ~/.Xresources
-!check man xrdb
-
-!x11 colour names
-!https://en.wikipedia.org/wiki/X11_color_names
 
 ! XScreenSaver
 ! xscreensaver-demo writes the chosen configuration to ~/.xscreensaver,
@@ -175,7 +168,7 @@ URxvt.cursorUnderline: false
 
 !bitmap font
 URxvt.font: 9x15
-!spacing between chars can be reduced by one pixel as such: 
+!spacing between chars can be reduced by one pixel as such:
 !URxvt.letterSpace: -1
 
 URxvt.scrollBar: true
@@ -291,7 +284,7 @@ URxvt.matcher.rend.0: Uline Bold fg5
 !Shift+Right 	Go to right tab
 !Ctrl+Left 	Move tab to the left
 !Ctrl+Right 	Move tab to the right
-!Ctrl+d 	Close tab 
+!Ctrl+d 	Close tab
 !you can change the colors of tabs with the following:
 URxvt.tabbed.tabbar-fg: 2
 URxvt.tabbed.tabbar-bg: 0
@@ -320,11 +313,11 @@ emacs*font: 10x20
 ! █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ 
 ! █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ 
 ! █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ █▓▒░ 
-! 
+!
 ! xterm
 ! xterm rocks!
 
-!have uxterm use xterm resources, replace "Xterm.vt100.name" with "*.vt100.name" or "xterm.vt100.name" 
+!have uxterm use xterm resources, replace "Xterm.vt100.name" with "*.vt100.name" or "xterm.vt100.name"
 
 !theme one
 ! Dracula Xresources palette -- Derek DistroTube
@@ -333,7 +326,7 @@ emacs*font: 10x20
 !XTerm*cursorColor: #bbc5ff
 ! black
 !! color0 was originally #292d3e
-!*.color0:       #101010  
+!*.color0:       #101010
 !*.color8:       #434758
 ! red
 !*.color1:       #f07178
@@ -398,6 +391,9 @@ emacs*font: 10x20
 !xterm.vt100.color14:    rgb:5f/9e/a0
 !xterm.vt100.color15:    rgb:ff/ff/ff
 !http://web.archive.org/web/20090130061234/http://phraktured.net/terminal-colors/
+
+!x11 colour names
+!https://en.wikipedia.org/wiki/X11_color_names
 
 !colour settings
 xterm.vt100.reverseVideo: false
@@ -472,10 +468,10 @@ xterm.vt100.numLock: true
 
 !fix the backspace key
 !on Arch Linux, xterm sends ^H key when backspace is pressed.
-!this breaks the Ctrl+H key combination on Emacs 
+!this breaks the Ctrl+H key combination on Emacs
 !xterm.vt100.backarrowKey: false
 !xterm.vt100.ttyModes: erase ^?
- 
+
 !bell
 xterm.vt100.visualBell: true
 xterm.vt100.visualBellLine: true
@@ -545,7 +541,7 @@ xterm.vt100.internalBorder: 2
 !xterm.title
 
 !alternate screen
-!check toggle in keybindings 
+!check toggle in keybindings
 !default is to ctrl-middle-click and toggle Alternate Screen
 !bash defaults:
 ! 	Ctrl+S stops output to screen but still receives inputs
@@ -578,7 +574,7 @@ xterm*boldFont: -xos4-terminus-bold-r-normal--16-160-72-72-c-80-iso10646-1
 !sequence to change font: echo -n -e "\033]50;8x16\007"
 !https://sites.google.com/site/ongytenes/code/xterm-configuration-tips
 
-!bitmap font sizes 
+!bitmap font sizes
 
 !Unreadable (do not set to use xterm default font):
 xterm*font1: -xos4-terminus-medium-r-normal--0-0-72-72-c-0-iso10646-1
@@ -642,7 +638,7 @@ xterm.vt100.selectToClipboard: true
 xterm*charClass: 33:48,36-47:48,58-59:48,61:48,63-64:48,95:48,126:48
 !https://debian-administration.org/article/66/Customizing_your_xterm
 
-!triple-click select both filesystem paths and url links 
+!triple-click select both filesystem paths and url links
 !(does not seem to work very well!)
 !xterm.vt100.on3Clicks: regex ([[:alpha:]]+://)?([[:alnum:]!#+,./=?@_~-]|(%[[:xdigit:]][[:xdigit:]]))+
 
@@ -669,7 +665,7 @@ xterm.vt100.translations: #override \n\
 	Shift <Key>End:scroll-to(end) \n\
 	Meta <Key>s:set-scrollbar(toggle) \n\
         Ctrl <Key>Return:fullscreen()
-! 	
+!
 !       Ctrl <Key>Return:maximize()   #may not work as expected in dual display systems
 ! 	Meta <Key>Prior:scroll-back(13,line) \n\
 !	Meta <Key>Next:scroll-forw(13,line) \n\

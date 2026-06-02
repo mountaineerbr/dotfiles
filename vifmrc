@@ -12,32 +12,19 @@
 " ::::::::::::::::::::::::::::::::::::::::::::::::::::::...::
 
 
-" Sample configuration file for vifm (last updated: 21 January, 2018)
-" ------------------------------------------------------------------------------
-
-" Command used to edit files in various contexts.  The default is vim.
-" If you would like to use another vi clone such as Elvis or Vile
-" you will need to change this setting.
+" Command used to edit files in various contexts.
 set vicmd=vim
-" set vicmd=elvis\ -G\ termcap
-" set vicmd=vile
 
-" This makes vifm perform file operations on its own instead of relying on
-" standard utilities like `cp`.  While using `cp` and alike is a more universal
-" solution, it's also much slower when processing large amounts of files and
-" doesn't support progress measuring.
+" This makes vifm perform file operations on its own instead of relying
+" on standard utilities like `cp`.
 set syscalls
 
 " Trash Directory
-" The default is to move files that are deleted with dd or :d to
-" the trash directory.  If you change this you will not be able to move
-" files by deleting them and then using p to put the file in the new location.
-" I recommend not changing this until you are familiar with vifm.
-" This probably shouldn't be an option.
 set trash
 
 " Trash Directories
 set trashdir+=$HOME/.local/share/Trash/files
+set trashdir+=$HOME/.local/share/Trash/info
 " Defaults Dirs for *nix
 "set trashdir+=%r/.vifm-Trash-%u,$VIFM/Trash,%r/.vifm-Trash
 
@@ -61,7 +48,7 @@ set fastrun
 " Maximum number of changes that can be undone
 " One file deleted, one unit, not one operation
 " (Default: 100)
-set undolevels=2000
+set undolevels=2048
 
 " If you installed the vim.txt help file set vimhelp.
 " If would rather use a plain text help file set novimhelp.
@@ -72,23 +59,23 @@ set vimhelp
 set norunexec
 
 " Selected color scheme
-"colorscheme molokai 
+"colorscheme molokai
 colorscheme Default-256 Default
 
 " Border Fill chars
 set fillchars=vborder:" ▒"
-" Chars: ▒ ▓ • ∅ ‖ Ѫ 
+" Chars: ▒ ▓ • ∅ ‖ Ѫ
 
 " Border Colors after loading Theme
 highlight Border cterm=none ctermbg=DarkBlue ctermfg=White
 
 " Format for displaying time in file list. For example:
 " TIME_STAMP_FORMAT=%m/%d-%H:%M
-" See man date or man strftime for details.
 "set timefmt=%m/%d\ %H:%M
 "set timefmt=%y/%m/%d\_%R
 set timefmt=%y%b%d\ %H%M
 " OBS: Check "man 1 date"
+" See man date or man strftime for details.
 
 " Show list of matches on tab completion in command-line mode
 set wildmenu
@@ -130,7 +117,7 @@ set wrapscan
 " Do not Wrap by Default in Quick View
 set nowrap
 
-" Case Sensitivity Expanded Control 
+" Case Sensitivity Expanded Control
 " p - always ignore case of paths during completion
 " P - always match case of paths during completion
 set caseoptions=p
@@ -237,26 +224,40 @@ command! mkcd :mkdir %a | cd %a
 command! vgrep vim "+grep %a"
 command! reload :write | restart full
 
-command copyh !cp -f "%f" "%D"
-command copys !cp -f "%F" "%D"
+" System cp to avoid breaking hardlinks
+command! cp  %S cp -pnrv %f %D
+command! cp!  !!cp -pfrv %f %D
 
-
-" Open Root ViFM
-command! Root :!sudo vifm %d %D
-		
-" \ -c ":source /home/jsn/.config/vifm/vifmrc" 
-" \ -c "highlight Win cterm=none ctermfg=white ctermbg=052"
-		
 " Creating symbolic links
 " When you call :link a link of the selected file is made in
 " the other directory (if you are in split view). It even works
 " with multiple files selected with visual (v) or tag (t)
-command link ln -s %d/%f %D
+command! link  %S ln -s %d/%f %D
+command! ln :link
+
+" Make hardlink or hardlink files if they are identical
+" Replaces the file in the other pane with a hardlink to the current file.
+command! hlink  %S if [ -f %D/%c ] && cmp -s %c:p %D/%c; then
+             \  ln -fv %c:p %D/%c;
+             \ elif ! ln -v %c:p %D/%c; then
+             \  ! echo "Error: Files differ or cannot link.";
+             \ fi
+
+" Alias for the above
+command! hl :hlink
+"nnoremap ,hl :hlink<cr>
+
+
+" Open Root ViFM
+command! Root :!sudo vifm %d %D
+
+" \ -c ":source /home/jsn/.config/vifm/vifmrc"
+" \ -c "highlight Win cterm=none ctermfg=white ctermbg=052"
 
 " Toggle Between Three Sorting States
 command! togglesort
          \ :if &sort == '+ext,+name'
-	 \ |    set sort=+name 
+	 \ |    set sort=+name
          \ |    echo 'Sorted by NAME'
          \ |elseif &sort == '-size,+name'
 	 \ |    set sort=+ext
@@ -271,11 +272,12 @@ command! togglesort
          \ |    set sort=+iname
 	 \ |    echo 'Defaults view, iNAME'
          \ |endif
+
 " https://q2a.vifm.info/78/how-can-i-toggle-between-two-sorting-states?show=79#a79
 "Original code:
 "command! togglesort
 "         \ :if &sort == '-size,+name'
-" 	  \ | 	set viewcolumns=-{name}.,12{}. 
+" 	  \ | 	set viewcolumns=-{name}.,12{}.
 "         \ |    set sort=+mtime
 "         \ |    echo 'Sorted by modification date'
 "         \ |else
@@ -291,17 +293,17 @@ command! togglesort
 "
 
 " Sanitise FileNames Command
-" Replace all spaces and various OS's reserved characters 
+" Replace all spaces and various OS's reserved characters
 " from file names and directory names
 command! sanitize :tr/ ?<>\\:*|"/__________
 " https://q2a.vifm.info/107/santize-directory-names?show=111#a111
 
 
-"Edit .Vimrc                                                                    
-command Vrc !vim ~/.vimrc                                                     
-"Edit .ViFMrc                                                                   
-command Vfrc !vim ~/.config/vifm/vifmrc                                      
-"Edit .Xresources                                                               
+"Edit .Vimrc
+command Vrc !vim ~/.vimrc
+"Edit .ViFMrc
+command Vfrc !vim ~/.config/vifm/vifmrc
+"Edit .Xresources
 command Xrc !vim ~/.Xresources
 "Edit .Bashrc
 command Brc !vim ~/.bashrc
@@ -310,7 +312,7 @@ command Xbrc !vim ~/.xbindkeysrc
 
 " add icons to files
 "source ~/.config/vifm/favicons.vifm
-" https://github.com/cirala/vifm_devicons 
+" https://github.com/cirala/vifm_devicons
 
 " ------------------------------------------------------------------------------
 
@@ -398,9 +400,9 @@ fileviewer {*.avi,*.mp4,*.wmv,*.dat,*.3gp,*.ogv,*.mkv,*.mpg,*.mpeg,*.vob,
 
 " Web
 filextype {*.html,*.htm},<text/html>
-	\ {Open with Vim} 
+	\ {Open with Vim}
 	\ vim %f ,
-	\ {Open with Firefox} 
+	\ {Open with Firefox}
 	\ firefox %f &,
 	\ {Open with dwb}
 	\ dwb %f %i &,
@@ -434,7 +436,7 @@ filextype {*.bmp,*.jpg,*.jpeg,*.png,*.xpm,*.pnm,*.tiff},<image/*>
 filextype {*.svg},<image/svg+xml>
 	\ nomacs %c,
 fileviewer {*.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm},<image/*>
-         \ imgt %px %py %pw %ph %c %i, 
+         \ imgt %px %py %pw %ph %c %i,
          \ %pc,
          \ imgc %px %py %pw %ph,
          \ identify %f
@@ -808,7 +810,7 @@ nnoremap _ <C-w>5>
 
 " Single stroke to access command line
 nnoremap ; :
-                                                                            
+
 " Exits
 "Prefer to use ZZ or ZQ
 " Bash-like quit
@@ -852,7 +854,7 @@ nnoremap \f :!firefox %c &<cr>
 "toggle lsview
 noremap \l :set lsview! <cr>
 "toggle millerview
-noremap \m :set millerview! 
+noremap \m :set millerview!
 	\ |view
 	\ |set viewcolumns={name} <cr>
 "tree view
@@ -939,6 +941,7 @@ highlight  OtherLine   cterm=none     ctermfg=yellow  ctermbg=236
 "highlight AuxWin cterm=bold,underline ctermfg=default ctermbg=default
 "highlight TopLine cterm=underline ctermfg=yellow ctermbg=234
 "highlight TopLineSel cterm=bold,underline ctermfg=yellow ctermbg=066
+highlight HardLink cterm=bold ctermfg=lightyellow
 
 "cd into directory on vifm exit
 "https://wiki.vifm.info/index.php?title=How_to_set_shell_working_directory_after_leaving_Vifm
@@ -957,3 +960,4 @@ highlight  OtherLine   cterm=none     ctermfg=yellow  ctermbg=236
 "░░░█░░░░░░░░░░░█▄█░░▄▀
 "░░░█░░░░░░░░░░░████▀
 "░░░▀▄▄▀▀▄▄▀▀▄▄▄█▀ 
+

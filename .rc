@@ -1,6 +1,6 @@
 # ~/.rc
 # shell functions
-# 2026-March  by mountaineerbr
+# 2026-June  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 #                        __       _                  ___
 #  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
@@ -69,7 +69,7 @@ if ${use_color} ; then
 	# Some colors might look different of some terminals.
 	# For example, I see 'Bold Red' as 'orange' on my screen,
 	# hence the 'Green' 'BRed' 'Red' sequence I often use in my prompt.
-	
+
 	# Normal Colors    # Bold              # Background
 	Black='\e[0;30m'   BBlack='\e[1;30m'   On_Black='\e[40m'  \
 	Red='\e[0;31m'     BRed='\e[1;31m'     On_Red='\e[41m'  \
@@ -83,7 +83,7 @@ if ${use_color} ; then
 	#Alert: Bold White on red background
 	#\\e[0;0;0m \\e[m' #\e \E \033 \u001b
 	#http://tldp.org/LDP/abs/html/sample-bashrc.html
-	
+
 	#coloured man pages
 	man()
 	{
@@ -119,7 +119,7 @@ if ${use_color} ; then
 	#export LESS_TERMCAP_so=$'\E[01;44;33m'
 	#export LESS_TERMCAP_ue=$'\E[0m'
 	#export LESS_TERMCAP_us=$'\E[01;32m'
-	
+
 	export JQ_COLORS='1;31:0;35:1;35:0;37:0;33:1;39:1;32'
 	#https://github.com/statico/dotfiles/blob/main/.zshrc
 	#export JQ_COLORS="48;5;237:48;5;52:48;5;22:38;5;80:38;5;214:1;39:1;39"
@@ -244,7 +244,8 @@ lsb()
 	local dir ar
 	ar=(${path[@]:-${PATH//:/ }})
 	for dir in ${ar[@]}
-	do 	if (($#))
+	do 	#[[ -d $dir ]] || continue
+		if (($#))
 		then 	ls $dir | grep "$@"
 		else 	ls $dir
 		fi
@@ -335,14 +336,15 @@ alias ag='/usr/bin/ag --nofollow --hidden --smart-case'
 
 #user agent
 #usage: curl/wget --header "$UAG"
-UAG='User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0'
-UAG2='user-agent: Mozilla/5.0 Gecko'
+UAG='user-agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Mobile Safari/537.36'
+UAG2='User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:151.0) Gecko/20100101 Firefox/151.0'
+UAG3='user-agent: Mozilla/5.0 Gecko'
 
 #ask for compressed data
 alias curl='curl -f --compressed'
 curlu()
 {
-	\curl -L -R -f --compressed --insecure \
+	command curl -L -R -f --compressed --insecure \
 	--cookie 'non-existing' --retry '2' -H "$UAG" \
 	-H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
 	-H 'Accept-Language: en-GB,pt-BR;q=0.8,pt;q=0.6,en-US;q=0.4,en;q=0.2' \
@@ -582,7 +584,7 @@ tdk()
 tmux_hack()
 {
 	typeset session var;
-	
+
 	#check which items are "attached"
 	while IFS= read -r var
 	do case "${var}" in
@@ -592,7 +594,7 @@ tmux_hack()
 		session=${var%%:*}; break;;
 	  esac;
 	done < <(tmux ls)
-	
+
 	#attach to existing session
 	if [[ -n ${session} ]]
 	then 	command tmux attach
@@ -714,14 +716,14 @@ alias vless=les
 vman()
 {
 	COLUMNS=$((COLUMNS-5)) /usr/bin/man ${@-man} | col -bpx | iconv -c | vim -c 'set ft=man nomod' -c 'set noeb vb t_vb=' -c 'map q <Esc>:q!<cr>' -c 'map i <nop>' -
-} 
+}
 
 #vim cmds:
 #:TOhtml
 #:let g:html_use_css = 0  #old html without css
 #select range of lines, type :MyToHtml
 #https://vim.fandom.com/wiki/Pasting_code_with_syntax_coloring_in_emails
-# modeline to avoid file backups: 
+# modeline to avoid file backups:
 # ex: set nobackup nowritebackup noundofile noswapfile readonly:
 
 #copy less buffer
@@ -747,16 +749,16 @@ trash()
 	[[ -d $trash ]] || mkdir -pv -- "$trash" || return;
 
 	for file
-	do 	file=${file%%/} name=${file##*/};
+	do 	file="${file%%/}" name="${file##*/}";
 
 		if [[ -e $trash/$name ]]
 		then
 			stamp=$(date +'%Y-%m-%dT%H-%M-%S');
 			#stamp=$(date +'%s.%N');  #bash: EPOCHREALTIME
 
-			if [[ -d $file ]] || [[ $name == .* ]] || [[ ${name%.*} == $name ]]
-			then 	name=${name}-${stamp};
-			else 	name=${name%.*}-${stamp}.${name##*.};
+			if [[ -d $file ]] || [[ $name == .* ]] || [[ ${name%.*} == "$name" ]]
+			then 	name="${name}-${stamp}";
+			else 	name="${name%.*}-${stamp}.${name##*.}";
 			fi
 		fi
 
@@ -925,7 +927,7 @@ thumblr()
 #reset/refresh cloned repo
 gres()
 {
-	git fetch --all && { 
+	git fetch --all && {
 	    git reset --hard "${1:-origin/main}" || {
 	    [[ -z $1 ]] && git reset --hard origin/master ;}
 	}
@@ -1148,14 +1150,14 @@ dockerimagesize()
 
 #Android Termux
 #termux-setup-storage
-#this creates a new directory in termux, ~/storage, which contains simlinks to /storage/emulated/0 and can be accessed by a standard gui file manager. 
+#this creates a new directory in termux, ~/storage, which contains simlinks to /storage/emulated/0 and can be accessed by a standard gui file manager.
 
 #keep cpu from sleep, may improve performance
 #alias lock=termux-wake-lock
 #alias unlock=termux-wake-unlock
 
 #print ssh command to connect to current machine
-alias shh='echo ssh $(whoami)@$(ip -4 n | awk "{print \$3;exit}" | ip -br -4 a s $(echo Device: >&2 ;cat /dev/stdin) | grep -Eo "[0-9.]{7,}")' 
+alias shh='echo ssh $(whoami)@$(ip -4 n | awk "{print \$3;exit}" | ip -br -4 a s $(echo Device: >&2 ;cat /dev/stdin) | grep -Eo "[0-9.]{7,}")'
 
 #list local ips
 iplist()
@@ -1165,11 +1167,12 @@ iplist()
 #https://superuser.com/questions/261818/how-can-i-list-all-ips-in-the-connected-network-through-terminal-preferably
 
 
+#git functions for my shell chatgpt.sh project
 upchat()
 {
 	typeset f1 f2
-	f1=$HOME/www/lab-shellchatgpt/chatgpt.sh 
-	f2=$HOME/bin/chatgpt.sh 
+	f1=$HOME/www/lab-shellchatgpt/chatgpt.sh
+	f2=$HOME/bin/chatgpt.sh
 	cd ~/www/lab-shellchatgpt/man || return
 
 	~/bin/openai/chatgpt-test.sh || return 1
@@ -1210,7 +1213,7 @@ upchataur()
 	#test PKGBUILD
 	builtin cd "$(mktemp -d)" || return
 	ln -sv $dir/PKGBUILD ./PKGBUILD
-	
+
 	namcap -i ./PKGBUILD &&
 	makepkg && {
 		echo >&2
@@ -1238,12 +1241,9 @@ upchatall()
 alias chat='chatgpt.sh -cc --git --time --md'
 alias unix="chatgpt.sh -..unix -cc  --time --md --goo"
 alias pt='chatgpt.sh -cc..pt --time --md'
-alias marv="chat --md --time -256- -cc --frequency-penalty=0.7 --temp=0.8 --top_p=0.4 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
+alias marv="chat --md --time -256 -cc --frequency-penalty=0.7 --temp=0.8 --top_p=0.4 --restart-seq='\\nYou: ' --start-seq='\\nMarv:' --stop='You:' --stop='Marv:' -S..marv"
 alias learn='chatgpt.sh -cc -6000 --time --goo --top-p 0.95 --top-k 64 -m learnlm-1.5-pro-experimental'
-alias dchatgpt.sh=$HOME/bin/openai/debug.chatgpt.sh
-alias dchat=dchatgpt.sh
-#chatgpt.sh with deepseek speciale
-alias deep='DEEPSEEK_BASE_URL=https://api.deepseek.com/v3.2_speciale_expires_on_20251215 chatgpt.sh --time --deepseek -cc'
+alias mailv='chatgpt.sh -w pt | mail'
 
 
 #local-ai
@@ -1260,6 +1260,7 @@ llchat()
 	MOD_IMAGE="stablediffusion" START='### Response:' RESTART='### User:' \
 	~/bin/chatgpt.sh -r'\n### User: ' -R'\n### Response:' -s'### User:' -s'### Response:' -s'### Instruction:' "$@"
 }
+#alias lai=/home/LocalAI/local-ai.sh
 
 #ollama
 ochat()
@@ -1267,14 +1268,8 @@ ochat()
 	~/bin/chatgpt.sh -O -m llama2-uncensored:latest -R'\n### RESPONSE:' -r'\n### HUMAN: ' -s'### RESPONSE:' -s'### HUMAN:' "$@"
 }
 
-alias lai=/home/LocalAI/local-ai.sh
 
-#concursos:
-#% bin/pciconcursos.sh
-#% cd Downloads/pciconcursos/centrooeste
-#% cat -- $(grep -i -e bi.logo -e biologia -e biol.gicas -e ambiente -e ambiental -e zool.gico -e conserva..o -e preserva..o -e molecular -e celular -e bioquim -- *txt | cut -f1 -d: | uniq) | chatgpt.sh --goo --markdown -m gemini-2.5-pro -0 -t 0.23 -cc -S.concurso
-
-
+#google text-to-speech engine
 tts()
 {
 	local in out;
@@ -1419,8 +1414,8 @@ b()
 }
 
 
-xtitle () 
-{ 
+xtitle ()
+{
 	echo -n -e "\033]0;$*\007"
 }
 #also see bashrc of gentoo and arch linux
@@ -1496,7 +1491,7 @@ pacmsg()
 #Listing changed config files
 #If you want to backup your system configuration files you could copy all
 #files in /etc/, but usually you are only interested in the files that you
-#have changed. Modified backup files can be viewed with the following command: 
+#have changed. Modified backup files can be viewed with the following command:
 #{ pacman -Qii | awk '/^MODIFIED/ {print $2}' ;}
 #https://wiki.archlinux.org/index.php/Pacman/Tips_and_tricks
 
@@ -1585,7 +1580,7 @@ piponly()
 activate()
 {
 	#python -m venv ~/venv
-	source ~/venv/bin/activate 
+	source ~/venv/bin/activate
 }
 #exit: deactivate
 #see also: pipx, pipenv
@@ -1866,7 +1861,7 @@ vipef()
 	[[ -t 0 ]] || cat >> "$tmp" || return
 	${VISUAL:-${EDITOR:-vim}} "$tmp" </dev/tty >/dev/tty
 	cat "$tmp"
-	/bin/rm "$tmp"
+	command rm "$tmp"
 }
 
 #safe sleep (lol)
@@ -1880,9 +1875,8 @@ function sleepf
 		};
 	done
 }
-#https://www.youtube.com/watch?v=47qrH5JZUUg
 #should work with bash, zsh, and ksh
-#command -v sleep >/dev/null 2>&1 || function sleep { 	sleepf ${*//[!0-9.]} ;};
+#https://www.youtube.com/watch?v=47qrH5JZUUg
 
 # unfmt - convert paragraphs into long lines
 # 20jul2014  +chris+  zsh function
@@ -1944,15 +1938,15 @@ zpass()
 #viacep
 cep()
 {
-	if [[ $1 = [0-9]* ]]
+	if [[ $1 != *[!0-9-]* ]]
 	then
 		set -- "${1//[!0-9]}";
 		\curl -\# -f -L "https://viacep.com.br/ws/${1:?CEP}/json/"
 	else
-		set -- "${1//[$IFS]/+}" "${2//[$IFS]/+}" "${3:-PR}";
-		printf 'Logradouro: %s\nCidade: %s  Estado: %s\n' "$1" "${2:-Londrina}" "$3" >&2;
+		set -- "${1//[$IFS]/+}" "${2//[$IFS]/+}" "${3:-}";
+		printf 'Logradouro: %s\nCidade: %s  Estado: %s\n' "$1" "${2:?cidade}" "${3:?estado: sigla}" >&2;
 
-		\curl -\# -f -L "https://viacep.com.br/ws/${3}/${2:-Londrina}/${1:?Logradouro}/json/" |
+		\curl -\# -f -L "https://viacep.com.br/ws/${3:-PR}/${2:-Londrina}/${1:?Logradouro}/json/" |
 		jq -r '.[]? | to_entries[] | "\(.key): \t\(.value | if . == null or . == "" then empty else . end)"' |
 		tac | column -t -s $'\t' || echo "Lookup failed" >&2;
 	fi;
@@ -1975,18 +1969,6 @@ cep2()
 #https://groups.google.com/forum/#!searchin/python-brasil/correios$20a%C3%A7%C3%A3o/python-brasil/wvERTS9Bz3M/efQdlHDfLIgJ
 #https://blog.public.law/2013/11/06/usps-zip-codes-are-commercially-sensitive-trade-secrets/
 #download base de dados cep antiga: https://www.republicavirtual.com.br/cep/
-
-#search and set cliboard with CEP from BRASIL CORREIOS API
-cepsh()
-{
-	local cep st
-	{ 	read -r cep st;
-		printf '%s *%s\n' "$cep" "$st" 
-		cat
-		xsel -b <<<"$cep"
-	} < <(~/bin/cep.sh -s "$@")
-}
-alias cep.sh=cepsh
 
 
 #indent a compact json (one-liner)
@@ -2097,7 +2079,7 @@ TEMPFILE="$HOME/Downloads/urls.sqlite"
 
 #firefox -- all urls (history, etc)
 faurls()
-{ 
+{
 	/bin/cp "$FFUSER" "$TEMPFILE" <<<y || return
 	sqlite3 "$TEMPFILE" <<<'select url from moz_places where 1;'
 	/bin/rm "$TEMPFILE"
@@ -2105,7 +2087,7 @@ faurls()
 
 #firefox -- bookmarks
 fburls()
-{ 
+{
 	/bin/cp "$FFUSER" "$TEMPFILE" <<<y || return
 	sqlite3 "$TEMPFILE" <<<'select url from moz_bookmarks, moz_places where moz_places.id=moz_bookmarks.fk;'
 	/bin/rm "$TEMPFILE"
@@ -2113,7 +2095,7 @@ fburls()
 
 #chrome -- all urls (history, etc)
 caurls()
-{ 
+{
 	/bin/cp "$GCUSER" "$TEMPFILE" <<<y || return
 	sqlite3 "$TEMPFILE" <<<'select url from urls where 1;'
 	/bin/rm "$TEMPFILE"
@@ -2247,7 +2229,7 @@ alias sunspotsm_old='curlu https://www.sidc.be/SILSO/DATA/ARCHIVE/V1.0/monthssn.
 gps()
 {
 	[[ -n ${*:?location: not set} ]] || return
-	
+
 	#https://nominatim.org/release-docs/develop/api/Lookup/
 	curl -fsL -H "$UAG" "https://nominatim.openstreetmap.org/search?q=$(sed 's/\s/%20/g' <<< "$*" | rmaccent)&format=json" \
 	| jq -r ".[]|.lat+\"\t\"+.lon+\"\t\"+.display_name"
@@ -2264,14 +2246,14 @@ gpsc()
 dist()
 {
 	local by from to
-	
+
 	case "$1" in
 	  -bike|-foot|-car)  by="${1##-}"; shift;;
 	esac
-	
+
 	from=$(_gps "${1:?from: not set}") || return
 	to=$(_gps "${2:?to: not set}") || return
-	
+
 	#coordinates: {longitude},{latitude};
 	from="${from##*[$IFS]},${from%%[$IFS]*}"
 	to="${to##*[$IFS]},${to%%[$IFS]*}"
@@ -2314,7 +2296,7 @@ _gps_fmt()
 	local var
 	var=$(sed -n 1p)
 	printf '%s\n' "$var" >&2
-	printf '%s\n' "${var%$'\t'*}" 
+	printf '%s\n' "${var%$'\t'*}"
 }
 
 #get coordinates from opencage
@@ -2336,19 +2318,15 @@ gps3()
 #Earth's Seasons - equinoxes, solstices, perihelion, and aphelion (US Navy API, v4.0.0)
 #usage: TZ=UTC-00  equinox [YYYY]
 equinox()
-{ 	local year tz tz_sign url tmpdir tmp
+{
+	local year tz tz_sign url
 	year=${1:-$(date +%Y)}
 	tz=$(date +%z) || tz=-00
 	tz_sign=${tz:0:1} tz=${tz:1:2}
-
-	tmpdir="${HOME}/.cache/USNavyMoon"
-	mkdir -p "$tmpdir" || tmpdir=${TMPDIR:-/tmp}
-	tmp="${tmpdir%%/}/USNavyEarthSeasons${year:0:4}TZ${tz_sign}${tz}.html"
 	url="https://aa.usno.navy.mil/calculated/seasons?year=${year:?required}&tz=${tz}&tz_sign=${tz_sign}1&tz_label=false&dst=false&submit=Get+Data"
-	
-	[[ -f $tmp ]] || curl -\# --fail --compressed --header "$UAG" --header 'Referer: https://aa.usno.navy.mil/data/Earth_Seasons' "$url" -o "$tmp"
-	
-	sed -n -e '/<table/,/<\/table/p' "$tmp" | sed -e 's/<[^>]*>/ /g' \
+
+	curl -\# --fail --compressed --header "$UAG" --header 'Referer: https://aa.usno.navy.mil/data/Earth_Seasons' "$url" |
+	sed -n -e '/<table/,/<\/table/p' | sed -e 's/<[^>]*>/ /g' \
 	  -e '/^\s*$/d' -e 's/^\s\s*//' -e 's/\s\s*$//' -e 's/  /,/g' -e 's/,,/,/g' \
 	| column -t -s, -N1,2,3 -O2,3,1 | sed -e '1d' -e 's/^\s\s*//'
 }
@@ -2357,64 +2335,66 @@ equinox()
 #Phase of the Moon (US Navy API, v4.0.0)
 #usage: moonphase [YYYY-MM-DD] [NUMBER_OF_PHASES]
 moonphase()
-{ 	local tmpdir tmp url date nump
-	date=$(date -Idate ${1:+-d"$1"} || echo "$1")
-	nump=${2:-6}  #number of phases < 100
-
-	tmpdir="${HOME}/.cache/USNavyMoon"
-	mkdir -p "$tmpdir" || tmpdir=${TMPDIR:-/tmp}
-	tmp="${tmpdir%%/}/USNavyMoonPhases${date:0:7}:${nump:0:2}.json"
+{
+	local url date nump
+	date=$(date -u -Idate ${1:+-d"$1"}) || date=$1
+	nump=${2:-10}  #number of phases < 100
 	url="https://aa.usno.navy.mil/api/moon/phases/date?date=${date:0:10}&nump=${nump:0:2}"
-	
-	[[ -f $tmp ]] || curl -f "$url" -o "$tmp"; [[ -f $tmp ]] || return
-	
-	jq -r '.phasedata[]|"\(.year)-\(.month)-\(.day)\t\(.time)\t\(.phase)"' "$tmp" \
-	|| { 	mv -fv "$tmp" "${tmp%.*}bad.json"; ! echo err >&2 ;}
+
+	curl -f "$url" | jq -r '.phasedata[]|"\(.year)-\(.month)-\(.day)\t\(.time)\t\(.phase)"'
 }
 #https://aa.usno.navy.mil/data/MoonPhases
 #https://aa.usno.navy.mil/data/api#phase
 
-#Illuminated Fraction of Moon (US Navy scrape, quantised)
-#usage: TZ=UTC-00  moonbrt [YYYY-MM-DD] [HH]
+#Illuminated Fraction of Moon (fracillum)
+#usage: moonbrt [YYYY-MM-DD] [HH]
+#requires astrophy and jplephem
 moonbrt()
-{ 	local tmpdir tmp year month day hour min sec var url tz tz_sign brt brtp brtq ind
-	IFS=$IFS'/.Tt:+-' read year month day hour min sec var < <(date -Iseconds ${*:+-d"$*"} || echo "$*")
+{
+	python -c "
+	from astropy.time import Time
+	from astropy.coordinates import get_body, solar_system_ephemeris
+	import numpy as np
+	import sys
 	
-	((year&&month&&day)) || return
-	: ${hour:=00} ${min:=00} ${sec:=00};
-	tz=$(date +%z) || tz=-00
-	tz_sign=${tz:0:1} tz=${tz:1:2}
+	if len(sys.argv) > 1 and sys.argv[1].strip():
+	    t = Time(sys.argv[1])
+	else:
+	    t = Time.now()
 	
-	tmpdir="${HOME}/.cache/USNavyMoon"
-	mkdir -p "$tmpdir" || tmpdir=${TMPDIR:-/tmp}
-	tmp="${tmpdir%%/}/USNavyMoon${year}TZ${tz_sign}${tz}.html"
-	url="https://aa.usno.navy.mil/calculated/moon/fraction?year=${year}&task=00&tz=${tz##0}.00&tz_sign=${tz_sign##+}1&tz_label=false&submit=Get+Data"
-
-	[[ -f $tmp ]] || curl -\# --fail --compressed --header "$UAG" "$url" -o "$tmp"; [[ -f $tmp ]] || return
-	set -- Day $(sed -n -e '/<table/,/<\/table/p' "$tmp" | sed -e 's/<[^>]*>/ /g' -e '1,/^\s*Day/d')
+	#with solar_system_ephemeris.set('jpl'):     #7-8 reliable decimals
+	with solar_system_ephemeris.set('builtin'):  #4-5 reliable decimals
+	    moon = get_body('moon', t)
+	    sun  = get_body('sun',  t)
 	
-	ind=$((13 + 1 + ( (${day##0} - 1) * 13) + ${month##0}));
-	brtp=${@:$((ind)):1}; brtq=${@:$((ind+13)):1};
-	[[ ${brtq:---} = -- ]] && brtq=${@:$((ind+13-((day+1-1)*13)+1)):1};
-	brt=$(bc <<<"scale=16;
-		brtp=${brtp}; brtq=${brtq};
-		unix=(${hour}*60*60)+(${min}*60)+${sec};
-		diff=brtq-brtp
-		rate=diff/(24*60*60);
-		((brtp+(rate*unix))*100)/1;")
-
-	((ind==416)) && brt=${brtp/./} hour=00 min=00 sec=00 #bug dec-31
-
-	printf '%.4f%%  %s\n' "$brt" "${year}-${month}-${day}T${hour}:${min}:${sec}${tz_sign}${tz}"
+	elong = sun.separation(moon).deg
+	frac  = (1 - np.cos(np.deg2rad(elong))) / 2
 	
-	((${#}==416)) || { 	mv -fv "$tmp" "${tmp%.*}bad.html"; ! echo err >&2 ;}
+	#print(f'{frac:.6f}')      #fractional illumination (0–1)
+	print(f'{frac*100:.4f}%')  #percentage with 4 decimals, e.g. 98.3247%
+	" "$@";
 }
+#https://ssd.jpl.nasa.gov/horizons/
+
+moonbrt2()
+{
+	local coords date tz
+	coords=${2:-0,0}
+	date=${1:-$(date -u -Iseconds)}
+
+	tz=$((12 - 10#${date:11:2}))
+	[[ $tz = [+-]* ]] || tz=+$tz
+
+	curl -L -\# "https://aa.usno.navy.mil/api/rstt/oneday?date=${date:0:10}&coords=${coords}&tz=${tz}" |
+	jq -r '.properties.data | .fracillum + " " + .curphase'
+}
+#https://aa.usno.navy.mil/data/api#rstt
 #https://aa.usno.navy.mil/data/MoonFraction
 
 moon()
 { 	moonphase "$@"; echo >&2;
 	datediff.sh -m "$@";
-	moonbrt "$@";
+	moonbrt "$@" || moonbrt2 "$@";
 }
 
 #ascii world
@@ -2449,44 +2429,6 @@ myip3()
  	dig ANY +short @ns1-1.akamaitech.net  whoami.akamai.net
 }
 #https://linuxize.com/post/how-to-find-ip-address-linux/
-
-#others
-myip4()
-{
-    curl -s https://checkip.amazonaws.com
-    wget -O - -q https://icanhazip.com/
-    curl -s api.infoip.io/ip
-}
-
-# get public ip
-myip5()
-{
-	local api
-	case "$1" in
-		"-4") api="http://v4.ipv6-test.com/api/myip.php";;
-		"-6") api="http://v6.ipv6-test.com/api/myip.php";;
-		*)    api="http://ipv6-test.com/api/myip.php";;
-	esac
-	curl -s "$api"
-	echo # Newline
-}
-
-#upload text and get a URL
-upload()
-{
-	if [[ -f $1 ]]
-	then 	curl -F "file=@${1}" 0x0.st;
-	elif [[ ! -t 0 ]]
-	then 	curl -F "file=@-" 0x0.st;
-	else 	false;
-	fi
-}
-
-_greek() { 
-sed 'y/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/αβcδεφγηιθκλμνοπχρστυvωξψζΑΒCΔΕΦΓΗΙΘΚΛΜΝΟΠΧΡΣΤΥVΩΞΨΖ/'; }
-#https://bbs.archlinux.org/viewtopic.php?pid=2122857#p2122857
-
-greek() { rmaccent | _greek ;}
 
 # IP addresses
 #alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
@@ -2525,6 +2467,16 @@ psk()
 #https://www.vivaolinux.com.br/topico/Iniciantes-no-Linux/Existe-algum-comando-para-exibir-a-senha-do-wifi-que-estou-conectado-no-momento/
 alias passkey=psk
 
+#upload text and get a URL
+upload()
+{
+	if [[ -f $1 ]]
+	then 	curl -F "file=@${1}" 0x0.st;
+	elif [[ ! -t 0 ]]
+	then 	curl -F "file=@-" 0x0.st;
+	else 	false;
+	fi
+}
 
 #url shortner
 turl()
@@ -2641,7 +2593,7 @@ colours2()
 			bgc=${bgc#40} # black
 			vals="${fgc:+$fgc;}${bgc}"
 			vals=${vals%%;}
-			seq0="${vals:+\e[${vals}m}"
+			seq0=${vals:+"\e[${vals}m"}
 
 			printf "  %-9s" "${seq0:-(default)}"
 			printf " ${seq0}TEXT\e[m"
@@ -2699,15 +2651,18 @@ toimage()
 xpointer()
 {
 	if [[ $* = rm ]]
-	then 	#xinput reattach 16 "Virtual core pointer" &&
+	then
+		#xinput reattach 16 "Virtual core pointer" &&
 		xinput remove-master "Virtual core pointer"
-	else 	
+	else
 		xinput list | grep -q "Auxiliary pointer" \
 		|| xinput create-master Auxiliary
-		xinput reattach 16 "Auxiliary pointer" \
-		&& xinput reattach 26 "Auxiliary keyboard" \
-		&& xinput reattach 28 "Auxiliary keyboard" \
-		&& xinput reattach 29 "Auxiliary keyboard"
+
+		#check system device ids!
+		#xinput reattach 6 "Auxiliary pointer" \
+		#&& xinput reattach 26 "Auxiliary keyboard" \
+		#&& xinput reattach 28 "Auxiliary keyboard" \
+		#&& xinput reattach 29 "Auxiliary keyboard"
 	fi
 }
 #https://wiki.archlinux.org/title/Multi-pointer_X
@@ -2746,9 +2701,9 @@ alias chessonline='telnet freechess.org 5000'
 
 #webcam adjustments: guvcview
 
+
 #youtube download fun
-#command:
-YT_CMD=yt-dlp
+YT_CMD="yt-dlp"
 #yt-dlp --proxy socks5://127.0.0.1:9050  #tor
 
 #YOUTUBE-DL WRAPPERS
@@ -2759,8 +2714,6 @@ YT_CMD=yt-dlp
 #	ytm [URL..]     -- bestaudio and convert to mp3
 #	yts [KEY_WORDS] -- search for keyword and play *audio* with mpv
 
-#simple download
-#usage: yt [urls..]
 _yt()
 {
 	$YT_CMD --restrict-filenames -o "%(title)s-%(id)s.%(ext)s" "$@"
@@ -2796,25 +2749,20 @@ alias ytm='noglob _ytm'
 alias yt='noglob _yt'
 alias yt-dlp="noglob yt-dlp"
 
-#youtube caption subtitiles
-#https://stackoverflow.com/questions/9611397/how-to-extract-closed-caption-transcript-from-youtube-video
-#does not work anymore as of june/2025
-
 
 ##shell globbing
 ##Z-SHELL has built-in `noglob' cmd
 ## ~/.bashrc
-#noglob_helper() {
-#	"$@"
-#	case "$shopts" in
-#		*noglob*) 	;;
-#		*) 	set +f ;;
-#	esac
-#	unset shopts
-#}
-#alias noglob='shopts="$SHELLOPTS"; set -f; noglob_helper'
+# noglob_helper() {
+# 	"$@"
+# 	case "$shopts" in
+# 		*noglob*) 	;;
+# 		*) 	set +f ;;
+# 	esac
+# 	unset shopts
+# }
+# alias noglob='shopts="$SHELLOPTS"; set -f; noglob_helper'
 ##check: https://www.chiark.greenend.org.uk/~sgtatham/aliases.html
-
 
 #calc
 _c()
@@ -2822,6 +2770,13 @@ _c()
 	bcalc.sh -v "$@" || datediff.sh "$@" 2>/dev/null
 }
 alias c='noglob _c'
+
+
+#whatsapp status format converter
+whats()
+{
+	ffmpeg -i "${1:-file required}" -c:v libx264 -profile:v main -level:v 4.0 -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart "${1%.*}.mp4"
+}
 
 #mount sshfs (phone)
 moto()
@@ -3009,6 +2964,11 @@ rmaccent()
 	sed 'y/äÄáÁàÀãÃâÂëËéÉèÈẽẼêÊïÏíÍìÌĩĨîÎöÖóÓòÒõÕôÔüÜúÚùÙũŨûÛçÇñÑ/aAaAaAaAaAeEeEeEeEeEiIiIiIiIiIoOoOoOoOoOuUuUuUuUuUcCnN/'
 }
 
+greek() { rmaccent | _greek ;}
+_greek() {
+sed 'y/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/αβcδεφγηιθκλμνοπχρστυvωξψζΑΒCΔΕΦΓΗΙΘΚΛΜΝΟΠΧΡΣΤΥVΩΞΨΖ/'; }
+#https://bbs.archlinux.org/viewtopic.php?pid=2122857#p2122857
+
 #translte special chars (ex: "\xe7") to utf-8
 #{ iconv -f iso-8859-1 -t utf-8 ;}
 #remove accents and
@@ -3143,22 +3103,14 @@ halving()
 	local hgt secs tgt
 	tgt=$((840000+210000))
 	hgt=$(curl -s https://blockchain.info/q/getblockcount) || return
-	
+
 	printf "Bitcoin Halving\\nDays left: %6d\\nHeight   : %6d/%d\\n" $(( ( (tgt-hgt)*(10*60))/(24*60*60) )) "$hgt" "$tgt"
 	secs=$(( (tgt-hgt)*(10*60) ))
 	datediff.sh -vv ${secs}seconds 2>/dev/null
 	date -R -d"${secs}seconds"
 }
-_halving()
-{
-	{ 	printf '---\n'
-		halving
-		binfo.sh -ii 2>/dev/null | grep EH/s
-	} | tee -a ~/halving.txt
-}
 
 #cryptocurrency greps
-
 #mainnet public addresses
 alias btcgrep="grep -E '\b([Bb][Cc](0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59}|[AC-HJ-NP-Z02-9]{39}|[AC-HJ-NP-Z02-9]{59})|1[ac-hj-np-z02-9]{8,87}|1[AC-HJ-NP-Z02-9]{8,87})|[13][a-km-zA-HJ-NP-Z1-9]{25,34})\b'"
 #https://stackoverflow.com/questions/21683680/regex-to-match-bitcoin-addresses
@@ -3445,10 +3397,9 @@ localidade()
 {
 	local args data
 	args=$( tr A-Z a-z <<< "$*" )
-	data=$(curl --compressed 'http://servicodados.ibge.gov.br/api/v1/localidades/distritos')
+	data=$(curlu --compressed 'http://servicodados.ibge.gov.br/api/v1/localidades/distritos')
 
-	jq -er '.. | select( .nome? | ascii_downcase == "'$args'")' <<<"$data" \
-		|| jq -r . <<<"$data"
+	jq -er '.[] | select( .nome? | ascii_downcase == "'$args'")' <<<"$data"
 }
 #https://servicodados.ibge.gov.br/api/docs/localidades
 
@@ -3458,12 +3409,12 @@ nomef()
 {
 	local json
 	if [[ -z "$1" ]]
-	then 	json=$( curl -s 'http://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking' )
+	then 	json=$( curlu -s 'http://servicodados.ibge.gov.br/api/v2/censos/nomes/ranking' )
 		jq -r '.[]|"Localidade: \(.localidade)"' <<<"$json"
 		jq -r '.[]|.res[]|"\(.nome)\t\(.frequencia)\t\(.ranking)"' <<<"$json" \
 			| column -et -NNOME,FREQ,RNK
 	else 	set -- "$( tr A-Z a-z <<< "$1" )"
-		json=$(curl -s "http://servicodados.ibge.gov.br/api/v2/censos/nomes/$1")
+		json=$(curlu -s "http://servicodados.ibge.gov.br/api/v2/censos/nomes/$1")
 		jq -r '.[]|"Local: \(.localidade)","Nome_: \(.nome)"' <<<"$json"
 		jq -r '.[].res[]|"\(.periodo)\t\(.frequencia)"' <<<"$json" \
 			| tr -d '][' | tr ',' '-' | column -et -NPERIODO,FREQ
@@ -3706,6 +3657,7 @@ SUM2()
 #https://www.programmersought.com/article/92546043400/
 
 #std deviation
+#requires module statistics-descriptive
 SUM3()
 {
 	perl -M'List::Util qw(sum max min)' -M'Statistics::Descriptive' -MPOSIX -0777 -a -ne '
@@ -4176,13 +4128,20 @@ mail()
 {
 	unset text size subj
 	if [[ $1 = *\@* ]]         #e-mail address
-	then 	EMAIL="$1" ;set -- "${@:2}"
+	then 	EMAIL="$1"
+		set -- "${@:2}"
 	fi
-	[[ $1 != \-\a ]] && [[ -e ${@:$#} ]] && set -- "${@:$#}" "${@:1:$# -1}" 
+
+	#read file in when no option -a
+	[[ $1 != \-\a ]] && [[ -f ${@:$#} ]] && set -- "${@:$#}" "${@:1:$# -1}"
+
         if [[ $1 = \-\a || $(file --mime "$1") = *charset=binary* ]]  #opt -a or binary
-	then 	[[ -e $1 ]] && set -- -a "$@"
-		size=$(wc -c <"$2")  subj="${3:-$2}" ;set -- "${@:1:2}" --
-	else 	[[ -t 0 ]] || subj="$*"
+	then
+		[[ -e $1 ]] && set -- -a "$@"
+		size=$(wc -c <"$2")  subj="${3:-$2}"
+		set -- "${@:1:2}" --
+	else
+		[[ -t 0 ]] || subj="$*"
 		if [[ -f $1 ]]     #ascii file
 		then 	text=$(<"$1")  subj="${@:2} ${1##*/}"
 		elif [[ ! -t 0 ]]  #stdin
@@ -4192,17 +4151,16 @@ mail()
 		size=$(LC_ALL=C ;echo "${#text}") ;set --
 	fi
 	subj="$subj ${text:0:100}" subj="${subj//[$IFS]/ }" subj="${subj:0:50}"
-	echo $size B \| $((size/(2**10) )) KB \| $((size/(2**20) )) MB $'\n'${EMAIL:?e-mail address required} - $subj
+	echo $size B \| $((size/(2**10) )) KB \| $((size/(2**20) )) MB $'\n'${EMAIL:?environment: address required} - $subj
 	mutt -s "$subj" "$@" $EMAIL <<<"$text" >/dev/null 2>&1 &
 	#echo pid=$! >&2;
 }
 #also see: xdg-email
-alias mailv='chatgpt.sh -w pt | mail'
 
 #ibge projeções população do brasil
 #https://servicodados.ibge.gov.br/api/docs/projecoes
 #https://servicodados.ibge.gov.br/api/docs/localidades
-	
+
 #reuters covid19
 #https://graphics.thomsonreuters.com/data/2020/coronavirus/tracking/global/data.json
 #CSSE covid19 archive repo
@@ -4219,8 +4177,6 @@ alias cmc.sh='noglob cmc.sh -3'
 alias cgk=cgk.sh
 alias cmc=cmc.sh
 alias uol='uol.sh'
-alias cointop='cointop --cache-dir ~/.cache'
-alias ctop=cointop
 alias usd='cmc usd brl ;cgk usd brl ;uol.sh|sed -n 8p\;17p'
 alias fee='~/bin/mempoolfee.sh'
 
@@ -4230,15 +4186,6 @@ alias mop='go run ~/go/src/github.com/mop-tracker/mop/cmd/mop/main.go'
 #wallet and trading monitors
 #alias W=walletmonitor.sh
 #alias T=tradingview.sh
-
-#gold rate from UOL
-ouro()
-{
-	curl --compressed -sL -H"$UAG" "https://economia.uol.com.br/cotacoes/" |
-	sed -e 's/<[^>]*>//g' -e 's/\s\s*/ /g' |
-	grep -m1 -Eo 'Ouro.{25}' |
-	grep -Eo '.*[^- ][0-9][0-9][0-9]+,[0-9]+'
-}
 
 
 ##################################################
@@ -4250,56 +4197,37 @@ ouro()
 #usage: VAL is an integer. Negative values are read as gains.
 loss()
 {
-	local u g
-	u=${1##+} u=${u%%%}
-	g=$(bc <<<"scale=16; ( (1 / (1 - ($u / 100) ) ) - 1) * 100")
-	if [[ -n $g ]] && [[ $u = *[0-9]* ]]
-	then 	if [[ $u = -* ]]
-		then 	printf "%4s: %6.${2:-4}f %%\n" gain ${u#-} loss ${g#-}
-		else 	printf "%4s  %6.${2:-4}f %%\n" loss $u gain $g
+	local val rec
+	val=${1##+} val=${val%%%}
+	rec=$(bc <<<"scale=16; ($val / (100 - $val)) * 100")
+
+	if [[ -n $rec ]] && [[ $val != *[!0-9.+-]* ]]
+	then 	if [[ $val = -* ]]
+		then 	printf "%4s: %6.${2:-4}f %%\n" gain "${val##-}" loss "${rec##-}"
+		else 	printf "%4s  %6.${2:-4}f %%\n" loss "${val}" gain "${rec}"
 		fi
 	else 	! printf 'err\nusage: loss [+|-]VAL[%%] [SCALE]\nexamp: loss 10%%; loss -2.30%%\n' >&2
 	fi
 }
+#"( (1 / (1 - ($val / 100) ) ) - 1) * 100"
 #fausto botelho: https://www.youtube.com/watch?v=yY7d6gOIynU
 #formula: 100/(100-loss)
 
-#lista de ações da bovespa b3
-blist()
-{
-	local i
-	if [[ -n "$*" ]]
-	then 	set -- $( tr '[:lower:]' '[:upper:]' <<< "$*" )
-	else 	printf 'uso: blist [LETRA|NUM]\n\n' >&2 ;set -- {A..Z} {0..9}
-	fi
 
-	for i
-	do 	printf 'Puxando %s..\r' "$i" 1>&2
-		curl -s "https://br.advfn.com/bolsa-de-valores/bovespa/$i" |
-			sed 's/<[^>]*>//g' | sed -n '/Ação/,/var ZD_USER/p' |
-			sed -e '1d' -e '$d' -e '/^\s*$/d' -Ee 's/[a-z ]([A-Z0-9]+)$/\t\1/' |
-			column -et -s$'\t' -NNOME,SIMBOLO -TNOME
-	done
-}
-
-
-#tesouro direto -- precos e taxas dos titulos
+#tesouro direto
+#preços e taxas dos títulos
 tesouro()
 {
-	local url data
-	url=https://www.tesourodireto.com.br/json/br/com/b3/tesourodireto/service/api/treasurybondsinfo.json
-	data="$(curlu -L --compressed --insecure "$url" )"
+	local data
+	data=$(curlu --compressed --insecure 'https://www.tesourodireto.com.br/o/rentabilidade/investir' --compressed -L -H "$UAG" \
+	-H 'Referer: https://www.tesourodireto.com.br/produtos/dados-sobre-titulos/rendimento-dos-titulos')
 
-	jq '.response.TrsrBondMkt' <<<"$data"
-	jq -r '.response.TrsrBdTradgList[].TrsrBd |
-		"\(.nm)\t\(.FinIndxs| if .nm == "PREFIXADO" then "" else .nm end)+\(if .anulInvstmtRate == 0 then empty else .anulInvstmtRate end)%\t\(.minInvstmtAmt)\t\(.untrInvstmtVal)\t\(.mtrtyDt|.[:10])"' <<<"$data" |
-		sort | column -et -s$'\t'  -NTÍTULO,RENT/ANO,INVEST/MIN,PREÇO,VENCIMENTO -RRENT/ANO,INVEST/MIN,PREÇO
+        jq -r '(.TesouroLegado + .Tesouro24x7)[] |
+              "\(.treasuryBondName)\t\(.investmentProfitabilityIndexerName)\t\(.investmentBondMinimumValue)\t\(.unitaryInvestmentValue)\t\(.maturityDate | .[:10])"' <<<$data |
+	sort | column -et -s$'\t'  -NTÍTULO,RENT/ANO,INVEST/MIN,PREÇO,VENCIMENTO -RRENT/ANO,INVEST/MIN,PREÇO
+
 	echo "<https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm>"
-
 }
-#url=https://www.tesourodireto.com.br/titulos/precos-e-taxas.htm
-#url=http://www.tesouro.fazenda.gov.br/tesouro-direto-precos-e-taxas-dos-titulos
-#https://stackoverflow.com/questions/47593807/how-to-scrape-a-html-table-and-print-it-on-terminal-using-bash
 
 
 #ibge inflação brasileira IPCA - Variação mensal
@@ -4307,13 +4235,12 @@ ipcab()
 {
 	local data mes ano v
 	(($#)) || printf %s\\n\\n 'uso: ipcab  ANO/MES  # >= 1980/01' >&2
-	
+
 	set -- "${@//[\/.-]}" ;[[ -n "$2" ]] && set -- "$1$2"
 	((${#1} == 4 && ${1:-0} >= 1980)) && set -- "${1}01" #ano+janeiro
 	((${#1} != 6 || ${1:-0} < 198001)) && set -- 199501  #199407 começo do plano real
 
-
-	data=$(curl --compressed -s "http://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=63&p=${1}-203701&ng=1(1)&c=")
+	data=$(curlu --compressed --insecure -s "http://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=63&p=${1}-203701&ng=1(1)&c=")
 	set -- 1
 
 	#inflação variação mensal #cod:63
@@ -4329,11 +4256,9 @@ ipcab()
 	done | column -et -NMes,Ano,Var%Mes,Acu%Total,Fator -OAno,Mes,Var%Mes,Acu%Total,Fator -RVar%Mes,Acu%Total,Fator
 }
 #inflação variação mensal #cod:63
-#calculadora: https://www3.bcb.gov.br/CALCIDADAO/publico/corrigirPorIndice.do?method=corrigirPorIndice
-
 
 #ibge inflação brasileira IPCA - Variação acumulada no ano
-#uso: %s [ANO]  #ANO>=1980 e calcula de jan/ANO a DEZ/ANO_ATUAL-1 
+#uso: %s [ANO]  #ANO>=1980 e calcula de jan/ANO a DEZ/ANO_ATUAL-1
 ipcab2()
 {
 	local data year yearend
@@ -4341,13 +4266,13 @@ ipcab2()
 	(($#)) || printf %s\\n\\n 'uso: ipcab2 ANO  #ANO >= 1980' >&2
 	((${#1} == 4 && ${1:-0} >= 1980)) && set -- "${1}01" #ano+janeiro
 	((${#1} != 6 || ${1:-0} < 1980)) && set -- 199501  #199407 começo do plano real
-	
+
 	#inflação acumulada por ano #cod:69
-	data=$(curl -sLb non-existing "http://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=69&p=${1}-203012&ng=1(1)&c=") || return
+	data=$(curlu -sLb non-existing "http://servicodados.ibge.gov.br/api/v1/conjunturais?&d=s&user=ibge&t=1737&v=69&p=${1}-203012&ng=1(1)&c=") || return
 
 	jq -er '.[0].var' <<<"$data"
 	jq -r '.[]|"\(.p) \(.v)"' <<<"$data" | column -ets' ' -NMes,Ano,Acu%Ano -OAno,Mes,Acu%Ano
-	
+
 	#inflação acumulada a partir de ano especifico
 	yearend=$(($( date +%Y ) - 1))
 	year="${1:0:4}"
@@ -4361,7 +4286,7 @@ ipcab2()
 			tvalp = (tval - 1) * 100;
 			val ;tval ;tvalp")
 		printf "%d\tdez\t%.2f%%\t%'.2f%%\t%.6f\n" "$year" "$1" "$3" "$2"
-	done | column -et -NAno,Mes,Ac%Ano,Acu%Total,Fator -RAc%Ano,Acu%Total,Fator 
+	done | column -et -NAno,Mes,Ac%Ano,Acu%Total,Fator -RAc%Ano,Acu%Total,Fator
 }
 #https://www.ibge.gov.br/estatisticas/economicas/precos-e-custos/9256-indice-nacional-de-precos-ao-consumidor-amplo.html?t=series-historicas&utm_source=landing&utm_medium=explica&utm_campaign=inflacao#plano-real-mes
 
@@ -4371,10 +4296,12 @@ ipca()
 {
 	if ((!$#))
 	then 	printf 'usage: ipca [series_id]\n' >&2
-		printf 'usage: ipca  .           #all series\n\n' >&2
+		printf 'usage: ipca  .    #all series\n\n' >&2
 		set -- CUUR0000SA0
 	fi
-	curlu 'https://download.bls.gov/pub/time.series/cu/cu.data.1.AllItems' | grep "$1" | column -t
+
+	curlu 'https://download.bls.gov/pub/time.series/cu/cu.data.1.AllItems' |
+	grep "$1" | column -t
 }
 #??Daily query limit Version 1.0 (Unregistered) 25
 #https://www.bls.gov/
@@ -4384,48 +4311,34 @@ ipca()
 #american inflation
 ipca2()
 {
-	curl -sL 'https://www.usinflationcalculator.com/inflation/consumer-price-index-and-annual-percent-changes-from-1913-to-2008/' | 
+	curl -sL 'https://www.usinflationcalculator.com/inflation/consumer-price-index-and-annual-percent-changes-from-1913-to-2008/' |
 		sed -n '/<tbody>/,/<\/tbody>/p' | sed -e 's/<[^>]*>//g' -e 's/&.*;//g' -e 's/^\s*//g' |
 		sed -n '/Year/,$p' | sed ':a;N;s/\n\(.\)/ \1/;ta' | sed 's/^\s//g' | column -ts' ' -o' '
 }
 #https://www.usinflationcalculator.com
 
-#stats from <xe.com>
-#30 and 60-day hig, low and avg
-#{ curl -sL 'https://www.xe.com/api/stats.php?fromCurrency=GBP&toCurrency=USD';}
 
 #metal rates from kitco
 kitco()
 {
-	local colconf c
-	#parse options
-	while getopts hn c
-	do 	case $c in
-			h*) cat <<-!
-			usage: kitco [CURRENCY] [UNIT]   #convert opts
-			usage: kitco -n NUM              #kitco news
-			usage: kitco -h                  #help page
-			currs: USD, AUD, CAD, EUR, GBP, JPY, CHF, CNY,
-			       HKD, BRL, INR, MXN, RUB and ZAR
-			units: ounce, gram, kilo or tola
-			defts: USD ounce'
-			!
-			return ;;
-			n*) #news
-			curl -s "https://proxy.kitco.com/getvnews?type=json&df=2&max=${2:-8}" -H 'Origin: https://www.kitco.com' \
-				| jq  -r '.News.videoNews|reverse[]|.fullHeadline,.publishDate,.description,""' \
-				| sed 's/<br\/>//g'
-			return ;;
-			\?) return 1
-		esac
-	done
-	shift $((OPTIND - 1))
+	local -a colconf
+	case "$1" in
+		-h|-help|--help|help) cat <<-!
+		usage: kitco [CURRENCY] [UNIT]   #convert opts
+		usage: kitco -h                  #help page
+		currs: USD, AUD, CAD, EUR, GBP, JPY, CHF, CNY,
+		       HKD, BRL, INR, MXN, RUB and ZAR
+		units: ounce, gram, kilo or tola
+		defts: USD ounce
+		!
+		return ;;
+	esac
 
 	#arrange parameters
 	set -- $( tr A-Z a-z <<< "$*" )
 	case "$1" in 	ounce|gram|kilo|tola) set -- "$2" "$1" ;;esac
 	case "$2" in 	ounce|gram|kilo|tola) false;; 	*) set -- "$1" ounce;; esac
-	
+
 	#check if $1 is empty
 	#set default currency
 	if [[ -z "$1" ]]
@@ -4437,66 +4350,63 @@ kitco()
 	then echo 'Err: invalid currency symbol' >&2 ;return 1
 	fi
 
-	#set columns
+	#column configurations
 	(( COLUMNS < 102 )) && colconf=( -TTIME -HUNIT,CUR )
-	
-	#ny spot
+
+	#new york spot
 	printf 'New York Spot Price\n'
-	#mkt status
+	#market status
 	curl -Ls 'https://proxy.kitco.com/getMarketStatus?market=1' -H 'Origin: https://www.kitco.com'
-	#table
+	#quote table
 	curl -Ls "https://proxy.kitco.com/getPM?symbol=AU,AG,PT,PD,RH&currency=${1}&unit=${2}&market=1" -H 'Origin: https://www.kitco.com' | sed -e 's/\s/T/' -e 's/\r//g' | column -ts, -NX,CUR,UNIT,TIME,BID,MID,ASK,CHG,CHG%,LOW,HIGH -RCUR,UNIT,BID,MID,ASK,CHG,CHG%,LOW,HIGH -OX,BID,MID,ASK,CHG,CHG%,LOW,HIGH,CUR,UNIT,TIME ${colconf[@]}
 
 	#world prices
 	printf '\nThe World Spot Price - Asia/Europe/NY markets\n'
-	#mkt status
+	#market status
 	curl -Ls 'https://proxy.kitco.com/getMarketStatus?market=4' -H 'Origin: https://www.kitco.com'
-	#table
+	#quote table
 	curl -Ls "https://proxy.kitco.com/getPM?symbol=AU,AG,PT,PD,RH&currency=${1}&unit=${2}&market=4" -H 'Origin: https://www.kitco.com' | sed -e 's/\s/T/' -e 's/\r//g' | column -ts, -NX,CUR,UNIT,TIME,BID,MID,ASK,CHG,CHG%,LOW,HIGH -RCUR,UNIT,BID,MID,ASK,CHG,CHG%,LOW,HIGH -OX,BID,MID,ASK,CHG,CHG%,LOW,HIGH,CUR,UNIT,TIME ${colconf[@]}
-	
+
 	echo '<https://www.kitco.com/market/>'
 }
-#<<Exchange rates displayed are the middle point between bid and ask.>>
-
+#Exchange rates displayed are the middle point between bid and ask.
 
 #metal rates from infomine
 metals()
 {
-        curl -sL https://www.mining.com/markets/ |
-                grep "class='commodity-name'" |
-                sed 's/<div/\n&/g ;s/<[^>]*>//g'
-        echo '<https://www.mining.com/markets/>' >&2
+	curl -sL https://www.mining.com/markets/ |
+	grep "class='commodity-name'" |
+	sed 's/<div/\n&/g ;s/<[^>]*>//g'
+	echo '<https://www.mining.com/markets/>' >&2
 }
 #https://www.mining.com/markets/
 
-#yahoo finance hack -- long ticker
-#https://query1.finance.yahoo.com/v7/finance/quote?symbols=${SYMBOL:-TSLA}&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance
-
-#currency, language, triggerable, region, tradeable, priceHint, messageBoardId
-#shortName -- symbol short name; gmtOffSetMilliseconds
-#https://query1.finance.yahoo.com/v7/finance/quote?symbols=DANSKE.CO,ERIC-B.ST,FPKPEN.CO,SSO.OL,VWS.CO&range=1d&interval=5m&indicators=close&includeTimestamps=false&includePrePost=false&corsDomain=finance.yahoo.com&.tsrc=finance
-
-#yahoo finance symbol list
-ylist()
+#gold rate from UOL
+ouro()
 {
-	#assign local vars
-	local LISTF TMPF
-	#local file?
-	LISTF="$HOME/arq/docs/yahooFinanceSymbols/yahooFinanceSymbols.txt" 
-	#temp file for download
-	TMPF='${TMPDIR:-/tmp}/yahooFinanceSymbols.txt'
+	curl --compressed -sL -H"$UAG" "https://economia.uol.com.br/cotacoes/" |
+	sed -e 's/<[^>]*>//g' -e 's/\s\s*/ /g' |
+	grep -m1 -Eo 'Ouro.{25}' |
+	grep -Eo '.*[^- ][0-9][0-9][0-9]+,[0-9]+'
+}
 
-	#if there is no local copy, try to download it
-	if [[ ! -e "$LISTF" ]]
-	then 	#check for downloaded temp file
-		if [[ ! -e "$TMPF" ]]
-		then 	curl -L -o "$TMPF" 'https://github.com/mountaineerbr/extra/raw/master/yahooFinanceSymbols/yahooFinanceSymbols.txt' || return
-			printf 'File at %s\n' "$TMPF" >&2
-		fi
-		#set new path
-		LISTF="$TMPF"
+
+#lista de ações da bovespa b3
+blist()
+{
+	local i
+	if [[ -n "$*" ]]
+	then 	set -- $( tr '[:lower:]' '[:upper:]' <<< "$*" )
+	else 	printf 'uso: blist [LETRA|NUM]\n\n' >&2 ;set -- {A..Z} {0..9}
 	fi
-	column -et -s $'\t' -N'TICKER,NAME,EXCHANGE,CATEGORY,COUNTRY' -T'CATEGORY,NAME' "$LISTF"
+
+	for i
+	do 	printf 'Puxando %s..\r' "$i" 1>&2
+		curlu -s "https://br.advfn.com/bolsa-de-valores/bovespa/$i" |
+			sed 's/<[^>]*>//g' | sed -n '/Ação/,/var ZD_USER/p' |
+			sed -e '1d' -e '$d' -e '/^\s*$/d' -Ee 's/[a-z ]([A-Z0-9]+)$/\t\1/' |
+			column -et -s$'\t' -NNOME,SIMBOLO -TNOME
+	done
 }
 
 #nasdaq stock symbols
@@ -4542,11 +4452,11 @@ rate()
 	else 	case "${*}" in
 			-h|help|:help)
 				curl -s 'rate.sx/:help'
-				printf '\nusage: rate [from_currency] [to_currency] [@date|?T|..]\n' 
+				printf '\nusage: rate [from_currency] [to_currency] [@date|?T|..]\n'
 				return;;
 		esac
 	fi
-	curl -s "${2:-usd}.rate.sx/${1:-btc}${3}" | awk NF
+	curl -s "${2:-usd}.rate.sx/${1:-btc}${3}" | awk 'NF'
 }
 
 
@@ -4564,7 +4474,7 @@ gold()
 	esac
 }
 
-#oil brent 
+#oil brent
 brent()
 {
 	case "$1" in
@@ -4584,7 +4494,7 @@ brent()
 }
 alias brenty=brent
 
-#oil wti 
+#oil wti
 wti()
 {
 	case "$1" in
@@ -4605,16 +4515,16 @@ wti()
 
 #consumer price index
 cpi()
-{ 
+{
 	curl -sLb non-existing https://datahub.io/core/cpi/_r/-/data/cpi.csv
 }
 
 #world population
-wpop2()
-{ 
+wpop()
+{
 	curl -sL 'https://pkgstore.datahub.io/core/population-growth-estimates-and-projections/population-estimates_json/data/1d29be418daf875533c4bd4b5d0a5963/population-estimates_json.json' |
-		jq -r '.[]|"\(.Year)\t\(.Population)\t\(.Region)"' |
-		sort -t$'\t' -k3 |column -ets$'\t' -NYEAR,POPULATION,REGION
+	jq -r '.[]|"\(.Year)\t\(.Population)\t\(.Region)"' |
+	sort -t$'\t' -k3 | column -ets$'\t' -NYEAR,POPULATION,REGION
 }
 
 
@@ -4649,10 +4559,6 @@ btcsupply()
 #alias pacr='pkg uninstall'
 #alias s='pkg search'
 #alias vim=nvim
-#
-#
-#alias cointop='TERM=screen-256color cointop'
-##https://github.com/cointop-sh/cointop/issues/315
 #
 #clip() { termux-clipboard-set "$@" ;}
 #upchat() { cd ~/www/shellchatgpt; gres; cd - ;}

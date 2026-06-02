@@ -66,7 +66,7 @@ fi
 
 
 # start some nice programs
-if [ -d /etc/X11/xinit/xinitrc.d ] ; then 
+if [ -d /etc/X11/xinit/xinitrc.d ] ; then
 	for f in /etc/X11/xinit/xinitrc.d/?*.sh ; do
 		[ -x "$f" ] && . "$f"
 	done
@@ -91,17 +91,17 @@ xbindkeys
 #if you want to run Xfce4 from .xinitrc, only use »startxfce4 --with-ck-
 #launch« (only on non-systemd systems). »startxfce4« itself starts dbus
 #and (if advised and not already running) consolkit in a proper way.
-#»ck-launch-session dbus-launch …« tend to break session stuff and is wrong. 
+#»ck-launch-session dbus-launch …« tend to break session stuff and is wrong.
 #http://xfce.10915.n7.nabble.com/startxfce4-and-ck-launch-td50149.html
 #
-#xfce4 and graphical-session.target 
+#xfce4 and graphical-session.target
 #!# currently managed by xfce4 session startup!
 #systemctl --user start xfce-session.target
 #stop must be set with xfce4 session startup manager!
 #https://gitlab.xfce.org/xfce/xfce4-session/-/issues/213
 #https://github.com/i3/i3/issues/5186
 
-#import environment to systemd 
+#import environment to systemd
 #manual hook to be able to run services at login:
 #systemctl --no-block --user start xsession.target
 #https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg

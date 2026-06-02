@@ -2,6 +2,7 @@
 # ~/.inputrc
 # config for readline
 
+
 #bind options for one session: bind 'set enable-bracketed-paste on'
 #defaults: C-x C-r is bound to 're-read-init-file'
 
@@ -24,7 +25,7 @@
 #"\C-n" is actually defaults binding for 'next char'
 #https://www.youtube.com/watch?v=MxRTh8wlmJk
 
-#history search to match current input 
+#history search to match current input
 #up arrow key
 "\e[A": history-search-backward
 # Down Arrow key
@@ -44,7 +45,7 @@
 #https://github.com/brito/dotfiles/blob/master/.inputrc
 
 
-#history code attempts to place the point (the current cursor position) at the 
+#history code attempts to place the point (the current cursor position) at the
 #same location on each history line retrieved with previous-history or next-history
 set history-preserve-point On
 
@@ -120,7 +121,7 @@ set enable-bracketed-paste On
 #set horizontal-scroll-mode On
 
 #visible bell
-#set bell-style visible 
+#set bell-style visible
 
 # If there are more than 200 possible completions for a word, ask to show them all
 #set completion-query-items 200
@@ -147,8 +148,8 @@ set enable-bracketed-paste On
 
 #resources
 
-#note: show what characters have a special meaning to the terminal with 'stty -a' 
-#note: 'ctrl+\' (backslash) is one of the control characters that cause the 
+#note: show what characters have a special meaning to the terminal with 'stty -a'
+#note: 'ctrl+\' (backslash) is one of the control characters that cause the
 #terminal to send a signal (SIGQUIT), like ctrl+c (SIGINT) and Ctrl+Z (SIGTSTP)
 #https://unix.stackexchange.com/questions/220448/bind-ctrl-in-inputrc
 

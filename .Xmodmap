@@ -7,7 +7,7 @@ clear Lock
 !modify <caps lock> to <esc>
 !keycode 66 = Escape NoSymbol Escape
 
-!keycode 77 = VoidSymbol NoSymbol Num_Lock 
+!keycode 77 = VoidSymbol NoSymbol Num_Lock
 
 !defaults
 !keycode   9 = Escape NoSymbol Escape
@@ -29,9 +29,9 @@ clear Lock
 !xmodmap -pp
 !xev -event button
 !
-!xinput list             
+!xinput list
 !xinput query-state 11
-!xinput get-button-map 11                                
+!xinput get-button-map 11
 !xmodmap -e "pointer = 1 2 3 4 5 6 7 8 9 10"
 !xinput set-button-map 10 1 2 3 4 5 6 7 1 9 10
 !

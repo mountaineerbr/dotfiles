@@ -1,5 +1,5 @@
 #env
-LESS = --IGNORE-CASE --SEARCH-SKIP-SCREEN --jump-target=5 --LONG-PROMPT --hilite-unread --no-init --RAW-CONTROL-CHARS --mouse --wheel-lines=4
+LESS = --IGNORE-CASE --SEARCH-SKIP-SCREEN --jump-target=5 --LONG-PROMPT --hilite-unread --no-init --RAW-CONTROL-CHARS --mouse --wheel-lines=4 --shift=1 --window=-2
 
 VISUAL = vim
 

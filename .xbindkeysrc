@@ -2,10 +2,8 @@
 # ~/.xbindkeysrc
 #
 
-#xinit loads this
-
-#reload:
-#killall -s1 xbindkeys
+#xinit loads this file!
+#reload: killall -s1 xbindkeys
 #start xbindkeys daemon
 #xbindkeys -f ~/.xbindkeysrc
 
@@ -16,6 +14,7 @@
 #   Mod3 (CapsLock), Mod4, Mod5 (Scroll).
 
 #start 'xev' and press to get key code and name
+
 
 #xf86 keys 
 "uxterm -e /usr/bin/vifm"
@@ -156,6 +155,34 @@ Mod2+Mod4 + r
 #xfce4-term
 "/usr/bin/xfce4-terminal"
  Mod2+Mod4 + x
+
+##reload bt speaker config
+#"$HOME/bin/bt-charge3-fix.sh"
+# Mod2+Mod4 + b
+
+#close all windows of the same app
+"$HOME/bin/window-close-all-same.sh"
+ Mod2+Mod4 + w
+
+#minimise all windows of the same app
+"$HOME/bin/window-minimise-all-same.sh"
+ Mod2+Mod4 + Alt + q
+
+#un-minimise all windows of the same app
+"$HOME/bin/window-un-minimise-all-same.sh"
+ Mod2+Mod4 + Shift + q
+
+"$HOME/bin/window-un-minimise-all-same.sh"
+ Mod2+Mod4 + Control + q
+
+# close all same on middle-button mouse click
+"$HOME/bin/window-close-all-same.sh"
+ Mod2+Mod4 + Control + b:2 + Release
+
+# minimise all same middle-button mouse click
+"$HOME/bin/window-minimise-all-same.sh"
+ Mod2+Mod4 + Alt + b:2 + Release
+
 
 #window sizes
 #normal windows

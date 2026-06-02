@@ -23,7 +23,7 @@ for dir in  \
 	"$HOME/bin/more" \
 	"$HOME/bin/markets" \
 	"$HOME/bin" \
-	"." 
+	"."
 do
 	if [[ -d $dir ]] && [[ :$PATH: != *:${dir:-x}:* ]]
 	then 	PATH=$dir:$PATH
@@ -104,7 +104,7 @@ export GTK_OVERLAY_SCROLLING=0
 
 #make sure user locale is loaded (depends on user settings)
 #I don't know of programs that will use ~/.config/locale.conf.
-#Most (if not all) Linux/glibc programs use the LANG and LC_* environment 
+#Most (if not all) Linux/glibc programs use the LANG and LC_* environment
 #variables. So to have a working locale in your environment, you have to know
 #how unix environment variables are inherited and from where in your case.
 #unset LANG && source /etc/profile.d/locale.sh
@@ -125,7 +125,7 @@ export GTK_OVERLAY_SCROLLING=0
 
 #xdg base directory specification
 #export XDG_CONFIG_HOME=$HOME/.config
-#export XDG_CACHE_HOME=$HOME/.cache 
+#export XDG_CACHE_HOME=$HOME/.cache
 #export XDG_DATA_HOME =$HOME/.local/share
 #more in ~/.config/user-dirs.dirs
 #xdg-user-dir TEMPLATES
@@ -220,7 +220,7 @@ then
 	##setfont ter-u18n -m 8859-2
 	##already set console font in /etc/vconsole.conf,
 	##see https://wiki.archlinux.org/title/Linux_console#Fonts
-	
+
 	#cursors for linux tty
 	#normal blinking underline:
 	#{ echo -e '\033[?2c';}
@@ -232,7 +232,7 @@ then
 	echo -e "\e[?16;0;74c"
 	#is it possible that hardware has got default cursor colour?
 	#https://linuxgazette.net/137/anonymous.html
-	#VGA-softcursor.txt 
+	#VGA-softcursor.txt
 	#http://fxr.watson.org/fxr/source/Documentation/VGA-softcursor.txt?v=linux-2.4.22
 	#as per reference, you may find crazy combinations (hardware-specific and unpredictable results)
 

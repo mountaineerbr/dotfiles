@@ -2,37 +2,15 @@
 # mountaineerbr
 
 
-[[ -e ~/.rc ]] && . ~/.rc
-
+#editing mode
 set -o emacs
-
 set -o multiline
-
-PS1='$? ${HOSTNAME}:${PWD##*/} % '
-
-
-##Set in /etc/environment or /etc/profile
-##ENV is .kshrc only when the shell is invoked in an interactive context,
-##and empty for a script, thanks to the array indexing based on the value of $-.
-#ENVFILE=$HOME/.kshrc
-#export ENVFILE
-#ENV='${ENVFILE[(_=1)+(_$-=0)-_${-%%*i*}]}'
-#export ENV
-##https://groups.google.com/g/comp.unix.shell/c/m7mY8fp69Fc
-
-
-# /etc/skel
-# This file contains examples of some of the things you may want to
-# include in a user startup file.
 
 # Set the shell options
 set -o emacs -o notify -o globstar
 [[ -o nobackslashctrl ]] && set -o nobackslashctrl
 [[ -o globcasedetect ]] && set -o globcasedetect
 #[[ -o noarrowkeysearch ]] && set -o noarrowkeysearch
-
-# Specify search path for autoloadable functions
-FPATH=/usr/share/ksh/functions:~/.func
 
 # Optional: Autoload functions installed with ksh
 #autoload autocd
@@ -50,6 +28,34 @@ FPATH=/usr/share/ksh/functions:~/.func
 # Save more commands in history
 HISTSIZE=2000
 #HISTEDIT=$EDITOR
+
+# Specify search path for autoloadable functions
+FPATH=/usr/share/ksh/functions:~/.func
+
+# Set in /etc/environment or /etc/profile
+# ENV is .kshrc only when the shell is invoked in an interactive context,
+# and empty for a script, thanks to the array indexing based on the value of $-.
+#   ENVFILE=$HOME/.kshrc
+#   export ENVFILE
+#   ENV='${ENVFILE[(_=1)+(_$-=0)-_${-%%*i*}]}'
+#   export ENV
+# https://groups.google.com/g/comp.unix.shell/c/m7mY8fp69Fc
+
+#keybd_trap () {
+#  case ${.sh.edchar} in
+#    $'\f')    .sh.edchar=$'\e\f';;  # clear-screen
+#    $'\e[1~') .sh.edchar=$'\001';;  # Home = beginning-of-line
+#    $'\e[4~') .sh.edchar=$'\005';;  # End = end-of-line
+#    $'\e[5~') .sh.edchar=$'\e>';;   # PgUp = history-previous
+#    $'\e[6~') .sh.edchar=$'\e<';;   # PgDn = history-next
+#    $'\e[3~') .sh.edchar=$'\004';;  # Delete = delete-char
+#  esac
+#}
+#trap keybd_trap KEYBD
+
+
+# Primary Prompt Tweaks
+PS1='$? ${HOSTNAME}:${PWD##*/} % '
 
 ## Remove the problematic default 'r' alias (this is only
 ## done when it's safe, as old versions of ksh can crash
@@ -109,3 +115,8 @@ fi
 #
 #	return $ret
 #}
+
+
+#sources
+[[ -e ~/.rc ]] && . ~/.rc
+

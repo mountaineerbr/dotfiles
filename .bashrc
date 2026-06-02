@@ -1,6 +1,6 @@
 #
 # ~/.bashrc
-# 2026-March  by mountaineerbr
+# 2026-June  by mountaineerbr
 #                         _        _                      ___      
 # ._ _ _  ___  _ _ ._ _ _| |_ ___ <_>._ _  ___  ___  _ _ | . > _ _ 
 # | ' ' |/ . \| | || ' | | | <_> || || ' |/ ._>/ ._>| '_>| . \| '_>
@@ -315,7 +315,7 @@ semaphore()
 # export ZZPATH="$HOME/bin/more/funcoeszz/funcoeszz"  # script
 # export ZZDIR="$HOME/bin/more/funcoeszz/zz"    # pasta zz/
 # #source "$ZZPATH"
-# 
+#
 # #ligar funcoezz
 # alias ZZ='source "'"$ZZPATH"'"'
 

@@ -7,12 +7,12 @@ exec /usr/bin/Xorg -nolisten tcp "$@" vt$XDG_VTNR
 #or if #xserverrc is configured:
 #$ xinit -- :1
 #
-#in order to maintain an authenticated session with logind and to prevent 
-#bypassing the screen locker by switching terminals, xorg has to be started 
-#on the same virtual terminal where the login occurred. therefore it is 
+#in order to maintain an authenticated session with logind and to prevent
+#bypassing the screen locker by switching terminals, xorg has to be started
+#on the same virtual terminal where the login occurred. therefore it is
 #recommended to specify vt$XDG_VTNR
 #
-#note: to re-enable redirection of the output from x session into the xorg 
+#note: to re-enable redirection of the output from x session into the xorg
 #log file, add -keeptty . see xorg#session log redirection for details.
 #https://wiki.archlinux.org/index.php/Xinit
 #

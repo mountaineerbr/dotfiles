@@ -2,7 +2,9 @@
 GRUB_DEFAULT=saved
 GRUB_TIMEOUT=1
 GRUB_DISTRIBUTOR="Arch"
-GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 sysrq_always_enabled=true module_blacklist=pcspkr,snd_pcsp i915.enable_guc=2 nvidia_drm.modeset=1 ipv6.disable=1 mitigations=off"
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 sysrq_always_enabled=true module_blacklist=pcspkr,snd_pcsp ipv6.disable=1 mitigations=off nvidia_drm.modeset=1 i915.enable_dc=0 intel_idle.max_cstate=1"
+#i915.enable_guc=2  #bad on skylake
+
 #intremap=no_x2apic_optout
 #AMD ATI Radeon HD 7730M - sourthern island
 # radeon.si_support=0 amdgpu.si_support=1
