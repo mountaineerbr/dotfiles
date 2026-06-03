@@ -1,6 +1,6 @@
 # ~/.rc
 # shell functions
-# 2026-June  by mountaineerbr
+# 2026-June-03  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 #                        __       _                  ___
 #  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
@@ -2353,30 +2353,33 @@ moonbrt()
 {
 	python -c "
 import sys
-import numpy as np
 from astropy.time import Time
-from astropy.coordinates import get_body, solar_system_ephemeris
+from astropy.coordinates import get_body_barycentric, solar_system_ephemeris
 
 if len(sys.argv) > 1 and sys.argv[1].strip():
-    t = Time(sys.argv[1])
+    t = Time(sys.argv[1], scale='utc')
 else:
     t = Time.now()
 
-#with solar_system_ephemeris.set('jpl'):     #7-8 reliable decimals
-with solar_system_ephemeris.set('builtin'):  #4-5 reliable decimals
-    moon = get_body('moon', t)
-    sun  = get_body('sun',  t)
+#with solar_system_ephemeris.set('jpl'):      #JPL ephemeris, try de440s
+with solar_system_ephemeris.set('builtin'):   #compact builtin ephemeris
+    earth = get_body_barycentric('earth', t)
+    moon  = get_body_barycentric('moon',  t)
+    sun   = get_body_barycentric('sun',   t)
 
-elong  = sun.separation(moon).rad
-d_sun  = sun.distance
-d_moon = moon.distance
+sun_from_moon   = sun   - moon
+earth_from_moon = earth - moon
 
-phase_angle = np.arctan2(d_sun * np.sin(elong), d_moon - d_sun * np.cos(elong))
-frac        = (1 + np.cos(phase_angle)) / 2
+cos_phase = (
+    sun_from_moon.dot(earth_from_moon)
+    / (sun_from_moon.norm() * earth_from_moon.norm())
+).decompose().value
 
-#print(f'{float(frac):.6f}')      #fractional illumination (0–1)
-print(f'{float(frac)*100:.4f}%')  #percentage with 4 decimals, e.g. 98.3247%
-	" "$@";
+cos_phase = max(-1.0, min(1.0, float(cos_phase)))
+frac = 0.5 * (1.0 + cos_phase)
+
+print(f'{frac*100:.4f}%')
+	" "${*}"
 }
 #https://ssd.jpl.nasa.gov/horizons/
 
