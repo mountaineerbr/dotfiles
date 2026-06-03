@@ -2352,26 +2352,30 @@ moonphase()
 moonbrt()
 {
 	python -c "
-	from astropy.time import Time
-	from astropy.coordinates import get_body, solar_system_ephemeris
-	import numpy as np
-	import sys
-	
-	if len(sys.argv) > 1 and sys.argv[1].strip():
-	    t = Time(sys.argv[1])
-	else:
-	    t = Time.now()
-	
-	#with solar_system_ephemeris.set('jpl'):     #7-8 reliable decimals
-	with solar_system_ephemeris.set('builtin'):  #4-5 reliable decimals
-	    moon = get_body('moon', t)
-	    sun  = get_body('sun',  t)
-	
-	elong = sun.separation(moon).deg
-	frac  = (1 - np.cos(np.deg2rad(elong))) / 2
-	
-	#print(f'{frac:.6f}')      #fractional illumination (0–1)
-	print(f'{frac*100:.4f}%')  #percentage with 4 decimals, e.g. 98.3247%
+import sys
+import numpy as np
+from astropy.time import Time
+from astropy.coordinates import get_body, solar_system_ephemeris
+
+if len(sys.argv) > 1 and sys.argv[1].strip():
+    t = Time(sys.argv[1])
+else:
+    t = Time.now()
+
+#with solar_system_ephemeris.set('jpl'):     #7-8 reliable decimals
+with solar_system_ephemeris.set('builtin'):  #4-5 reliable decimals
+    moon = get_body('moon', t)
+    sun  = get_body('sun',  t)
+
+elong  = sun.separation(moon).rad
+d_sun  = sun.distance
+d_moon = moon.distance
+
+phase_angle = np.arctan2(d_sun * np.sin(elong), d_moon - d_sun * np.cos(elong))
+frac        = (1 + np.cos(phase_angle)) / 2
+
+#print(f'{float(frac):.6f}')      #fractional illumination (0–1)
+print(f'{float(frac)*100:.4f}%')  #percentage with 4 decimals, e.g. 98.3247%
 	" "$@";
 }
 #https://ssd.jpl.nasa.gov/horizons/
@@ -2658,7 +2662,7 @@ xpointer()
 		xinput list | grep -q "Auxiliary pointer" \
 		|| xinput create-master Auxiliary
 
-		#check system device ids!
+		## Check system device ids!
 		#xinput reattach 6 "Auxiliary pointer" \
 		#&& xinput reattach 26 "Auxiliary keyboard" \
 		#&& xinput reattach 28 "Auxiliary keyboard" \
