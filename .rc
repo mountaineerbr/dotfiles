@@ -1,6 +1,6 @@
 # ~/.rc
 # shell functions
-# 2026-July  by mountaineerbr
+# 2026-Aug  by mountaineerbr
 # https://github.com/mountaineerbr/dotfiles
 #                        __       _                  ___
 #  __ _  ___  __ _____  / /____ _(_)__  ___ ___ ____/ _ )____
@@ -10,7 +10,7 @@
 # This file is sourced by ~/.bashrc, ~/.kshrc, and ~/.zshrc
 
 #set xterm font
-#{ echo -e "\e]50;-xos4-terminus-medium-r-*--18-*-*-*-*-*-*-*\a" ;}
+#{ printf "\e]50;-xos4-terminus-medium-r-*--18-*-*-*-*-*-*-*\a" ;}
 
 #welcome message
 [[ -e ~/bin/welcome_message.sh ]] && . ~/bin/welcome_message.sh
@@ -185,8 +185,8 @@ zultra()
 
 }
 
-#bigger font for terminal
-alias bigger='echo "setfont iso02-12x22" ;setfont iso02-12x2'
+#bigger font for TTY terminal
+alias bigger='setfont iso02-12x22'
 
 #font list
 alias fontlist='fc-list | col | sort | less'
@@ -195,11 +195,6 @@ alias fontlist='fc-list | col | sort | less'
 #check which fonts have got some (unicode) characters:
 #{ fc-list :charset=A4B0,A4B1 }
 
-#alias cp="cp -i" # confirm before overwriting something
-alias df='df -h'  # human-readable sizes
-#alias free='free -m' # show sizes in MB
-#alias np='nano -w PKGBUILD'
-
 #safeguards for common operations
 #removing files: set -I to interactively ask once
 alias rm='rm --interactive=always'
@@ -207,6 +202,10 @@ alias rm='rm --interactive=always'
 alias cp='cp -v --interactive'
 #moving
 alias mv='mv --interactive'
+
+alias df='df -h'  # human-readable sizes
+#alias free='free -m' # show sizes in MB
+#alias np='nano -w PKGBUILD'
 
 #grep cmds
 #colorise grep (useful for retrieving logs)
@@ -231,8 +230,10 @@ alias ll='ls++ --potsf'
 #alias ls='ls -F'
 alias lsd='command ls -lsd'
 
-pl() { 	printf '%s\n' "$@" ;}
-p() { 	printf '%s\n' "$*" ;}
+#print args as list
+pl() { 	printf '%s\n' "${@}" ;}
+#print args in single line
+p() { 	printf '%s\n' "${*}" ;}
 
 #alias j='jobs -l'
 #alias pu=pushd
@@ -305,7 +306,7 @@ sanitize()
 #run gpg and (un)archive files/dirs
 gar()
 {
-	#decrypt (sigle file)
+	#decrypt (single file)
 	if [[ "$1" = *.tar.gpg* ]]
 	then 	gpg -d -- "$1" | tar xk
 	#encrypt (multiple files)
@@ -359,7 +360,7 @@ htmlfilter()
 		w3m)    w3m -dump -T text/html ${@:2} ;;
 		elinks) elinks -force-html -dump -no-references ${@:2} ;;
 		links)  links -force-html -dump ${@:2} ;;
-		lynx)   lynx -force_html -dump -nolist $([[ -t 0 ]] || echo -stdin) ${@:2} ;;
+		lynx)   lynx -force_html -dump -nolist $([[ -t 0 ]] || printf '%s' '-stdin') ${@:2} ;;
 		sed)    sed '/</{ :loop ;s/<[^<]*>//g ;/</{ N ;b loop } }' ${@:2} ;;
 		*)      htmlfilter w3m "$@" ;;
 	esac
@@ -382,7 +383,7 @@ chf()
 #If a line ends with a backslash append the next line to it.
 #alias unbackslash="sed ':loop ;/\\$/N ;s/\\\n */ / ;t loop'"
 
-#Commify a numeric strings
+#Commify numeric strings
 alias commify="sed ':loop ;s/\(.*[0-9]\)\([0-9]\{3\}\)/\1,\2/; t loop'"
 
 #Replace every leading space of a line with ‘+’
@@ -460,7 +461,7 @@ bsd13halt()
 	#resume or pause or poweroff
 }
 #https://www.techrepublic.com/article/how-to-run-virtualbox-virtual-machines-from-the-command-line/
-#check runnign VMs: { VBoxManage list runningvms ;}
+#check running VMs: { VBoxManage list runningvms ;}
 
 #parse sitemap.xml
 #{ sed 's|<loc>\(.*\)<\/loc>$|\1|g' ;}
@@ -628,11 +629,14 @@ alias ku='sudo pkill -15 -u'
 #check battery level on arch linux
 batt()
 {
-        X=$( < /sys/class/power_supply/BAT0/charge_now )
-        Y=$( < /sys/class/power_supply/BAT0/charge_full )
-        python2 -c "z=$X/$Y.; print('%.2f' % z)"
-
-	acpi -bi
+	local X Y pct_int pct_dec
+	X=$(< /sys/class/power_supply/BAT0/charge_now ) || return
+	Y=$(< /sys/class/power_supply/BAT0/charge_full ) || return
+	pct_int=$(( X * 100 / Y ))
+	pct_dec=$(( (X * 10000 / Y) % 100 ))
+	printf "%d.%02d%%\n" "$pct_int" "$pct_dec"
+	
+	acpi -bi 2>/dev/null
 }
 #from the real plato's sober october arch tips
 #https://therealplato.com/posts/soberoctober07/
@@ -653,16 +657,16 @@ vf()
 {
 	local recfile="$HOME/.config/vifm/vifmcd.txt"
 	VIFMSET=1 command vifm --choose-dir "$recfile" "$@"
-	echo -e "\aPWD: $PWD"
+	printf 'PWD: %s\a\n' "$PWD"
 }
-((VIFMSET)) && echo -e \\aYou are within VIFM! >&2
+((VIFMSET)) && printf 'You are within VIFM!\a\n' >&2
 
 #cd to last visited dir in Vifm
 vfcd()
 {
 	local recfile="$HOME/.config/vifm/vifmcd.txt"
 	cd "$(<"$recfile")" || return
-	echo -e "\aPWD: $PWD"
+	printf 'PWD: %s\a\n' "$PWD"
 }
 #see another idea from:
 #https://wiki.vifm.info/index.php?title=How_to_set_shell_working_directory_after_leaving_Vifm
@@ -676,7 +680,7 @@ vifmh()
 }
 
 #alias vimdiff='vimdiff -o "+colorscheme default" "+syntax off" "+set t_Co=16"'
-# Ref vimdiff colurs: https://stackoverflow.com/questions/2019281/load-different-colorscheme-when-using-vimdiff
+# Ref vimdiff colours: https://stackoverflow.com/questions/2019281/load-different-colorscheme-when-using-vimdiff
 alias diff='/usr/bin/diff -W$(tput cols) -y --suppress-common-lines'
 #https://www.reddit.com/r/git/comments/6mnnag/view_modified_files_in_the_last_n_commits_in_git/
 
@@ -750,6 +754,7 @@ trash()
 
 	for file
 	do 	file="${file%%/}" name="${file##*/}";
+		[[ -n "$file" ]] || continue
 
 		if [[ -e $trash/$name ]]
 		then
@@ -882,7 +887,7 @@ gaddr()
 #This will automatically preserve the aspect ratio of the image too.
 thumblr()
 {
-	local f size
+	local file size
 	[[ ${size:=$1} = [0-9Xx]*[!a-wyzA-WYZ] ]] && shift || size=200x150
 	for file in "$@"
 	do 	convert "$file" -resize $size\> "${file%.*}_thumb.${file##*.}"
@@ -1040,7 +1045,7 @@ gd()
 		curl -fL\# "$url"
 	else 	#otherwise, copy to stderr for conference
 		curl -fL\# "$url" | tee /dev/stderr
-		echo -e '\a\ngd.func: copy sent to stderr' >&2
+		printf '\ngd.func: copy sent to stderr\a\n' >&2
 	fi
 	echo "$url" >&2
 }
@@ -1063,9 +1068,9 @@ gk()
 
 	#use func gd() to download file from repo
 	gd "$@" | if [[ -e "$file" ]]
-		then 	#$file is at current local dir
+		then 	#file is at current local dir
 			tee >(cksum -- - "$file" >&2)
-		else 	#$file is down local dir hierarch
+		else 	#file is down local dir hierarchy
 			tee >(cksum -- - **/"$file" >&2 2>/dev/null)
 		fi
 )
@@ -1085,7 +1090,7 @@ slurm()
 {
 	/bin/slurm -i "$( iw dev | awk '/Interface/ {print $2}' )"
 }
-#alias slurm="/bin/slurm -i enp3s0"
+#see also: nethogs
 
 #last log-ins
 alias lastl='last | head -5 | tr -s " "'
@@ -1094,7 +1099,8 @@ countl()
 {
 	local user
 	for user in /home/*
-	do 	echo -ne "$user\t"
+	do 	user=${user##*/}
+		printf '%s\t' "$user"
 		last "$user" | wc -l
 	done
 }
@@ -1187,7 +1193,7 @@ upchat()
 }
 upchataur()
 {
-	local dir source ver commit
+	local dir source ver commit pkgrel latest
 	dir=$HOME/www/aur-chatgpt.sh
 	source=$HOME/www/lab-shellchatgpt
 
@@ -1320,7 +1326,7 @@ clip()
 	else 	xsel -b
 	fi
 }
-#to use with GNU Screen: 1.Copy buffer (Ctrl+a [); 2. entre this function; 3. Paste (Ctrl+a ]); 4. Ctrl+d
+#to use with GNU Screen: 1.Copy buffer (Ctrl+a [); 2. enter this function; 3. Paste (Ctrl+a ]); 4. Ctrl+d
 #https://stackoverflow.com/questions/16111548/how-to-copy-the-gnu-screen-copy-buffer-to-the-clipboard
 
 #selection buffer monitors
@@ -1328,9 +1334,9 @@ clip()
 clipboard()
 {
 	while :
-	do 	echo -ne "\n${Purple}PRIMARY__:$NC "
+	do 	printf "\n${Purple}PRIMARY__:${NC} "
 		xsel -p -o
-		echo -ne "\n${Blue}CLIPBOARD:$NC "
+		printf "\n${Blue}CLIPBOARD:${NC} "
 		xsel -b -o
 		sleep 1
 	done
@@ -1339,9 +1345,9 @@ clipboard()
 clipboard2()
 {
 	while :
-	do 	echo -ne "\n${Purple}PRIMARY__:$NC "
+	do 	printf "\n${Purple}PRIMARY__:${NC} "
 		xclip -o -sel p
-		echo -ne "\n${Blue}CLIPBOARD:$NC "
+		printf "\n${Blue}CLIPBOARD:${NC} "
 		xclip -o -sel c
 		sleep 1
 	done
@@ -1416,7 +1422,7 @@ b()
 
 xtitle ()
 {
-	echo -n -e "\033]0;$*\007"
+	printf "\033]0;%s\007" "${*}"
 }
 #also see bashrc of gentoo and arch linux
 
@@ -1637,18 +1643,18 @@ mping()
 	sed -nE "/$q/ s|.*//([^/]*).*|\1|p" /etc/pacman.d/mirrorlist |
 		sort -u | tee >( echo "servs: $(wc -l)" ) |
 		while read
-		do 	p=$( ping -c 1 "$REPLY" | grep -o --color=always 'time=.*' | tee >(read x ;echo -e "$x\t$REPLY" >&2) )
+		do 	p=$( ping -c 1 "$REPLY" | grep -o --color=always 'time=.*' | tee >(read x ;printf "${x}\t${REPLY}\n" >&2) )
 			printf '%s\t%s\n----\n' "$p" "$REPLY"
 		done | sort -Vru
 }
 
 #yay -- aur
-#search in oficial repos and aur
+#search in official repos and aur
 alias s='yay -Ss'
 #skip validity checks, look for mflags
 #ex:yay -S package --mflags "--skipchecksums --skippgpcheck"
 
-#arch linux archieve explorer script
+#arch linux archive explorer script
 alias ala='~/bin/ala.sh'
 
 #get a PKGBUILD
@@ -1740,7 +1746,7 @@ hy3()
 #thesaurus
 
 #mythes
-#installed from oficial repos mythes-en
+#installed from official repos mythes-en
 th()
 {
 	sed -n "/^${1:-.*}|/,/^[a-z.]/ p" /usr/share/mythes/th_en_US_v2.dat \
@@ -2224,7 +2230,7 @@ alias sunspotsm_old='curlu https://www.sidc.be/SILSO/DATA/ARCHIVE/V1.0/monthssn.
 #curl 'https://services.swpc.noaa.gov/json/solar-cycle/sunspots.json' --compressed -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Accept-Language: en-GB,pt-BR;q=0.8,pt;q=0.6,en-US;q=0.4,en;q=0.2' -H 'Accept-Encoding: gzip, deflate, br' -H 'X-Requested-With: XMLHttpRequest' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Referer: https://services.swpc.noaa.gov/dynamic/solar_cycle_charts' -H 'Sec-Fetch-Dest: empty' -H 'Sec-Fetch-Mode: cors' -H 'Sec-Fetch-Site: same-origin' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' -H 'TE: trailers'
 #https://www.swpc.noaa.gov/products/solar-cycle-progression
 
-#get gps coordenates
+#get gps coordinates
 #usage: gpsf [location|coordinates]
 gps()
 {
@@ -2381,7 +2387,7 @@ def frac(ephem):
     return float(0.5 * (1.0 + np.cos(i)))
 
 try:
-    f = frac('de440s')   # JPL de440s: valid 1849--2150; de440: roughly 1550--2650
+    f = frac('de440s')   # JPL de440s: valid 1849--2150; de440: 1550--2650
 except Exception as e:
     print(f'DE440s unavailable: {e}. Using builtin.', file=sys.stderr)
     f = frac('builtin')
@@ -2422,7 +2428,7 @@ moon()
 #{ ip -brief link show ;}
 #{ ip a ;}
 
-#ip adresses
+#ip addresses
 myip()
 {
  	{  #wget -cq http://jsonip.com/ -O -
@@ -2452,7 +2458,7 @@ myip3()
 #alias localip="ipconfig getifaddr en0"
 #alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
 #https://github.com/mathiasbynens
-#also check pkg `geoip' and `geoip-database' from oficial repos
+#also check pkg `geoip' and `geoip-database' from official repos
 
 #get geo info from ip addr
 ipgeo()
@@ -2463,7 +2469,7 @@ ipgeo()
 #https://www.vivaolinux.com.br/topico/Shell-Script/SHELL-SCRIPT-45
 
 #wifi pass key list (passwords)
-#all conections, requires root access
+#all connections, requires root access
 psks()
 {
 	sudo su root -c "awk '/^(id|psk)=/' /etc/NetworkManager/system-connections/*"
@@ -2495,7 +2501,7 @@ upload()
 	fi
 }
 
-#url shortner
+#url shortener
 turl()
 {
 	curl -sL "http://tinyurl.com/api-create.php?url=$*"
@@ -2586,8 +2592,9 @@ colours()
 	for x in {9..1} ;do
 		for i in {30..37} ;do
 			for a in {40..47} ;do
-				echo -ne "\e[$x;$i;$a""m\\\e[$x;$i;$a""m\e[0;37;40m "
-			done ;echo
+				printf '\e[%d;%d;%dm\\e[%d;%d;%dm\e[0;37;40m ' "$x" "$i" "$a" "$x" "$i" "$a"
+			done
+			printf '\n'
 		done
 	done
 }
@@ -2792,7 +2799,7 @@ alias c='noglob _c'
 #whatsapp status format converter
 whats()
 {
-	ffmpeg -i "${1:-file required}" -c:v libx264 -profile:v main -level:v 4.0 -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart "${1%.*}.mp4"
+	ffmpeg -i "${1:?file required}" -c:v libx264 -profile:v main -level:v 4.0 -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart "${1%.*}.mp4"
 }
 
 #mount sshfs (phone)
@@ -2986,7 +2993,7 @@ _greek() {
 sed 'y/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/αβcδεφγηιθκλμνοπχρστυvωξψζΑΒCΔΕΦΓΗΙΘΚΛΜΝΟΠΧΡΣΤΥVΩΞΨΖ/'; }
 #https://bbs.archlinux.org/viewtopic.php?pid=2122857#p2122857
 
-#translte special chars (ex: "\xe7") to utf-8
+#translate special chars (ex: "\xe7") to utf-8
 #{ iconv -f iso-8859-1 -t utf-8 ;}
 #remove accents and
 #{ iconv -f utf-8 -t ascii//translit ;}
@@ -3000,9 +3007,9 @@ clr()
 
 #terminal escapes, clear line, clear screen
 #clear from the cursor position to the beginning of the line:
-#{ echo -e "\033[1K" ;}
+#{ printf "\033[1K" ;}
 #or everything on the line, regardless of cursor position:
-#{ echo -e "\033[2K" ;}
+#{ printf "\033[2K" ;}
 #https://unix.stackexchange.com/questions/26576/how-to-delete-line-with-echo
 #{ tput cuu1 && tput dl1 ;}
 #{ printf '\e[A\e[K' ;} # to move the cursor up one line and erase the line
@@ -3069,9 +3076,9 @@ toBase58()
 #{ strings -n 20 blk0000.dat ;}
 #https://bitcoin.stackexchange.com/questions/18/how-can-one-embed-custom-data-in-block-headers
 #transaction hex to ascii
-#{ echo -n "$hex" | xxd -p -r ;}
+#{ printf '%s' "$hex" | xxd -p -r ;}
 #transaction ascii to hex
-#{ echo -n "$str" | xxd -ps ;}
+#{ printf '%s' "$str" | xxd -ps ;}
 
 #see the actual bits of a file
 #{ xxd -b ;}
@@ -3156,7 +3163,7 @@ alias btcgrep4a="grep -E '\b(tb(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[a
 #https://stackoverflow.com/questions/21683680/regex-to-match-bitcoin-addresses/50391800#50391800
 
 
-#private keys (mainet and testnet)
+#private keys (mainnet and testnet)
 alias btcgrep5="grep -E '\b[59KLc][1-9A-HJ-NP-Za-km-z]{50,51}\b'"
 #word boundary: '\b'
 #https://bitcoin.stackexchange.com/questions/56737/how-can-i-find-a-bitcoin-private-key-that-i-saved-in-a-text-file
@@ -3203,21 +3210,21 @@ fire2()
 #reset terminal size to 80x24
 xtr()
 {
-	echo -e '\e[8;24;80t'
+	printf '\e[8;24;80t'
 }
 
 #reset font
 xtfr()
 {
-	echo -e "\e]50;#0\a"
+	printf "\e]50;#0\a"
 }
 
 #change font size and list terminus fonts
 xtfs()
 {
 	if [[ "$1" = [[:digit:]]* ]]
-	then 	echo -e "\e]50;-xos4-terminus-medium-r-*--${1}-*-*-*-*-*-*-*\a"
-	else 	echo -e "\e]50;${1}\a"
+	then 	printf "\e]50;-xos4-terminus-medium-r-*--${1}-*-*-*-*-*-*-*\a"
+	else 	printf "\e]50;${1}\a"
 	fi
 
 	xlsfonts | grep xos4 | grep medium
@@ -3293,13 +3300,13 @@ graphics()
 	lspci -vnnn | perl -lne 'print if /^\d+\:.+(\[\S+\:\S+\])/' | grep VGA
 }
 
-#bbwitch status
+#bbswitch status
 bb()
 {
 	cat /proc/acpi/bbswitch
 }
 
-#bbswicth status monitor
+#bbswitch status monitor
 bbm()
 {
 	printf 'BB Switch Monitor\n'
@@ -3491,7 +3498,7 @@ mandelbrot3()
 #{ du -Lsbc ;}
 
 #arch's 'wifi-menu' script ships with 'netctl' and doesn't need further wireless_tools
-#if you have got the 'network manager', then yse 'nmtui'
+#if you have got the 'network manager', then use 'nmtui'
 #https://www.vivaolinux.com.br/dica/Arch-Linux-Configurando-Wi-Fi-com-wifi-menu
 
 #comment inside a command
@@ -3556,9 +3563,10 @@ wfreq()
 #add box outside text
 border()
 {
+	local str bordas
 	str="| $1 |"
 	bordas=$(echo "$str" | sed 's/./-/g')
-	echo -e "$bordas\n$str\n$bordas"
+	printf "%s\n%s\n%s\n" "$bordas" "$str" "$bordas"
 }
 #https://www.vivaolinux.com.br/topico/Shell-Script/Texto-com-bordas-usando-Shell-Script
 
@@ -3986,15 +3994,15 @@ tmr()
 	[[ -z "$1" ]] || printf "max: %ss\n" $max ;trap break INT
 	while ((SECONDS<max))
 	do 	t=$SECONDS ;printf '\r%*d' 0 $t ;sleep 1
-	done ;printf '\a\n%dh ~ %dm ~ %ds\n' $((t/3600)) $((t/60)) $t
+	done ;printf '\n%dh ~ %dm ~ %ds\a\n' $((t/3600)) $((t/60)) $t
 )
 
-#get relatove date (now -1 hour)
+#get relative date (now -1 hour)
 #sqlite3 /dev/null <<<'SELECT strftime("%m/%d/%Y-%H:%M:%S", "now", "-1 hour")'
 #https://community.unix.com/t/generating-dates-with-bash/381693/2
 
 #useful logs
-#how all messages from this boot:
+#show all messages from this boot:
 #{ less /var/log/Xorg.0.log ;}
 #{ journalctl -b ;}
 #{ journalctl --since "20 min ago" ;}
@@ -4053,7 +4061,7 @@ trimf()
 #{ read -r foo <<<"$foo" ;}  #from usenet
 #{ read -r -d$'\04' foo <<<"$foo" ;}
 
-#trim traling zeroes with sed
+#trim trailing zeroes with sed
 #{ sed '/\./ s/\.\{0,1\}0\{1,\}$//' ;}
 
 #tip: sed `//d' removes last expression
@@ -4169,8 +4177,7 @@ mail()
 	fi
 	subj="$subj ${text:0:100}" subj="${subj//[$IFS]/ }" subj="${subj:0:50}"
 	echo $size B \| $((size/(2**10) )) KB \| $((size/(2**20) )) MB $'\n'${EMAIL:?environment: address required} - $subj
-	mutt -s "$subj" "$@" $EMAIL <<<"$text" >/dev/null 2>&1 &
-	#echo pid=$! >&2;
+	mutt -s "$subj" "$@" $EMAIL <<<"$text"
 }
 #also see: xdg-email
 
@@ -4209,7 +4216,7 @@ alias mop='go run ~/go/src/github.com/mop-tracker/mop/cmd/mop/main.go'
 ############### FINANCIAL MARKETS ################
 ##################################################
 
-#loss/gain reciprocal or symetrical ratio
+#loss/gain reciprocal or symmetrical ratio
 #usage: loss [+|-]VAL[%] [SCALE]
 #usage: VAL is an integer. Negative values are read as gains.
 loss()
@@ -4236,7 +4243,7 @@ loss()
 tesouro()
 {
 	local data
-	data=$(curlu --compressed --insecure 'https://www.tesourodireto.com.br/o/rentabilidade/investir' --compressed -L -H "$UAG" \
+	data=$(curlu --compressed --insecure 'https://www.tesourodireto.com.br/o/rentabilidade/investir' -L -H "$UAG" \
 	-H 'Referer: https://www.tesourodireto.com.br/produtos/dados-sobre-titulos/rendimento-dos-titulos')
 
         jq -r '(.TesouroLegado + .Tesouro24x7)[] |
@@ -4576,7 +4583,12 @@ btcsupply()
 #alias pacr='pkg uninstall'
 #alias s='pkg search'
 #alias vim=nvim
+#alias ip=ifconfig
+#alias ecit=exit
+#alias ezit=exit
 #
 #clip() { termux-clipboard-set "$@" ;}
 #upchat() { cd ~/www/shellchatgpt; gres; cd - ;}
 
+
+# vim:syntax=sh filetype=sh
